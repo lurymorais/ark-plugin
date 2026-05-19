@@ -2,8 +2,7 @@
 /**
  * @file plugins/pubIds/ark/resolver.php
  * 
- * ARK Resolver - Plugin embutido
- * Versão simplificada que NÃO requer o bootstrap do OJS
+ * ARK Resolver
  * 
  * @copyright (c) 2026 Lury Morais
  * @license GNU GPL v2
