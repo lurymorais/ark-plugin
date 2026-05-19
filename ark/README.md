@@ -5,7 +5,7 @@
 ## Features
 
 - Generate ARK identifiers only for **Articles**
-- Format: `ark:NAAN/CUSTOMxxxx-yyyy` (e.g., `ark/CRL5432-ABCD`)
+- Format: `ark:NAAN/CUSTOMxxxx-yyyy` (e.g., `ark:16081/CRL5432-ABCD`)
 - Configurable ARK prefix (2-40 chars)
 - Configurable custom suffix prefix (2-6 uppercase letters)
 - Automatic duplicate detection and prevention
@@ -32,7 +32,7 @@
 | Custom Suffix Prefix | `CRL` |
 | Resolver URL | `https://n2t.net/` |
 
-Resulting ARK: `ark:16081/CRL6522-QVWX`
+Resulting ARK: `https://n2t.net/ark:16081/CRL6522-QVWX`
 
 ## NAAN Registration (n2t.net)
 
