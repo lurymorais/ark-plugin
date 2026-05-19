@@ -86,12 +86,18 @@ try {
     }
     
     if (!$resultado) {
+        // Calcula a URL base do site
+        $baseUrl = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+        $baseUrl = str_replace('/plugins/pubIds/ark', '', $baseUrl);
+        $siteUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$baseUrl";
+        
         http_response_code(404);
         echo '<!DOCTYPE html><html><head><title>ARK Not Found</title></head>';
         echo '<body style="font-family: sans-serif; padding: 20px;">';
         echo '<h1>ARK Not Found</h1>';
         echo '<p>O identificador <strong>' . htmlspecialchars($arkSuffix) . '</strong> não foi encontrado.</p>';
-        echo '<hr><small>ARK Resolver Plugin v1.0</small>';
+        echo '<hr><small>ARK Resolver Plugin v1.0</small><br><br>';
+        echo '<a href="' . htmlspecialchars($siteUrl) . '">Homepage</a>';
         echo '</body></html>';
         exit;
     }
