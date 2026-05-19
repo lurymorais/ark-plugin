@@ -1,4 +1,105 @@
-This plugin is based on the pkp-ark-pubId plugin created by Yasiel Pérez Vera (c) 2021. All credit goes to the original author; I only updated it to the reported version with the little knowledge I have :)
+# ARK Plugin for OJS 3.5.x
 
-Este plugin foi baseado no plugin pkp-ark-pubId criado por Yasiel Pérez Vera (c) 2021.
-Todos os créditos ao primeiro autor, eu apenas atualizei para a versão informada com o pouco que sei :)
+**Archival Resource Key (ARK) plugin for Open Journal Systems 3.5.x**
+
+## Features
+
+- Generate ARK identifiers only for **Articles**
+- Format: `PREFIX/CUSTOMxxxx-yyyy` (e.g., `ARK/CRL1234-ABCD`)
+- Configurable ARK prefix (2-40 chars)
+- Configurable custom suffix prefix (2-6 uppercase letters)
+- Automatic duplicate detection and prevention
+- **Built-in resolver** (works without editing main .htaccess)
+- SEO meta tags: `DC.Identifier.ARK` and `citation_ark`
+- Ready for NAAN registration (n2t.net)
+
+## Installation
+
+1. Copy the `ark` folder to `plugins/pubIds/`
+2. Go to **Settings > Website > Plugins**
+3. Find "ARK PubId Plugin" and enable it
+4. Configure the plugin:
+   - **Enable ARK for Articles** (must be checked)
+   - **ARK Prefix**: The fixed prefix (e.g., `ark:16081`, `ARK`, `ARK_TESTE`)
+   - **Custom Suffix Prefix**: The prefix before the random part (2-6 letters, e.g., `MIT`, `UERN`, `CRL`)
+   - **Resolver URL**: `https://n2t.net/` (or your own resolver)
+
+## Configuration Example
+
+| Setting | Value |
+|---------|-------|
+| Enable ARK for Articles | ✅ Checked |
+| ARK Prefix | `ark:16081` |
+| Custom Suffix Prefix | `CRL` |
+| Resolver URL | `https://n2t.net/` |
+
+Resulting ARK: `ark:16081/CRL1234-ABCD`
+
+## NAAN Registration (n2t.net)
+
+After installing the plugin, configure your NAAN target to:
+https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=$%7Bvalue%7D
+
+========================
+Example for NAAN 16081:
+https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=$%7Bvalue%7D
+
+
+## Usage
+
+- ARKs are automatically generated for new articles when enabled
+- Click **"Gerar ARK"** button in the Identifiers section of the article form
+- Duplicate or invalid ARKs are prevented automatically
+- ARKs are exposed in HTML meta tags for SEO:
+  - `<meta name="DC.Identifier.ARK" content="ark:16081/CRL1234-ABCD">`
+  - `<meta name="citation_ark" content="ark:16081/CRL1234-ABCD">`
+
+## Resolver Integration
+
+The plugin includes a built-in resolver that works without editing your main `.htaccess` file. The resolver:
+
+1. Receives the ARK suffix via `?ark=` parameter
+2. Queries the database to find the corresponding article
+3. Redirects to the article page (302 Found)
+
+**Direct access example:**
+https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL1234-ABCD
+
+
+## Requirements
+
+- OJS 3.5.x
+- PHP 7.4 or higher
+- MySQL 5.7+ or MariaDB 10.2+
+
+## Troubleshooting
+
+### Resolver returns 403 Forbidden
+The plugin includes a `.htaccess` file that grants access to `resolver.php`. If you still get 403, check if your main `.htaccess` has conflicting rules.
+
+### ARK not appearing in article form
+Ensure "Enable ARK for Articles" is checked in plugin settings.
+
+### Duplicate ARK error
+The plugin automatically prevents duplicates. If you see this error, click "Gerar ARK" to generate a new unique identifier.
+
+## Uninstallation
+
+1. Disable the plugin in **Settings > Website > Plugins**
+2. Remove the `ark` folder from `plugins/pubIds/`
+3. (Optional) Remove ARK data from database:
+   ```sql
+   DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
+
+License
+GNU General Public License v2 - See LICENSE file for details.
+
+Author
+Lury Morais (2026)
+
+Credits
+Based on original work by Yasiel Pérez Vera (2021)
+
+
+Built for Carnaubais Revista de Literatura
+
