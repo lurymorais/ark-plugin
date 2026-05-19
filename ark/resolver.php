@@ -96,7 +96,7 @@ try {
         echo '<body style="font-family: sans-serif; padding: 20px;">';
         echo '<h1>ARK Not Found</h1>';
         echo '<p>O identificador <strong>' . htmlspecialchars($arkSuffix) . '</strong> não foi encontrado.</p>';
-        echo '<hr><small>ARK Resolver Plugin v1.0</small><br><br>';
+        echo '<hr><small>ARK Resolver Plugin by Lury Morais 2026</small><br><br>';
         echo '<a href="' . htmlspecialchars($siteUrl) . '">Homepage</a>';
         echo '</body></html>';
         exit;
