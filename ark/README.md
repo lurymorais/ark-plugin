@@ -37,11 +37,11 @@ Resulting ARK: `ark:16081/CRL6522-QVWX`
 ## NAAN Registration (n2t.net)
 
 After installing the plugin, configure your NAAN target to:
-https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=$%7Bvalue%7D
+https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=${value}
 
 ========================
 Example for NAAN 16081:
-https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=$%7Bvalue%7D
+https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=${value}
 
 
 ## Usage
