@@ -16,7 +16,7 @@
 
 1. Copy the `ark` folder to `plugins/pubIds/`
 2. Go to **Settings > Website > Plugins**
-3. Find "ARK PubId Plugin" and enable it
+3. Find "ARK" Public Identifier Plugins and enable it
 4. Configure the plugin:
    - **Enable ARK for Articles** (must be checked)
    - **ARK Prefix**: The fixed prefix (e.g., `ark:16081`)
