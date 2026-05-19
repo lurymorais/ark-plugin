@@ -5,12 +5,11 @@
 ## Features
 
 - Generate ARK identifiers only for **Articles**
-- Format: `PREFIX/CUSTOMxxxx-yyyy` (e.g., `ARK/CRL1234-ABCD`)
+- Format: `ark:NAAN/CUSTOMxxxx-yyyy` (e.g., `ark/CRL5432-ABCD`)
 - Configurable ARK prefix (2-40 chars)
 - Configurable custom suffix prefix (2-6 uppercase letters)
 - Automatic duplicate detection and prevention
 - **Built-in resolver** (works without editing main .htaccess)
-- SEO meta tags: `DC.Identifier.ARK` and `citation_ark`
 - Ready for NAAN registration (n2t.net)
 
 ## Installation
@@ -20,7 +19,7 @@
 3. Find "ARK PubId Plugin" and enable it
 4. Configure the plugin:
    - **Enable ARK for Articles** (must be checked)
-   - **ARK Prefix**: The fixed prefix (e.g., `ark:16081`, `ARK`, `ARK_TESTE`)
+   - **ARK Prefix**: The fixed prefix (e.g., `ark:16081`)
    - **Custom Suffix Prefix**: The prefix before the random part (2-6 letters, e.g., `MIT`, `UERN`, `CRL`)
    - **Resolver URL**: `https://n2t.net/` (or your own resolver)
 
@@ -33,7 +32,7 @@
 | Custom Suffix Prefix | `CRL` |
 | Resolver URL | `https://n2t.net/` |
 
-Resulting ARK: `ark:16081/CRL1234-ABCD`
+Resulting ARK: `ark:16081/CRL6522-QVWX`
 
 ## NAAN Registration (n2t.net)
 
@@ -47,12 +46,8 @@ https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=$%7Bvalue%7
 
 ## Usage
 
-- ARKs are automatically generated for new articles when enabled
 - Click **"Gerar ARK"** button in the Identifiers section of the article form
 - Duplicate or invalid ARKs are prevented automatically
-- ARKs are exposed in HTML meta tags for SEO:
-  - `<meta name="DC.Identifier.ARK" content="ark:16081/CRL1234-ABCD">`
-  - `<meta name="citation_ark" content="ark:16081/CRL1234-ABCD">`
 
 ## Resolver Integration
 
@@ -63,7 +58,7 @@ The plugin includes a built-in resolver that works without editing your main `.h
 3. Redirects to the article page (302 Found)
 
 **Direct access example:**
-https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL1234-ABCD
+https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
 
 ## Requirements
@@ -98,7 +93,7 @@ Author
 Lury Morais (2026)
 
 Credits
-Based on original work by Yasiel Pérez Vera (2021)
+Based on original pkp-ark-pubid plugin by Yasiel Pérez Vera (2021)
 
 
 Built for Carnaubais Revista de Literatura
