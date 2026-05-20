@@ -43,19 +43,35 @@ class ARKSettingsForm extends Form {
             }
         ));
 
+        // Validação do prefixo ARK
         $this->addCheck(new FormValidatorRegExp($this, 'arkPrefix', 'required', 
             'plugins.pubIds.ark.manager.settings.form.arkPrefixPattern', 
             '/^[A-Za-z0-9_:]{2,40}$/'
         ));
 
+        // Validação do prefixo personalizado
         $this->addCheck(new FormValidatorRegExp($this, 'arkCustomPrefix', 'required', 
             'plugins.pubIds.ark.manager.settings.form.arkCustomPrefixPattern', 
             '/^[A-Z]{2,6}$/'
         ));
 
-        $this->addCheck(new FormValidatorUrl($this, 'arkResolver', 'required', 
-            'plugins.pubIds.ark.manager.settings.form.arkResolverRequired'
+        // Validação condicional do resolvedor personalizado
+        $this->addCheck(new FormValidatorCustom($this, 'arkResolver', 'optional', 
+            'plugins.pubIds.ark.manager.settings.form.arkResolverRequired',
+            function($arkResolver) use ($form) {
+                $resolverType = $form->getData('resolverType');
+                // Se for custom, precisa ter valor e ser URL válida
+                if ($resolverType === 'custom') {
+                    if (empty($arkResolver)) {
+                        return false;
+                    }
+                    // Valida URL
+                    return filter_var($arkResolver, FILTER_VALIDATE_URL) !== false;
+                }
+                return true;
+            }
         ));
+        
         $this->addCheck(new FormValidatorPost($this));
         $this->addCheck(new FormValidatorCSRF($this));
 
@@ -65,35 +81,60 @@ class ARKSettingsForm extends Form {
     public function initData() {
         $contextId = $this->_getContextId();
         $plugin = $this->_getPlugin();
-        foreach($this->_getFormFields() as $fieldName => $fieldType) {
-            $this->setData($fieldName, $plugin->getSetting($contextId, $fieldName));
+        
+        $this->setData('enablePublicationARK', $plugin->getSetting($contextId, 'enablePublicationARK'));
+        $this->setData('arkPrefix', $plugin->getSetting($contextId, 'arkPrefix'));
+        $this->setData('arkSuffix', $plugin->getSetting($contextId, 'arkSuffix'));
+        $this->setData('arkCustomPrefix', $plugin->getSetting($contextId, 'arkCustomPrefix'));
+        
+        $resolverType = $plugin->getSetting($contextId, 'resolverType');
+        if (empty($resolverType)) {
+            $resolverType = 'n2t';
+        }
+        $this->setData('resolverType', $resolverType);
+        
+        // Só carrega o arkResolver se o tipo for custom
+        if ($resolverType === 'custom') {
+            $this->setData('arkResolver', $plugin->getSetting($contextId, 'arkResolver'));
+        } else {
+            $this->setData('arkResolver', '');
         }
     }
 
     public function readInputData() {
-        $this->readUserVars(array_keys($this->_getFormFields()));
+        $this->readUserVars([
+            'enablePublicationARK',
+            'arkPrefix',
+            'arkSuffix',
+            'arkCustomPrefix',
+            'resolverType',
+            'arkResolver'
+        ]);
     }
 
     public function execute(...$functionArgs) {
         $contextId = $this->_getContextId();
         $plugin = $this->_getPlugin();
-        foreach($this->_getFormFields() as $fieldName => $fieldType) {
-            $plugin->updateSetting($contextId, $fieldName, $this->getData($fieldName), $fieldType);
+        
+        $resolverType = $this->getData('resolverType');
+        $arkResolver = $this->getData('arkResolver');
+        
+        // Salva configurações básicas
+        $plugin->updateSetting($contextId, 'enablePublicationARK', $this->getData('enablePublicationARK'), 'bool');
+        $plugin->updateSetting($contextId, 'arkPrefix', $this->getData('arkPrefix'), 'string');
+        $plugin->updateSetting($contextId, 'arkSuffix', $this->getData('arkSuffix'), 'string');
+        $plugin->updateSetting($contextId, 'arkCustomPrefix', $this->getData('arkCustomPrefix'), 'string');
+        $plugin->updateSetting($contextId, 'resolverType', $resolverType, 'string');
+        
+        // Só salva o arkResolver se o tipo for custom
+        if ($resolverType === 'custom') {
+            $plugin->updateSetting($contextId, 'arkResolver', $arkResolver, 'string');
+        } else {
+            $plugin->updateSetting($contextId, 'arkResolver', '', 'string');
         }
         
         parent::execute(...$functionArgs);
         
-        // Retorna dados para o AJAX
         return true;
-    }
-
-    private function _getFormFields() {
-        return [
-            'enablePublicationARK' => 'bool',
-            'arkPrefix' => 'string',
-            'arkSuffix' => 'string',
-            'arkCustomPrefix' => 'string',
-            'arkResolver' => 'string',
-        ];
     }
 }
