@@ -98,6 +98,7 @@
     <script>
     (function() {
         var updateInterval = null;
+        var ROTATION_INTERVAL = 5000; // 5 segundos
         
         function generateRandomSuffix(customPrefix) {
             var cp = customPrefix.trim().toUpperCase();
@@ -115,7 +116,7 @@
             return cp + xxxx + '-' + yyyy;
         }
         
-        function updatePreview() {
+        function updatePreview(withTransition) {
             var prefixField = document.querySelector('input[name="arkPrefix"]');
             var resolverField = document.getElementById('arkResolver');
             var radioN2T = document.getElementById('resolverType_n2t');
@@ -123,7 +124,6 @@
             var customPrefixField = document.getElementById('arkCustomPrefix');
             
             if (!prefixField) {
-                console.log('updatePreview: prefixField não encontrado');
                 return;
             }
             
@@ -140,8 +140,8 @@
                 resolver = 'https://n2t.net/';
             }
             
-            // Obtém o valor do customPrefix com fallback
-            var customPrefix = 'CRL'; // valor padrão
+            // Obtém o valor do customPrefix
+            var customPrefix = 'CRL';
             if (customPrefixField) {
                 customPrefix = customPrefixField.value.trim().toUpperCase();
                 if (customPrefix.length < 2) customPrefix = 'CRL';
@@ -149,31 +149,66 @@
             }
             
             // Gera sufixo
-            var numbers = '23456789';
-            var letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-            var xxxx = '';
-            var yyyy = '';
-            for (var i = 0; i < 4; i++) {
-                xxxx += numbers.charAt(Math.floor(Math.random() * numbers.length));
-                yyyy += letters.charAt(Math.floor(Math.random() * letters.length));
-            }
-            var suffix = customPrefix + xxxx + '-' + yyyy;
-            
+            var suffix = generateRandomSuffix(customPrefix);
             var fullArk = prefix.replace(/\/$/, '') + '/' + suffix;
             
             var previewElement = document.getElementById('arkPreviewExample');
             var urlElement = document.getElementById('arkPreviewUrl');
             
+            // Função para aplicar transição
+            function applyTransition(element, callback) {
+                if (withTransition !== false) {
+                    element.style.transition = 'opacity 0.3s ease';
+                    element.style.opacity = '0.3';
+                    setTimeout(function() {
+                        callback();
+                        element.style.opacity = '1';
+                    }, 100);
+                } else {
+                    callback();
+                }
+            }
+            
             if (previewElement) {
-                previewElement.innerHTML = '<strong>' + fullArk + '</strong>';
+                applyTransition(previewElement, function() {
+                    previewElement.innerHTML = '<strong>' + fullArk + '</strong>';
+                });
             }
             
             if (urlElement && resolver) {
                 var resolveUrl = resolver.replace(/\/$/, '') + '/' + fullArk;
-                urlElement.innerHTML = '<a href="' + resolveUrl + '" target="_blank" style="color: #d00a6c;">' + resolveUrl + '</a>';
+                applyTransition(urlElement, function() {
+                    urlElement.innerHTML = '<a href="' + resolveUrl + '" target="_blank" style="color: #d00a6c;">' + resolveUrl + '</a>';
+                });
             } else if (urlElement) {
-                urlElement.innerHTML = 'Informe a URL do resolvedor';
+                applyTransition(urlElement, function() {
+                    urlElement.innerHTML = 'Informe a URL do resolvedor';
+                });
             }
+        }
+        
+        // Atualização com transição suave
+        function updatePreviewWithTransition() {
+            updatePreview(true);
+        }
+        
+        // Atualização sem transição (para inicialização)
+        function updatePreviewNoTransition() {
+            updatePreview(false);
+        }
+        
+        function startRotation() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            
+            updateInterval = setInterval(function() {
+                var radioRandom = document.getElementById('arkSuffixRandom');
+                // Só rotaciona se o modo aleatório estiver ativo
+                if (radioRandom && radioRandom.checked) {
+                    updatePreviewWithTransition();
+                }
+            }, ROTATION_INTERVAL);
         }
         
         function setupResolvers() {
@@ -193,7 +228,7 @@
                         resolverInput.value = '';
                     }
                 }
-                updatePreview();
+                updatePreviewWithTransition();
             }
             
             if (radioN2T) radioN2T.addEventListener('change', toggleResolverField);
@@ -205,26 +240,49 @@
             var prefixField = document.querySelector('input[name="arkPrefix"]');
             var customPrefixField = document.getElementById('arkCustomPrefix');
             var resolverInput = document.getElementById('arkResolver');
+            var radioRandom = document.getElementById('arkSuffixRandom');
             
             if (!prefixField) {
-                console.log('setupListeners: prefixField não encontrado');
                 return false;
             }
             
-            prefixField.addEventListener('input', updatePreview);
-            prefixField.addEventListener('change', updatePreview);
+            // Eventos para atualização em tempo real
+            prefixField.addEventListener('input', updatePreviewWithTransition);
+            prefixField.addEventListener('change', updatePreviewWithTransition);
             
             if (customPrefixField) {
-                customPrefixField.addEventListener('input', updatePreview);
-                customPrefixField.addEventListener('change', updatePreview);
+                customPrefixField.addEventListener('input', updatePreviewWithTransition);
+                customPrefixField.addEventListener('change', updatePreviewWithTransition);
             }
             
             if (resolverInput) {
-                resolverInput.addEventListener('input', updatePreview);
-                resolverInput.addEventListener('change', updatePreview);
+                resolverInput.addEventListener('input', updatePreviewWithTransition);
+                resolverInput.addEventListener('change', updatePreviewWithTransition);
             }
             
-            updatePreview();
+            // Controle da rotação baseado no modo aleatório
+            if (radioRandom) {
+                radioRandom.addEventListener('change', function() {
+                    updatePreviewWithTransition();
+                    if (radioRandom.checked) {
+                        startRotation();
+                    } else {
+                        if (updateInterval) {
+                            clearInterval(updateInterval);
+                            updateInterval = null;
+                        }
+                    }
+                });
+            }
+            
+            // Preview inicial (sem transição)
+            updatePreviewNoTransition();
+            
+            // Inicia rotação se modo aleatório estiver ativo
+            if (radioRandom && radioRandom.checked) {
+                startRotation();
+            }
+            
             return true;
         }
         
