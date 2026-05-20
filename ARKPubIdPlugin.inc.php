@@ -51,9 +51,22 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     public function getPubIdType() { return 'ark'; }
     public function getPubIdDisplayType() { return 'ARK'; }
     public function getPubIdFullName() { return 'Archival Resource Key'; }
-    public function getResolvingURL($contextId, $pubId) { 
+    public function getResolvingURL($contextId, $pubId) {
+        $resolverType = $this->getSetting($contextId, 'resolverType');
+        
+        // Se for n2t ou não definido, usa o resolvedor global
+        if ($resolverType !== 'custom') {
+            return 'https://n2t.net/' . $pubId;
+        }
+        
+        // Se for custom, usa o resolver personalizado
         $resolver = $this->getSetting($contextId, 'arkResolver');
-        return rtrim($resolver, '/') . '/' . $pubId;
+        if (!empty($resolver)) {
+            return rtrim($resolver, '/') . '/' . $pubId;
+        }
+        
+        // Fallback para n2t
+        return 'https://n2t.net/' . $pubId;
     }
     public function getPubIdMetadataFile() { return $this->getTemplateResource('arkSuffixEdit.tpl'); }
     public function addJavaScript($request, $templateMgr) { }
