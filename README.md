@@ -1,4 +1,4 @@
-# 🌐 ARK Plugin for OJS 3.5.x
+# ARK Plugin for OJS 3.5.x
 
 > **Choose your language / Escolha seu idioma / Elija su idioma:**  
 > [🇺🇸 English](#english) | [🇧🇷 Português](#português) | [🇪🇸 Español](#español)
@@ -106,7 +106,7 @@ Based on original pkp-ark-pubid plugin by Yasiel Pérez Vera (2021)
 
 ---
 
-[⬆ Back to top](#english)
+[Back to top](#english)
 
 ---
 
@@ -211,7 +211,7 @@ Baseado no plugin original pkp-ark-pubid por Yasiel Pérez Vera (2021)
 
 ---
 
-[⬆ Voltar ao topo](#português)
+[Voltar ao topo](#português)
 
 ---
 
@@ -316,14 +316,14 @@ Basado en el plugin original pkp-ark-pubid por Yasiel Pérez Vera (2021)
 
 ---
 
-[⬆ Volver al principio](#español)
+[Volver al principio](#español)
 
 ---
 
-## 📄 License / Licença / Licencia
+## License / Licença / Licencia
 
 GNU General Public License v2 - See LICENSE file for details.
 
 ---
 
-**Built for Carnaubais Revista de Literatura** 🚀
+**Built for Carnaubais Revista de Literatura**
