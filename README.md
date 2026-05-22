@@ -36,10 +36,10 @@ IMPORTANT: When you download the plugin from GitHub, the folder may be named ark
 
 ### Configuration Example
 
-Enable ARK for Articles: Checked
-ARK Prefix: ark:16081
-Custom Suffix Prefix: CRL
-Resolver URL: https://n2t.net/
+- Enable ARK for Articles: Checked
+- ARK Prefix: ark:16081
+- Custom Suffix Prefix: CRL
+- Resolver URL: https://n2t.net/
 
 Resulting ARK: https://n2t.net/ark:16081/CRL6522-QVWX
 
@@ -67,12 +67,6 @@ The plugin includes a built-in resolver that works without editing your main .ht
 
 Direct access example:
 https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
-
-### Requirements
-
-- OJS 3.5.x
-- PHP 7.4 or higher
-- MySQL 5.7+ or MariaDB 10.2+
 
 ### Troubleshooting
 
@@ -141,10 +135,10 @@ IMPORTANTE: Quando você baixar o plugin do GitHub, a pasta pode estar nomeada c
 
 ### Exemplo de Configuração
 
-Habilitar ARK para Artigos: Marcado
-Prefixo ARK: ark:16081
-Prefixo Personalizado do Sufixo: CRL
-URL do Resolvedor: https://n2t.net/
+- Habilitar ARK para Artigos: Marcado
+- Prefixo ARK: ark:16081
+- Prefixo Personalizado do Sufixo: CRL
+- URL do Resolvedor: https://n2t.net/
 
 ARK resultante: https://n2t.net/ark:16081/CRL6522-QVWX
 
@@ -173,21 +167,15 @@ O plugin inclui um resolvedor integrado que funciona sem editar seu arquivo .hta
 Exemplo de acesso direto:
 https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
-### Requisitos
-
-- OJS 3.5.x
-- PHP 7.4 ou superior
-- MySQL 5.7+ ou MariaDB 10.2+
-
 ### Solução de Problemas
 
-Resolvedor retorna 403 Forbbiden/Acesso negado
+Resolvedor retorna 403 Forbbiden/Acesso negado?
 O plugin inclui um arquivo .htaccess que concede acesso ao resolver.php. Se você ainda receber 403, verifique se seu .htaccess principal tem regras conflitantes.
 
-ARK não aparece no formulário do artigo
+ARK não aparece no formulário do artigo?
 Certifique-se de que "Habilitar ARK para Artigos" está marcado nas configurações do plugin.
 
-Erro de ARK duplicado
+Erro de ARK duplicado?
 O plugin previne automaticamente duplicatas. Se você ver este erro, clique em "Gerar ARK" para gerar um novo identificador único.
 
 ### Desinstalar
@@ -286,13 +274,13 @@ https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
 ### Solución de Problemas
 
-El resolvedor devuelve 403 Prohibido
+¿El resolvedor devuelve 403 Prohibido?
 El plugin incluye un archivo .htaccess que concede acceso a resolver.php. Si aún recibe 403, verifique si su .htaccess principal tiene reglas conflictivas.
 
-ARK no aparece en el formulario del artículo
+¿ARK no aparece en el formulario del artículo?
 Asegúrese de que "Habilitar ARK para Artículos" esté marcado en la configuración del plugin.
 
-Error de ARK duplicado
+¿Error de ARK duplicado?
 El plugin previene automáticamente duplicados. Si ve este error, haga clic en "Generar ARK" para generar un nuevo identificador único.
 
 ### Desinstalación
