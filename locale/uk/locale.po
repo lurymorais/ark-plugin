@@ -1,0 +1,121 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ARK Plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 10:00-0300\n"
+"PO-Revision-Date: 2026-01-19 10:00-0300\n"
+"Last-Translator: Lury Morais\n"
+"Language-Team: Ukrainian\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "plugins.pubIds.ark.displayName"
+msgstr "ARK"
+
+msgid "plugins.pubIds.ark.description"
+msgstr "Плагін для призначення ідентифікаторів ARK (Archival Resource Key) статтям."
+
+msgid "plugins.pubIds.ark.manager.settings.description"
+msgstr "Налаштування плагіна ARK для статей:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkObjects"
+msgstr "Типи об’єктів"
+
+msgid "plugins.pubIds.ark.manager.settings.arkObjectsRequired"
+msgstr "ARK генеруються лише для статей."
+
+msgid "plugins.pubIds.ark.manager.settings.explainARKs"
+msgstr "Оберіть, для яких типів об’єктів будуть створюватися ARK:"
+
+msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
+msgstr "Статті"
+
+msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
+msgstr "Префікс ARK"
+
+msgid "plugins.pubIds.ark.manager.settings.arkPrefix.description"
+msgstr "Фіксований префікс ARK (наприклад, ARK, ark:12345). Після нього додається '/' та суфікс."
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkPrefixPattern"
+msgstr "Префікс має містити 2-40 символів (літери, цифри, :, _)."
+
+msgid "plugins.pubIds.ark.manager.settings.arkSuffix"
+msgstr "Формат суфікса"
+
+msgid "plugins.pubIds.ark.manager.settings.arkSuffix.description"
+msgstr "Налаштуйте, як буде генеруватися суфікс ARK."
+
+msgid "plugins.pubIds.ark.manager.settings.arkSuffixRandom"
+msgstr "Випадковий суфікс (наприклад, CRL1234-ABCD)"
+
+msgid "plugins.pubIds.ark.manager.settings.arkCustomPrefix"
+msgstr "Користувацький префікс:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkCustomPrefix.validation"
+msgstr "(2-6 великих літер)"
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkCustomPrefixPattern"
+msgstr "Користувацький префікс має містити 2–6 великих літер."
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver"
+msgstr "URL резолвера"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.description"
+msgstr "Базовий URL для визначення ARK (наприклад, https://n2t.net/)"
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkResolverRequired"
+msgstr "Будь ласка, вкажіть URL резолвера."
+
+msgid "plugins.pubIds.ark.manager.settings.preview"
+msgstr "Попередній перегляд"
+
+msgid "plugins.pubIds.ark.manager.settings.previewLabel"
+msgstr "Приклад ARK, який буде згенеровано:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkReassign"
+msgstr "Перегенерувати ARK"
+
+msgid "plugins.pubIds.ark.manager.settings.arkReassign.description"
+msgstr "Натисніть, щоб видалити всі існуючі ARK та призначити нові відповідно до налаштувань."
+
+msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
+msgstr "Ви впевнені? Усі існуючі ARK буде безповоротно видалено."
+
+msgid "plugins.pubIds.ark.editor.ark"
+msgstr "ARK"
+
+msgid "plugins.pubIds.ark.editor.missingPrefix"
+msgstr "ARK має починатися з {$arkPrefix}."
+
+msgid "plugins.pubIds.ark.editor.invalidSuffixFormat"
+msgstr "Неправильний формат. Використовуйте: {$format}"
+
+msgid "plugins.pubIds.ark.editor.arkSuffixNotUnique"
+msgstr "Цей ARK вже використовується. Натисніть \"Згенерувати ARK\", щоб створити новий."
+
+msgid "plugins.pubIds.ark.editor.clearObjectsARK"
+msgstr "Очистити ARK"
+
+msgid "plugins.pubIds.ark.editor.clearObjectsARK.confirm"
+msgstr "Видалити цей ARK безповоротно?"
+
+msgid "plugins.pubIds.ark.editor.assignARK"
+msgstr "Призначити ARK {$pubId} для {$pubObjectType}"
+
+msgid "plugins.pubIds.ark.editor.ark.assignArk"
+msgstr "Призначити"
+
+msgid "plugins.pubIds.ark.editor.ark.clearArk"
+msgstr "Очистити"
+
+msgid "plugins.pubIds.ark.editor.generateArk"
+msgstr "Згенерувати ARK"
+
+msgid "plugins.pubIds.ark.suffix.random"
+msgstr "Випадковий суфікс"
+
+msgid "plugins.pubIds.ark.editor.arkHelp"
+msgstr "ARK (Archival Resource Key) — це постійний ідентифікатор для цієї статті. Формат: {$prefix}/PREFIX2345-ABCD. Натисніть «Згенерувати ARK», щоб автоматично створити новий ідентифікатор."
