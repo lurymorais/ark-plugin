@@ -134,10 +134,9 @@ function getInflection() {
  * @param int $contextId Journal ID
  * @param string $arkSuffix ARK suffix (without prefix)
  * @param string $baseUrl Site base URL
- * @param string $journalPath Journal path
  * @return array Metadata array with keys: who, what, when, ark_url, base_ark_url, who_journal, issn, support_when
  */
-function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUrl, $journalPath) {
+function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUrl,) {
     $metadata = [];
     
     // Get publication basic info
@@ -279,7 +278,9 @@ function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUr
     } else {
         $metadata['support_when'] = $metadata['when'];
     }
-    
+    $metadata['primary_locale'] = getPrimaryLocale($pdo, $contextId);
+    $metadata['site_url'] = $baseUrl;
+
     return $metadata;
 }
 
@@ -306,6 +307,7 @@ function outputBriefERC($metadata, $arkSuffix, $fullArkResolverUrl) {
  * @param string $arkSuffix ARK suffix
  * @param string $fullArkResolverUrl Full resolver URL
  */
+
 function outputFullERC($metadata, $arkSuffix, $fullArkResolverUrl) {
     header('Content-Type: text/plain; charset=utf-8');
     echo "erc:\n";
@@ -321,6 +323,60 @@ function outputFullERC($metadata, $arkSuffix, $fullArkResolverUrl) {
     if (!empty($metadata['issn'])) {
         echo "issn: " . $metadata['issn'] . "\n";
     }
+    echo "
+";
+    
+    // Messages in multiple languages without duplicates
+    $primary = $metadata['primary_locale'];
+    $url = $metadata['site_url'];
+    
+    $messages = [];
+    
+    // Add primary language message
+    if ($primary === 'pt_BR') {
+        $messages[] = "# Se você chegou a esta página por engano, por favor acesse: " . $url;
+    } elseif ($primary === 'en') {
+        $messages[] = "# If you reached this page by mistake, please visit: " . $url;
+    } elseif ($primary === 'es') {
+        $messages[] = "# Si llegaste a esta página por error, por favor visita: " . $url;
+    } else {
+        $messages[] = "# If you reached this page by mistake, please visit: " . $url;
+    }
+    
+    // Add Portuguese if primary is not Portuguese
+    if ($primary !== 'pt_BR') {
+        $messages[] = "# Se você chegou a esta página por engano, por favor acesse: " . $url;
+    }
+    
+    // Add English if primary is not English
+    if ($primary !== 'en') {
+        $messages[] = "# If you reached this page by mistake, please visit: " . $url;
+    }
+    
+    // Output unique messages (remove duplicates)
+    $uniqueMessages = array_unique($messages);
+    foreach ($uniqueMessages as $msg) {
+        echo $msg . "\n";
+    }
+}
+    
+
+/**
+ * Get the primary locale of the journal
+ * 
+ * @param PDO $pdo Database connection
+ * @param int $contextId Journal ID
+ * @return string Locale code (e.g., 'pt_BR', 'en', 'es')
+ */
+function getPrimaryLocale($pdo, $contextId) {
+    $stmt = $pdo->prepare("
+        SELECT primary_locale FROM journals WHERE journal_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$contextId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    return $result ? $result['primary_locale'] : 'en';
 }
 
 /**
@@ -577,7 +633,6 @@ try {
             $result['context_id'], 
             $originalInput,
             $siteBaseUrl,
-            $journal['path']
         );
         
         if ($inflection === 'brief') {
