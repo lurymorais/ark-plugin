@@ -68,6 +68,45 @@ The plugin includes a built-in resolver that works without editing your main .ht
 Direct access example:
 https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
+### ERC Metadata Support (ARK Inflections)
+
+The resolver supports ARK inflections:
+
+| Inflection | Behavior |
+|------------|----------|
+| (none) | Redirects to article page |
+| `??` | Returns full ERC metadata |
+
+**Example:**
+https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata
+https://n2t.net/ark:16081/CRL0001-LURY → Redirects to article
+
+text
+
+> **Note:** Only `??` works via n2t.net. The `?` inflection (brief metadata) works only when accessing your resolver directly.
+
+### ARK Implementation Date
+
+In the plugin settings, you can set a **fixed implementation date** for your journal:
+
+- This date represents when your journal started supporting ARK identifiers
+- It will be displayed in the `erc-support.when` field of the ERC metadata
+- The date must be in `YYYYMMDD` format (e.g., `20260215`)
+- If not set, the article publication date is used as fallback
+
+**Example ERC output with implementation date:**\
+
+> erc:\
+who: Lury Hortêncio Costa Morais\
+what: Assombrosamente maravilhoso\
+when: 20260215\
+where: https://n2t.net/ark:16081/CRL0001-LURY/\
+erc-support:\
+who: Carnaubais Revista de Literatura\
+what: Permanent: Stable Content:\
+when: 20260215\
+where: https://n2t.net/ark:16081/
+
 ### Requirements
 
 - OJS 3.5.x
@@ -173,6 +212,43 @@ O plugin inclui um resolvedor integrado que funciona sem editar seu arquivo .hta
 Exemplo de acesso direto:
 https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
+### Suporte a Metadados ERC (Inflexões ARK)
+
+O resolvedor suporta inflexões ARK:
+
+| Inflexão | Comportamento |
+|----------|---------------|
+| (nenhuma) | Redireciona para o artigo |
+| `??` | Retorna metadados ERC completos |
+
+**Exemplo:**
+https://n2t.net/ark:16081/CRL0001-LURY?? → Retorna metadados ERC
+https://n2t.net/ark:16081/CRL0001-LURY → Redireciona para o artigo
+
+> **Nota:** Apenas `??` funciona via n2t.net. A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor.
+
+### Data de Implementação do ARK
+
+Nas configurações do plugin, você pode definir uma **data de implementação fixa** para o seu periódico:
+
+- Esta data representa quando seu periódico começou a suportar identificadores ARK
+- Será exibida no campo `erc-support.when` dos metadados ERC
+- A data deve estar no formato `AAAAMMDD` (exemplo: `20260215`)
+- Se não for definida, a data de publicação do artigo será usada como fallback
+
+**Exemplo de output ERC com data de implementação:**\
+
+> erc:\
+who: Lury Hortêncio Costa Morais\
+what: Assombrosamente maravilhoso\
+when: 20260215\
+where: https://n2t.net/ark:16081/CRL0001-LURY/\
+erc-support:\
+who: Carnaubais Revista de Literatura\
+what: Permanent: Stable Content:\
+when: 20260215\
+where: https://n2t.net/ark:16081/
+
 ### Requisitos
 
 - OJS 3.5.x
@@ -181,13 +257,13 @@ https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
 ### Solução de Problemas
 
-Resolvedor retorna 403 Forbbiden/Acesso negado
+#### Resolvedor retorna 403 Forbbiden/Acesso negado
 O plugin inclui um arquivo .htaccess que concede acesso ao resolver.php. Se você ainda receber 403, verifique se seu .htaccess principal tem regras conflitantes.
 
-ARK não aparece no formulário do artigo
+#### ARK não aparece no formulário do artigo
 Certifique-se de que "Habilitar ARK para Artigos" está marcado nas configurações do plugin.
 
-Erro de ARK duplicado
+#### Erro de ARK duplicado
 O plugin previne automaticamente duplicatas. Se você ver este erro, clique em "Gerar ARK" para gerar um novo identificador único.
 
 ### Desinstalar
@@ -278,6 +354,43 @@ El plugin incluye un resolvedor integrado que funciona sin editar su archivo .ht
 Ejemplo de acceso directo:
 https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
+### Soporte de Metadatos ERC (Inflexiones ARK)
+
+El resolvedor soporta inflexiones ARK:
+
+| Inflexión | Comportamiento |
+|-----------|----------------|
+| (ninguna) | Redirige al artículo |
+| `??` | Devuelve metadatos ERC completos |
+
+**Ejemplo:**
+https://n2t.net/ark:16081/CRL0001-LURY?? → Devuelve metadatos ERC
+https://n2t.net/ark:16081/CRL0001-LURY → Redirige al artículo
+
+> **Nota:** Solo `??` funciona vía n2t.net. La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor.
+
+### Fecha de Implementación del ARK
+
+En la configuración del plugin, puede definir una **fecha de implementación fija** para su revista:
+
+- Esta fecha representa cuándo su revista comenzó a soportar identificadores ARK
+- Se mostrará en el campo `erc-support.when` de los metadatos ERC
+- La fecha debe estar en formato `AAAAMMDD` (ejemplo: `20260215`)
+- Si no se define, se usará la fecha de publicación del artículo como fallback
+
+**Ejemplo de salida ERC con fecha de implementación:**\
+
+> erc:\
+who: Lury Hortêncio Costa Morais\
+what: Assombrosamente maravilhoso\
+when: 20260215\
+where: https://n2t.net/ark:16081/CRL0001-LURY/\
+erc-support:\
+who: Carnaubais Revista de Literatura\
+what: Permanent: Stable Content:\
+when: 20260215\
+where: https://n2t.net/ark:16081/
+
 ### Requisitos
 
 - OJS 3.5.x
@@ -286,13 +399,13 @@ https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
 ### Solución de Problemas
 
-El resolvedor devuelve 403 Prohibido
+#### El resolvedor devuelve 403 Prohibido
 El plugin incluye un archivo .htaccess que concede acceso a resolver.php. Si aún recibe 403, verifique si su .htaccess principal tiene reglas conflictivas.
 
-ARK no aparece en el formulario del artículo
+#### ARK no aparece en el formulario del artículo
 Asegúrese de que "Habilitar ARK para Artículos" esté marcado en la configuración del plugin.
 
-Error de ARK duplicado
+#### Error de ARK duplicado
 El plugin previene automáticamente duplicados. Si ve este error, haga clic en "Generar ARK" para generar un nuevo identificador único.
 
 ### Desinstalación
