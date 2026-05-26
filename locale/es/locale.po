@@ -130,10 +130,10 @@ msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
 msgstr "URL del resolvedor personalizado"
 
 msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
-msgstr "Fecha de Implementación del ARK"
+msgstr "Fecha de Implementación del ARK. Formato: AAAAMMDD (Ejemplo: 20260215)."
 
 msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
-msgstr "Ingrese la fecha en que los identificadores ARK comenzaron a usarse o planificarse en su revista. Esta fecha será fija para todos los registros y representa el inicio del soporte de la revista para enlaces persistentes. Formato: AAAAMMDD (Ejemplo: 20260215)."
+msgstr "Ingrese la fecha en que los identificadores ARK comenzaron a usarse o planificarse en su revista. Esta fecha será fija para todos los registros y representa el inicio del soporte de la revista para enlaces persistentes."
 
 msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
 msgstr "Si es la primera vez que usa ARK, ingrese la fecha en que recibió su NAAN o la fecha de publicación del primer ARK."
