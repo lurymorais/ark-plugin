@@ -11,11 +11,6 @@
 // BLOCK SEARCH ENGINES - Must be before any output
 header('X-Robots-Tag: noindex, nofollow');
 
-// Enable error reporting for debugging (remove after testing)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 /**
  * Get the base URL of the OJS installation
  * 
@@ -137,20 +132,7 @@ function getInflection() {
 /**
  * Get metadata for ERC response
  * 
- * Fetches article metadata
- * 
- * @param PDO $pdo Database connection
- * @param int $publicationId Publication ID
- * @param int $contextId Journal ID
- * @param string $arkSuffix ARK suffix (without prefix)
- * @param string $baseUrl Site base URL
- * @param string $journalPath Journal path
- * @return array Metadata array with keys: who, what, when, ark_url, base_ark_url, who_journal, issn
- */
-/**
- * Get metadata for ERC response
- * 
- * Fetches article metadata
+ * Fetches article metadata from OJS database
  * 
  * @param PDO $pdo Database connection
  * @param int $publicationId Publication ID
@@ -161,11 +143,6 @@ function getInflection() {
  * @return array Metadata array with keys: who, what, when, ark_url, base_ark_url, who_journal, issn, support_when
  */
 function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUrl, $journalPath) {
-        // ===== DEBUG =====
-    error_log("ARK getMetadataForERC: publication_id = " . $publicationId);
-    error_log("ARK getMetadataForERC: context_id = " . $contextId);
-    error_log("ARK getMetadataForERC: journalPath = " . $journalPath);
-    // =================
     $metadata = [];
     
     // Get publication basic info
@@ -261,7 +238,6 @@ function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUr
     $issn = $stmt->fetch(PDO::FETCH_ASSOC);
     $metadata['issn'] = $issn ? $issn['setting_value'] : '';
     
-    // ===== ARK URLs for ERC standard =====
     // Get the full ARK identifier from database
     $stmt = $pdo->prepare("
         SELECT setting_value FROM publication_settings
@@ -293,27 +269,19 @@ function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUr
     }
     $metadata['base_ark_url'] = 'https://n2t.net/ark:' . $naan . '/';
     
-    // ===== FIXED DATE FOR ERC-SUPPORT (arkImplementationDate) =====
     // Get ARK implementation date from journal settings (fixed date)
-    error_log("ARK: Buscando arkImplementationDate para context_id = " . $contextId);
-
     $stmt = $pdo->prepare("
         SELECT setting_value FROM journal_settings
-            WHERE journal_id = ? AND setting_name = 'arkImplementationDate' AND (locale = '' OR locale IS NULL)
+        WHERE journal_id = ? AND setting_name = 'arkImplementationDate' AND (locale = '' OR locale IS NULL)
         LIMIT 1
     ");
     $stmt->execute([$contextId]);
     $implDate = $stmt->fetch(PDO::FETCH_ASSOC);
-    error_log("ARK: Busca DIRETA no banco = " . ($implDate['setting_value'] ?? 'NULL'));
-    error_log("ARK: Resultado da busca = " . print_r($implDate, true));
-
     
-    // Use implementation date if set and valid, otherwise fallback to today
-    // (fallback only occurs if admin didn't configure the date)
+    // Use implementation date if set and valid, otherwise fallback to article publication date
     if ($implDate && !empty($implDate['setting_value']) && preg_match('/^(19|20)\d{6}$/', $implDate['setting_value'])) {
         $metadata['support_when'] = $implDate['setting_value'];
     } else {
-        // Fallback: use article publication date
         $metadata['support_when'] = $metadata['when'];
     }
     
