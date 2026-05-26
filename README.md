@@ -1,6 +1,6 @@
 # 🌐 ARK Plugin for OJS 3.5.x
 
-> **Choose your language / Escolha seu idioma / Elija su idioma:**  
+> **Escolha seu idioma / Elija su idioma / Choose your language :**  
 > [🇧🇷 Português](#português) | [🇪🇸 Español](#español) | [🇺🇸 English](#english) | 
 
 ---
@@ -45,7 +45,7 @@ ARK resultante: https://n2t.net/ark:16081/CRL6522-QVWX
 
 <img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
 
-> At the end of the configuration, you will be able to see an example preview for your resources.
+> Ao fim da configuração, você verá um pré-visualizador.
 
 ### Registro NAAN (n2t.net)
 
@@ -110,7 +110,7 @@ where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
 erc-support:\
 who: Carnaubais Revista de Literatura\
 what: Permanent: Stable Content:\
-when: 20260215\
+**when: 20260215**\
 where: https://n2t.net/ark:16081/
 
 ### Requisitos
@@ -260,7 +260,7 @@ where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
 erc-support:\
 who: Carnaubais Revista de Literatura\
 what: Permanent: Stable Content:\
-when: 20260215\
+**when: 20260215**\
 where: https://n2t.net/ark:16081/
 
 ### Requisitos
@@ -410,7 +410,7 @@ where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
 erc-support:\
 who: Carnaubais Revista de Literatura\
 what: Permanent: Stable Content:\
-when: 20260215\
+**when: 20260215**\
 where: https://n2t.net/ark:16081/
 
 ### Requirements
