@@ -81,7 +81,7 @@ The resolver supports ARK inflections:
 | `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY?info` |
 
 **Example:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata
+https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata\
 https://n2t.net/ark:16081/CRL0001-LURY → Redirects to article
 
 text
@@ -229,7 +229,7 @@ O resolvedor suporta inflexões ARK:
 | `?info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY?info` |
 
 **Exemplo:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Retorna metadados ERC
+https://n2t.net/ark:16081/CRL0001-LURY?? → Retorna metadados ERC\
 https://n2t.net/ark:16081/CRL0001-LURY → Redireciona para o artigo
 
 > **Nota:** A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor.
@@ -375,7 +375,7 @@ El resolvedor soporta inflexiones ARK:
 | `?info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY?info` |
 
 **Ejemplo:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Devuelve metadatos ERC
+https://n2t.net/ark:16081/CRL0001-LURY?? → Devuelve metadatos ERC\
 https://n2t.net/ark:16081/CRL0001-LURY → Redirige al artículo
 
 > **Nota:** La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor.
