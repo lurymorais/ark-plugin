@@ -1,154 +1,7 @@
 # 🌐 ARK Plugin for OJS 3.5.x
 
 > **Choose your language / Escolha seu idioma / Elija su idioma:**  
-> [🇺🇸 English](#english) | [🇧🇷 Português](#português) | [🇪🇸 Español](#español)
-
----
-
-<a name="english"></a>
-## 🇺🇸 English
-
-**Archival Resource Key (ARK) plugin for Open Journal Systems 3.5.x**
-
-### Features
-
-- Generate ARK identifiers only for Articles
-- Format: ark:NAAN/CUSTOMxxxx-yyyy (e.g., ark:16081/CRL5432-ABCD)
-- Configurable custom suffix prefix (2-6 uppercase letters)
-- Automatic duplicate detection and prevention
-- Built-in resolver (works without editing main .htaccess)
-- Ready for NAAN registration (n2t.net)
-
-### Installation
-
-IMPORTANT: When you download the plugin from GitHub, the folder may be named ark-plugin-main or ark-plugin-2.0.0. You MUST rename it to ark before copying to your OJS installation.
-
-1. Download the plugin from GitHub
-2. Rename the folder to ark (if not already named ark)
-3. Copy the ark folder to plugins/pubIds/
-4. Go to Settings > Website > Plugins
-5. Find "ARK" Public Identifier Plugins and enable it
-6. Configure the plugin:
-   - Enable ARK for Articles (must be checked)
-   - ARK Prefix: The fixed prefix (e.g., ark:16081)
-   - Custom Suffix Prefix: The prefix before the random part (2-6 letters, e.g., MIT, UERN, CRL)
-   - Resolver URL: https://n2t.net/ (or your own resolver)
-
-### Configuration Example
-
-Enable ARK for Articles: Checked
-ARK Prefix: ark:16081
-Custom Suffix Prefix: CRL
-Resolver URL: https://n2t.net/
-
-Resulting ARK: https://n2t.net/ark:16081/CRL6522-QVWX
-
-### NAAN Registration (n2t.net)
-
-After installing the plugin, configure your NAAN target to:
-
-https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=${value}
-
-Example:
-https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=${value}
-
-### Usage
-
-- Click "Generate ARK" button in the Identifiers section of the article form
-- Duplicate or invalid ARKs are prevented automatically
-
-### Resolver Integration
-
-The plugin includes a built-in resolver that works without editing your main .htaccess file. The resolver:
-
-1. Receives the ARK suffix via ?ark= parameter
-2. Queries the database to find the corresponding article
-3. Redirects to the article page (302 Found)
-
-Direct access example:
-https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
-
-### ERC Metadata Support (ARK Inflections)
-
-The resolver supports ARK inflections:
-| Inflection | Behavior | Example |
-|------------|----------|---------|
-| (none) | Redirects to article page | `?ark=CRL0001-LURY` |
-| `?` | Returns brief ERC metadata | `?ark=CRL0001-LURY?` |
-| `??` | Returns full ERC metadata | `?ark=CRL0001-LURY??` |
-| `.info` | Returns full ERC metadata | `?ark=CRL0001-LURY.info` |
-| `&info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
-| `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY?info` |
-
-**Example:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata\
-https://n2t.net/ark:16081/CRL0001-LURY → Redirects to article
-
-text
-
-> **Note:** The `?` inflection (brief metadata) works only when accessing your resolver directly.
-
-### ARK Implementation Date
-
-In the plugin settings, you can set a **fixed implementation date** for your journal:
-
-- This date represents when your journal started supporting ARK identifiers
-- It will be displayed in the `erc-support.when` field of the ERC metadata
-- The date must be in `YYYYMMDD` format (e.g., `20260215`)
-- If not set, the article publication date is used as fallback
-
-**Example ERC output with implementation date:**\
-
-> erc:\
-who: Lury Hortêncio Costa Morais\
-what: Assombrosamente maravilhoso\
-when: 20260215\
-where: https://n2t.net/ark:16081/CRL0001-LURY/\
-erc-support:\
-who: Carnaubais Revista de Literatura\
-what: Permanent: Stable Content:\
-when: 20260215\
-where: https://n2t.net/ark:16081/
-
-### Requirements
-
-- OJS 3.5.x
-- PHP 7.4 or higher
-- MySQL 5.7+ or MariaDB 10.2+
-
-### Troubleshooting
-
-Resolver returns 403 Forbidden
-The plugin includes a .htaccess file that grants access to resolver.php. If you still get 403, check if your main .htaccess has conflicting rules.
-
-ARK not appearing in article form
-Ensure "Enable ARK for Articles" is checked in plugin settings.
-
-Duplicate ARK error
-The plugin automatically prevents duplicates. If you see this error, click "Generate ARK" to generate a new unique identifier.
-
-### Uninstallation
-
-1. Disable the plugin in Settings > Website > Plugins
-2. Remove the ark folder from plugins/pubIds/
-3. (Optional) Remove ARK data from database using SQL:
-   DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
-
-### License
-
-GNU General Public License v2 - See LICENSE file for details.
-
-### Author
-
-Lury Morais (2026)
-
-### Credits
-
-Based on original pkp-ark-pubid plugin by Yasiel Pérez Vera (2021)
-
----
-
-[⬆ Back to top](#english)
+> [🇧🇷 Português](#português) | [🇪🇸 Español](#español) | [🇺🇸 English](#english) | 
 
 ---
 
@@ -183,12 +36,16 @@ IMPORTANTE: Quando você baixar o plugin do GitHub, a pasta pode estar nomeada c
 
 ### Exemplo de Configuração
 
-Habilitar ARK para Artigos: Marcado
-Prefixo ARK: ark:16081
-Prefixo Personalizado do Sufixo: CRL
+Habilitar ARK para Artigos: Marcado\
+Prefixo ARK: ark:16081\
+Sufixo Personalizado: CRL\
 URL do Resolvedor: https://n2t.net/
 
 ARK resultante: https://n2t.net/ark:16081/CRL6522-QVWX
+
+<img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
+
+> At the end of the configuration, you will be able to see an example preview for your resources.
 
 ### Registro NAAN (n2t.net)
 
@@ -243,13 +100,13 @@ Nas configurações do plugin, você pode definir uma **data de implementação 
 - A data deve estar no formato `AAAAMMDD` (exemplo: `20260215`)
 - Se não for definida, a data de publicação do artigo será usada como fallback
 
-**Exemplo de output ERC com data de implementação:**\
+**Exemplo de output ERC com data de implementação:** <br>
 
 > erc:\
 who: Lury Hortêncio Costa Morais\
 what: Assombrosamente maravilhoso\
 when: 20260215\
-where: https://n2t.net/ark:16081/CRL0001-LURY/\
+where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
 erc-support:\
 who: Carnaubais Revista de Literatura\
 what: Permanent: Stable Content:\
@@ -329,12 +186,16 @@ IMPORTANTE: Cuando descargue el plugin de GitHub, la carpeta puede llamarse ark-
 
 ### Ejemplo de Configuración
 
-Habilitar ARK para Artículos: Marcado
-Prefijo ARK: ark:16081
-Prefijo Personalizado del Sufijo: CRL
+Habilitar ARK para Artículos: Marcado\
+Prefijo ARK: ark:16081\
+Sufijo Personalizado: CRL\
 URL del Resolvedor: https://n2t.net/
 
 ARK resultante: https://n2t.net/ark:16081/CRL6522-QVWX
+
+<img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
+
+> Al finalizar la configuración, podrá ver una vista previa de ejemplo de sus recursos.
 
 ### Registro NAAN (n2t.net)
 
@@ -389,13 +250,13 @@ En la configuración del plugin, puede definir una **fecha de implementación fi
 - La fecha debe estar en formato `AAAAMMDD` (ejemplo: `20260215`)
 - Si no se define, se usará la fecha de publicación del artículo como fallback
 
-**Ejemplo de salida ERC con fecha de implementación:**\
+**Ejemplo de salida ERC con fecha de implementación:** <br>
 
 > erc:\
 who: Lury Hortêncio Costa Morais\
 what: Assombrosamente maravilhoso\
 when: 20260215\
-where: https://n2t.net/ark:16081/CRL0001-LURY/\
+where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
 erc-support:\
 who: Carnaubais Revista de Literatura\
 what: Permanent: Stable Content:\
@@ -444,10 +305,159 @@ Basado en el plugin original pkp-ark-pubid por Yasiel Pérez Vera (2021)
 
 ---
 
-## License / Licença / Licencia
+
+<a name="english"></a>
+## 🇺🇸 English
+
+**Archival Resource Key (ARK) plugin for Open Journal Systems 3.5.x**
+
+### Features
+
+- Generate ARK identifiers only for Articles
+- Format: ark:NAAN/CUSTOMxxxx-yyyy (e.g., ark:16081/CRL5432-ABCD)
+- Configurable custom suffix prefix (2-6 uppercase letters)
+- Automatic duplicate detection and prevention
+- Built-in resolver (works without editing main .htaccess)
+- Ready for NAAN registration (n2t.net)
+
+### Installation
+
+IMPORTANT: When you download the plugin from GitHub, the folder may be named ark-plugin-main or ark-plugin-2.0.0. You MUST rename it to ark before copying to your OJS installation.
+
+1. Download the plugin from GitHub
+2. Rename the folder to ark (if not already named ark)
+3. Copy the ark folder to plugins/pubIds/
+4. Go to Settings > Website > Plugins
+5. Find "ARK" Public Identifier Plugins and enable it
+6. Configure the plugin:
+   - Enable ARK for Articles (must be checked)
+   - ARK Prefix: The fixed prefix (e.g., ark:16081)
+   - Custom Suffix Prefix: The prefix before the random part (2-6 letters, e.g., MIT, UERN, CRL)
+   - Resolver URL: https://n2t.net/ (or your own resolver)
+
+### Configuration Example
+
+Enable ARK for Articles: Checked\
+ARK Prefix: ark:16081\
+Custom Suffix: CRL\
+Resolver URL: https://n2t.net/
+
+Resulting ARK: https://n2t.net/ark:16081/CRL6522-QVWX
+
+<img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
+
+> At the end of the configuration, you will be able to see an example preview for your resources.
+
+### NAAN Registration (n2t.net)
+
+After installing the plugin, configure your NAAN target to:
+
+https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=${value}
+
+Example:
+https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=${value}
+
+### Usage
+
+- Click "Generate ARK" button in the Identifiers section of the article form
+- Duplicate or invalid ARKs are prevented automatically
+
+### Resolver Integration
+
+The plugin includes a built-in resolver that works without editing your main .htaccess file. The resolver:
+
+1. Receives the ARK suffix via ?ark= parameter
+2. Queries the database to find the corresponding article
+3. Redirects to the article page (302 Found)
+
+Direct access example:
+https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
+
+### ERC Metadata Support (ARK Inflections)
+
+The resolver supports ARK inflections:
+| Inflection | Behavior | Example |
+|------------|----------|---------|
+| (none) | Redirects to article page | `?ark=CRL0001-LURY` |
+| `?` | Returns brief ERC metadata | `?ark=CRL0001-LURY?` |
+| `??` | Returns full ERC metadata | `?ark=CRL0001-LURY??` |
+| `.info` | Returns full ERC metadata | `?ark=CRL0001-LURY.info` |
+| `&info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
+| `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY?info` |
+
+**Example:**
+https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata\
+https://n2t.net/ark:16081/CRL0001-LURY → Redirects to article
+
+> **Note:** The `?` inflection (brief metadata) works only when accessing your resolver directly.
+
+### ARK Implementation Date
+
+In the plugin settings, you can set a **fixed implementation date** for your journal:
+
+- This date represents when your journal started supporting ARK identifiers
+- It will be displayed in the `erc-support.when` field of the ERC metadata
+- The date must be in `YYYYMMDD` format (e.g., `20260215`)
+- If not set, the article publication date is used as fallback
+
+**Example ERC output with implementation date:** <br>
+
+> erc:\
+who: Lury Hortêncio Costa Morais\
+what: Assombrosamente maravilhoso\
+when: 20260215\
+where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
+erc-support:\
+who: Carnaubais Revista de Literatura\
+what: Permanent: Stable Content:\
+when: 20260215\
+where: https://n2t.net/ark:16081/
+
+### Requirements
+
+- OJS 3.5.x
+- PHP 7.4 or higher
+- MySQL 5.7+ or MariaDB 10.2+
+
+### Troubleshooting
+
+Resolver returns 403 Forbidden
+The plugin includes a .htaccess file that grants access to resolver.php. If you still get 403, check if your main .htaccess has conflicting rules.
+
+ARK not appearing in article form
+Ensure "Enable ARK for Articles" is checked in plugin settings.
+
+Duplicate ARK error
+The plugin automatically prevents duplicates. If you see this error, click "Generate ARK" to generate a new unique identifier.
+
+### Uninstallation
+
+1. Disable the plugin in Settings > Website > Plugins
+2. Remove the ark folder from plugins/pubIds/
+3. (Optional) Remove ARK data from database using SQL:
+   DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
+
+### License
 
 GNU General Public License v2 - See LICENSE file for details.
 
+### Author
+
+Lury Morais (2026)
+
+### Credits
+
+Based on original pkp-ark-pubid plugin by Yasiel Pérez Vera (2021)
+
 ---
+
+[⬆ Back to top](#english)
+
+---
+
+## License / Licença / Licencia
+GNU General Public License v2 - See LICENSE file for details.
+
+<br>
 
 **Built for Carnaubais Revista de Literatura**
