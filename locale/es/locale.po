@@ -1,0 +1,142 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ARK Plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 10:00-0300\n"
+"PO-Revision-Date: 2026-01-19 10:00-0300\n"
+"Last-Translator: Lury Morais\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "plugins.pubIds.ark.displayName"
+msgstr "ARK"
+
+msgid "plugins.pubIds.ark.description"
+msgstr "Plugin para asignar identificadores ARK (Archival Resource Key) a los artículos."
+
+msgid "plugins.pubIds.ark.manager.settings.description"
+msgstr "Configure el plugin ARK para artículos:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkObjects"
+msgstr "Tipos de objeto"
+
+msgid "plugins.pubIds.ark.manager.settings.arkObjectsRequired"
+msgstr "Los ARKs se generan solo para artículos."
+
+msgid "plugins.pubIds.ark.manager.settings.explainARKs"
+msgstr "Seleccione los tipos de objeto que recibirán ARK:"
+
+msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
+msgstr "Artículos"
+
+msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
+msgstr "Prefijo ARK"
+
+msgid "plugins.pubIds.ark.manager.settings.arkPrefix.description"
+msgstr "Prefijo fijo del ARK (ej: ARK, ark:12345). Será seguido por '/' y el sufijo."
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkPrefixPattern"
+msgstr "El prefijo debe contener 2-40 caracteres (letras, números, :, _)."
+
+msgid "plugins.pubIds.ark.manager.settings.arkSuffix"
+msgstr "Formato del sufijo"
+
+msgid "plugins.pubIds.ark.manager.settings.arkSuffix.description"
+msgstr "Configure cómo se generará el sufijo del ARK."
+
+msgid "plugins.pubIds.ark.manager.settings.arkSuffixRandom"
+msgstr "Sufijo aleatorio (ej: CRL1234-ABCD)"
+
+msgid "plugins.pubIds.ark.manager.settings.arkCustomPrefix"
+msgstr "Prefijo personalizado:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkCustomPrefix.validation"
+msgstr "(2-6 letras mayúsculas)"
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkCustomPrefixPattern"
+msgstr "El prefijo personalizado debe contener 2-6 letras mayúsculas."
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver"
+msgstr "URL del resolvedor"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.description"
+msgstr "URL base para resolución de ARKs (ej: https://n2t.net/)"
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkResolverRequired"
+msgstr "Indique la URL del resolvedor."
+
+msgid "plugins.pubIds.ark.manager.settings.preview"
+msgstr "Vista previa"
+
+msgid "plugins.pubIds.ark.manager.settings.previewLabel"
+msgstr "Ejemplo de ARK que se generará:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkReassign"
+msgstr "Reasignar ARKs"
+
+msgid "plugins.pubIds.ark.manager.settings.arkReassign.description"
+msgstr "Haga clic para eliminar todos los ARKs existentes y reasignar con las nuevas configuraciones."
+
+msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
+msgstr "¿Está seguro? Todos los ARKs existentes serán eliminados permanentemente."
+
+msgid "plugins.pubIds.ark.editor.ark"
+msgstr "ARK"
+
+msgid "plugins.pubIds.ark.editor.missingPrefix"
+msgstr "El ARK debe comenzar con {$arkPrefix}."
+
+msgid "plugins.pubIds.ark.editor.invalidSuffixFormat"
+msgstr "Formato inválido. Use: {$format}"
+
+msgid "plugins.pubIds.ark.editor.arkSuffixNotUnique"
+msgstr "Este ARK ya está en uso. Haga clic en \"Generar ARK\" para crear uno nuevo."
+
+msgid "plugins.pubIds.ark.editor.clearObjectsARK"
+msgstr "Limpiar ARK"
+
+msgid "plugins.pubIds.ark.editor.clearObjectsARK.confirm"
+msgstr "¿Eliminar este ARK permanentemente?"
+
+msgid "plugins.pubIds.ark.editor.assignARK"
+msgstr "Asignar el ARK {$pubId} a este {$pubObjectType}"
+
+msgid "plugins.pubIds.ark.editor.ark.assignArk"
+msgstr "Asignar"
+
+msgid "plugins.pubIds.ark.editor.ark.clearArk"
+msgstr "Limpiar"
+
+msgid "plugins.pubIds.ark.editor.generateArk"
+msgstr "Generar ARK"
+
+msgid "plugins.pubIds.ark.suffix.random"
+msgstr "Sufijo aleatorio"
+
+msgid "plugins.pubIds.ark.editor.arkHelp"
+msgstr "El ARK (Archival Resource Key) es un identificador persistente para este artículo. El formato es {$prefix}/PREFIJO2345-ABCD. Haga clic en 'Generar ARK' para crear un nuevo identificador automáticamente."
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
+msgstr "n2t.net (Predeterminado)"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.custom"
+msgstr "Resolvedor personalizado:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
+msgstr "URL del resolvedor personalizado"
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
+msgstr "Fecha de Implementación del ARK"
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
+msgstr "Ingrese la fecha en que los identificadores ARK comenzaron a usarse o planificarse en su revista. Esta fecha será fija para todos los registros y representa el inicio del soporte de la revista para enlaces persistentes. Formato: AAAAMMDD (Ejemplo: 20260215)."
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
+msgstr "Si es la primera vez que usa ARK, ingrese la fecha en que recibió su NAAN o la fecha de publicación del primer ARK."
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
+msgstr "La fecha debe estar en formato AAAAMMDD (año, mes, día) con 8 dígitos."

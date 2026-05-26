@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+
+<!--
+  * plugins/pubIds/ark/version.xml
+  *
+  * Copyright (c) 2026 Lury Morais
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * Plugin version information.
+  -->
+<version>
+  <application>ark</application>
+  <type>plugins.pubIds</type>
+  <release>2.0.0.0</release>
+  <date>2026-01-19</date>
+  <lazy-load>1</lazy-load>
+  <class>ARKPubIdPlugin</class>
+</version>
