@@ -78,7 +78,7 @@ The resolver supports ARK inflections:
 | `??` | Returns full ERC metadata | `?ark=CRL0001-LURY??` |
 | `.info` | Returns full ERC metadata | `?ark=CRL0001-LURY.info` |
 | `&info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
-| `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
+| `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY?info` |
 
 **Example:**
 https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata
@@ -226,7 +226,7 @@ O resolvedor suporta inflexões ARK:
 | `??` | Retorna metadados ERC completos | `?ark=CRL0001-LURY??` |
 | `.info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY.info` |
 | `&info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY&info` |
-| `?info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY&info` |
+| `?info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY?info` |
 
 **Exemplo:**
 https://n2t.net/ark:16081/CRL0001-LURY?? → Retorna metadados ERC
@@ -372,7 +372,7 @@ El resolvedor soporta inflexiones ARK:
 | `??` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY??` |
 | `.info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY.info` |
 | `&info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY&info` |
-| `?info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY&info` |
+| `?info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY?info` |
 
 **Ejemplo:**
 https://n2t.net/ark:16081/CRL0001-LURY?? → Devuelve metadatos ERC
