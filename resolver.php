@@ -85,45 +85,40 @@ function getDbConfig() {
 }
 
 /**
- * Extract inflection from query string
+ * Extract inflection from query string and clean the ARK value
  * 
- * Detects '?' (brief metadata) and '??' (full metadata) in the request
+ * Detects '?info', '.info', '??' (full metadata) and '?' (brief metadata)
+ * Modifies the ARK value by reference to remove inflection characters
  * 
- * @return string|null 'brief' for '?', 'full' for '??', or null if no inflection
+ * @param string &$arkValue The ARK value (passed by reference, may be modified)
+ * @return string|null 'brief' for '?', 'full' for '?info'/'info'/'??', or null if no inflection
  */
 function getInflection() {
-    // Check for '?' and '??' in query string
-    if (empty($_SERVER['QUERY_STRING'])) {
-        $requestUri = $_SERVER['REQUEST_URI'];
-        if (substr($requestUri, -2) === '??') {
-            return 'full';
-        } elseif (substr($requestUri, -1) === '?') {
-            return 'brief';
-        }
-        return null;
+    $requestUri = $_SERVER['REQUEST_URI'];
+    
+    // Check for '&info' parameter (works reliably)
+    if (isset($_GET['info'])) {
+        return 'full';
     }
     
-    // For cases like resolver.php?ark=ID? or resolver.php?ark=ID??
-    if (isset($_GET['ark'])) {
-        $arkValue = $_GET['ark'];
-        if (substr($arkValue, -2) === '??') {
-            $_GET['ark'] = substr($arkValue, 0, -2);
-            return 'full';
-        } elseif (substr($arkValue, -1) === '?') {
-            $_GET['ark'] = substr($arkValue, 0, -1);
-            return 'brief';
-        }
+    // Check for '.info' at the end of URL
+    if (substr($requestUri, -5) === '.info') {
+        return 'full';
     }
     
-    if (isset($_GET['id'])) {
-        $idValue = $_GET['id'];
-        if (substr($idValue, -2) === '??') {
-            $_GET['id'] = substr($idValue, 0, -2);
-            return 'full';
-        } elseif (substr($idValue, -1) === '?') {
-            $_GET['id'] = substr($idValue, 0, -1);
-            return 'brief';
-        }
+    // Check for '?info' in the URL (if server preserves it)
+    if (strpos($requestUri, '?info') !== false) {
+        return 'full';
+    }
+    
+    // Check for legacy '??' inflection
+    if (substr($requestUri, -2) === '??') {
+        return 'full';
+    }
+    
+    // Check for legacy '?' inflection (brief metadata)
+    if (substr($requestUri, -1) === '?' && substr($requestUri, -2) !== '??') {
+        return 'brief';
     }
     
     return null;
@@ -428,10 +423,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
 
 // ============ MAIN EXECUTION ============
 
-// Check for '?' and '??' inflections
-$inflection = getInflection();
-
-// Check parameter
+// Check parameter first
 if (empty($_GET['ark']) && empty($_GET['id'])) {
     showErrorPage(
         400,
@@ -445,6 +437,21 @@ if (empty($_GET['ark']) && empty($_GET['id'])) {
 }
 
 $arkSuffix = $_GET['ark'] ?? $_GET['id'];
+$originalInput = $arkSuffix;
+
+// Detect inflection (function called without arguments)
+$inflection = getInflection();
+
+// DEBUG: Ver o que está sendo recebido (remove after testing)
+error_log("ARK DEBUG: \$_GET = " . print_r($_GET, true));
+error_log("ARK DEBUG: inflection = " . ($inflection ?? 'null'));
+
+// Remove inflection suffixes from ARK value
+$arkSuffix = preg_replace('/\?info$/', '', $arkSuffix);
+$arkSuffix = preg_replace('/\.info$/', '', $arkSuffix);
+$arkSuffix = preg_replace('/\?\?$/', '', $arkSuffix);
+$arkSuffix = preg_replace('/\?$/', '', $arkSuffix);
+
 $originalInput = $arkSuffix;
 
 // Clean ARK suffix (remove ark: prefix and shoulder)

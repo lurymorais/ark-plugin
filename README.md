@@ -71,11 +71,14 @@ https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 ### ERC Metadata Support (ARK Inflections)
 
 The resolver supports ARK inflections:
-
-| Inflection | Behavior |
-|------------|----------|
-| (none) | Redirects to article page |
-| `??` | Returns full ERC metadata |
+| Inflection | Behavior | Example |
+|------------|----------|---------|
+| (none) | Redirects to article page | `?ark=CRL0001-LURY` |
+| `?` | Returns brief ERC metadata | `?ark=CRL0001-LURY?` |
+| `??` | Returns full ERC metadata | `?ark=CRL0001-LURY??` |
+| `.info` | Returns full ERC metadata | `?ark=CRL0001-LURY.info` |
+| `&info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
+| `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
 
 **Example:**
 https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata
@@ -83,7 +86,7 @@ https://n2t.net/ark:16081/CRL0001-LURY → Redirects to article
 
 text
 
-> **Note:** Only `??` works via n2t.net. The `?` inflection (brief metadata) works only when accessing your resolver directly.
+> **Note:** The `?` inflection (brief metadata) works only when accessing your resolver directly.
 
 ### ARK Implementation Date
 
@@ -216,16 +219,20 @@ https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
 O resolvedor suporta inflexões ARK:
 
-| Inflexão | Comportamento |
-|----------|---------------|
-| (nenhuma) | Redireciona para o artigo |
-| `??` | Retorna metadados ERC completos |
+| Inflexão | Comportamento | Exemplo |
+|----------|---------------|---------|
+| (nenhuma) | Redireciona para o artigo | `?ark=CRL0001-LURY` |
+| `?` | Retorna metadados ERC resumidos | `?ark=CRL0001-LURY?` |
+| `??` | Retorna metadados ERC completos | `?ark=CRL0001-LURY??` |
+| `.info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY.info` |
+| `&info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY&info` |
+| `?info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY&info` |
 
 **Exemplo:**
 https://n2t.net/ark:16081/CRL0001-LURY?? → Retorna metadados ERC
 https://n2t.net/ark:16081/CRL0001-LURY → Redireciona para o artigo
 
-> **Nota:** Apenas `??` funciona via n2t.net. A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor.
+> **Nota:** A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor.
 
 ### Data de Implementação do ARK
 
@@ -358,16 +365,20 @@ https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
 
 El resolvedor soporta inflexiones ARK:
 
-| Inflexión | Comportamiento |
-|-----------|----------------|
-| (ninguna) | Redirige al artículo |
-| `??` | Devuelve metadatos ERC completos |
+| Inflexión | Comportamiento | Ejemplo |
+|-----------|----------------|---------|
+| (ninguna) | Redirige al artículo | `?ark=CRL0001-LURY` |
+| `?` | Devuelve metadatos ERC resumidos | `?ark=CRL0001-LURY?` |
+| `??` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY??` |
+| `.info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY.info` |
+| `&info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY&info` |
+| `?info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY&info` |
 
 **Ejemplo:**
 https://n2t.net/ark:16081/CRL0001-LURY?? → Devuelve metadatos ERC
 https://n2t.net/ark:16081/CRL0001-LURY → Redirige al artículo
 
-> **Nota:** Solo `??` funciona vía n2t.net. La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor.
+> **Nota:** La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor.
 
 ### Fecha de Implementación del ARK
 
@@ -433,10 +444,10 @@ Basado en el plugin original pkp-ark-pubid por Yasiel Pérez Vera (2021)
 
 ---
 
-## 📄 License / Licença / Licencia
+## License / Licença / Licencia
 
 GNU General Public License v2 - See LICENSE file for details.
 
 ---
 
-**Built for Carnaubais Revista de Literatura** 🚀
+**Built for Carnaubais Revista de Literatura**
