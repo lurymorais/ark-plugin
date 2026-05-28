@@ -30,9 +30,6 @@ msgstr "ARKs are generated only for articles."
 msgid "plugins.pubIds.ark.manager.settings.explainARKs"
 msgstr "Select which object types will receive ARKs:"
 
-msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
-msgstr "Articles"
-
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
 msgstr "ARK Prefix"
 
@@ -118,7 +115,7 @@ msgid "plugins.pubIds.ark.suffix.random"
 msgstr "Random suffix"
 
 msgid "plugins.pubIds.ark.editor.arkHelp"
-msgstr "ARK (Archival Resource Key) is a persistent identifier for this article. The format is {$prefix}/PREFIX2345-ABCD. Click 'Generate ARK' to automatically create a new identifier."
+msgstr "ARK (Archival Resource Key) is a persistent identifier. Click 'Generate ARK' to automatically create a new identifier."
 
 msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
 msgstr "n2t.net (Default)"
@@ -140,3 +137,33 @@ msgstr "If this is your first time using ARK, enter the date you received your N
 
 msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
 msgstr "The date must be in YYYYMMDD format (year, month, day) with 8 digits."
+
+msgid "plugins.pubIds.ark.editor.generateNewArk"
+msgstr "Generate New ARK"
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmReplace"
+msgstr "This will replace the existing ARK: %s. Are you sure you want to generate a new one? The old ARK will be overwritten when you save."
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmNew"
+msgstr "Generate a new ARK for this issue?"
+
+msgid "plugins.pubIds.ark.editor.duplicateArkError"
+msgstr "ERROR: This ARK is already in use by another article or issue! Use the 'Generate New ARK' button to create a unique identifier."
+
+msgid "plugins.pubIds.ark.editor.saveSuccess"
+msgstr "ARK saved successfully!"
+
+msgid "plugins.pubIds.ark.editor.networkError"
+msgstr "Network error. Please try again."
+
+msgid "plugins.pubIds.ark.editor.genericError"
+msgstr "Error saving ARK: "
+
+msgid "common.saving"
+msgstr "Saving..."
+
+msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
+msgstr "Articles"
+
+msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
+msgstr "Issues"

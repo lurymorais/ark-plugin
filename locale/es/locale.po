@@ -30,9 +30,6 @@ msgstr "Los ARKs se generan solo para artículos."
 msgid "plugins.pubIds.ark.manager.settings.explainARKs"
 msgstr "Seleccione los tipos de objeto que recibirán ARK:"
 
-msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
-msgstr "Artículos"
-
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
 msgstr "Prefijo ARK"
 
@@ -118,7 +115,7 @@ msgid "plugins.pubIds.ark.suffix.random"
 msgstr "Sufijo aleatorio"
 
 msgid "plugins.pubIds.ark.editor.arkHelp"
-msgstr "El ARK (Archival Resource Key) es un identificador persistente para este artículo. El formato es {$prefix}/PREFIJO2345-ABCD. Haga clic en 'Generar ARK' para crear un nuevo identificador automáticamente."
+msgstr "El ARK (Archival Resource Key) es un identificador persistente. Haga clic en 'Generar ARK' para crear un nuevo identificador automáticamente."
 
 msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
 msgstr "n2t.net (Predeterminado)"
@@ -140,3 +137,33 @@ msgstr "Si es la primera vez que usa ARK, ingrese la fecha en que recibió su NA
 
 msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
 msgstr "La fecha debe estar en formato AAAAMMDD (año, mes, día) con 8 dígitos."
+
+msgid "plugins.pubIds.ark.editor.generateNewArk"
+msgstr "Generar Nuevo ARK"
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmReplace"
+msgstr "Esto reemplazará el ARK existente: %s. ¿Estás seguro de que quieres generar uno nuevo? El ARK antiguo se sobrescribirá cuando guardes."
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmNew"
+msgstr "¿Generar un nuevo ARK para esta edición?"
+
+msgid "plugins.pubIds.ark.editor.duplicateArkError"
+msgstr "ERROR: ¡Este ARK ya está en uso por otro artículo o edición! Utilice el botón 'Generar Nuevo ARK' para crear un identificador único."
+
+msgid "plugins.pubIds.ark.editor.saveSuccess"
+msgstr "¡ARK guardado con éxito!"
+
+msgid "plugins.pubIds.ark.editor.networkError"
+msgstr "Error de red. Inténtelo de nuevo."
+
+msgid "plugins.pubIds.ark.editor.genericError"
+msgstr "Error al guardar ARK: "
+
+msgid "common.saving"
+msgstr "Guardando..."
+
+msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
+msgstr "Ediciones"
+
+msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
+msgstr "Artículos"

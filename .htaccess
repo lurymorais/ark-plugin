@@ -6,6 +6,15 @@
     Require all granted
 </Files>
 
+<Files "save_ajax.php">
+    Require all granted
+    Satisfy Any
+    <IfModule mod_php.c>
+        php_value auto_prepend_file ""
+        php_value auto_append_file ""
+    </IfModule>
+</Files>
+
 # Impede listagem de diretório por segurança
 Options -Indexes
 

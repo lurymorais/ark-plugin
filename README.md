@@ -1,95 +1,111 @@
 # 🌐 ARK Plugin for OJS 3.5.x
 
 > **Escolha seu idioma / Elija su idioma / Choose your language :**  
-> [🇧🇷 Português](#português) | [🇪🇸 Español](#español) | [🇺🇸 English](#english) | 
+> [🇧🇷 Português](#portugues) | [🇪🇸 Español](#espanol) | [🇺🇸 English](#english)
 
 ---
 
-<a name="português"></a>
+<a name="portugues"></a>
 ## 🇧🇷 Português
 
 **Plugin ARK para OJS 3.5.x**
 
 ### Funcionalidades
 
-- Gera identificadores ARK apenas para Artigos
-- Formato: ark:NAAN/SUASIGLAxxxx-yyyy (ex.: ark:16081/CRL5432-ABCD)
+- Gera identificadores ARK para **Artigos** e **Edições**
+- Formato: `ark:NAAN/SUASIGLAxxxx-yyyy`
 - Prefixo personalizado (2-6 letras maiúsculas)
+- **Geração automática** ao acessar a aba de identificadores
+- **Botão "Gerar Novo ARK"** com confirmação para substituição
+- **Restauração automática** de ARKs existentes (evita perda de dados)
 - Detecção e prevenção automática de duplicatas
 - Resolvedor integrado (funciona sem editar o .htaccess principal)
+- Suporte a **metadados ERC** para artigos e edições
 - Pronto para registro NAAN (n2t.net)
+- **Resolvedor inteligente** que detecta se o ARK é de artigo ou edição
 
 ### Instalação
 
-IMPORTANTE: Quando você baixar o plugin do GitHub, a pasta pode estar nomeada como ark-plugin-main ou ark-plugin-2.0.0. Você DEVE renomeá-la para "ark" antes de copiar para sua instalação do OJS.
+**IMPORTANTE:** Quando você baixar o plugin do GitHub, a pasta pode estar nomeada como `ark-plugin-main` ou `ark-plugin-2.0.0`. Você DEVE renomeá-la para **`ark`** antes de copiar para sua instalação do OJS.
 
 1. Baixe o plugin do GitHub
-2. Renomeie a pasta para "ark" (se já não estiver nomeada como ark)
-3. Copie a pasta ark para plugins/pubIds/
-4. Vá para Configurações > Website > Plugins
+2. Renomeie a pasta para `ark` (se já não estiver nomeada como `ark`)
+3. Copie a pasta `ark` para `plugins/pubIds/`
+4. Vá para **Configurações > Website > Plugins**
 5. Encontre o plugin de identificador público "ARK" e ative-o
 6. Configure o plugin:
-   - Habilitar ARK para Artigos (deve estar marcado)
-   - Prefixo ARK: O seu prefixo NAAN (ex.: ark:16081)
-   - Prefixo Personalizado: O prefixo antes da parte aleatória (2-6 letras, ex.: MIT, UERN, CRL)
-   - URL do Resolvedor: https://n2t.net/ (ou seu próprio resolvedor)
+
+| Configuração | Valor |
+|--------------|-------|
+| Habilitar ARK para Artigos | ✓ (opcional) |
+| Habilitar ARK para Edições | ✓ (opcional) |
+| Prefixo ARK | Seu prefixo NAAN (ex.: `ark:12345`) |
+| Prefixo Personalizado | 2-6 letras maiúsculas (ex.: `SIGLA`) |
+| URL do Resolvedor | `https://n2t.net/` (ou seu próprio resolvedor) |
 
 ### Exemplo de Configuração
 
-Habilitar ARK para Artigos: Marcado\
-Prefixo ARK: ark:16081\
-Sufixo Personalizado: CRL\
-URL do Resolvedor: https://n2t.net/
+- **Habilitar ARK para Artigos:** Marcado
+- **Habilitar ARK para Edições:** Marcado
+- **Prefixo ARK:** `ark:12345`
+- **Prefixo Personalizado:** `SIGLA`
+- **URL do Resolvedor:** `https://n2t.net/`
 
-ARK resultante: https://n2t.net/ark:16081/CRL6522-QVWX
+**ARK resultante para artigo:** `https://n2t.net/ark:12345/SIGLA1234-ABCD`
 
-<img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
+**ARK resultante para edição:** `https://n2t.net/ark:12345/SIGLA5678-EFGH`
+
+<img width="auto" height="auto" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
 
 > Ao fim da configuração, você verá um pré-visualizador.
 
-### Registro NAAN (n2t.net)
-
-Após instalar o plugin, configure seu target NAAN para:
-
-https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=${value}
-
-Exemplo:
-https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=${value}
-
 ### Uso
 
-- Clique no botão "Gerar ARK" na seção de "Identificadores" do formulário do artigo
+#### Para Artigos
+- Acesse o formulário do artigo, aba "Identificadores"
+- Clique no botão "Gerar ARK" para gerar um novo identificador
 - ARKs duplicados ou inválidos são prevenidos automaticamente
 
-### Integração do Resolvedor
+#### Para Edições
+- Acesse **Edições > Editar** uma edição
+- Vá para a aba **"Identificadores"**
+- O ARK é gerado automaticamente ao carregar a página
+- Se precisar de um novo ARK, clique em **"Gerar Novo ARK"** (um alerta de confirmação será exibido)
+- ARKs duplicados são prevenidos automaticamente
 
-O plugin inclui um resolvedor integrado que funciona sem editar seu arquivo .htaccess principal. O resolvedor:
+### Resolver e Registro NAAN (se você usa n2t.net) IMPORTANTE
 
-1. Recebe o sufixo do ARK via parâmetro ?ark=
-2. Consulta o banco de dados para encontrar o artigo correspondente
-3. Redireciona para a página do artigo (302 Found)
+> Após instalar o plugin, configure seu target NAAN para:
+> `https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=${value}`
 
-Exemplo de acesso direto:
-https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
+O plugin inclui um **resolvedor integrado** que funciona sem editar seu arquivo .htaccess principal. O resolvedor:
+
+1. Recebe o identificador ARK via parâmetro `?ark=`
+2. **Detecta automaticamente** se o ARK pertence a um artigo ou uma edição
+3. Redireciona para a página correspondente (302 Found)
+
+**Exemplos de acesso direto:**
+
+- Artigo: `https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=SIGLA2244-AABB`
+- Edição: `https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=EDICAO1234-ABCD`
 
 ### Suporte a Metadados ERC (Inflexões ARK)
 
-O resolvedor suporta inflexões ARK:
+O resolvedor suporta inflexões ARK para artigos e edições:
 
 | Inflexão | Comportamento | Exemplo |
 |----------|---------------|---------|
-| (nenhuma) | Redireciona para o artigo | `?ark=CRL0001-LURY` |
-| `?` | Retorna metadados ERC resumidos | `?ark=CRL0001-LURY?` |
-| `??` | Retorna metadados ERC completos | `?ark=CRL0001-LURY??` |
-| `.info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY.info` |
-| `&info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY&info` |
-| `?info` | Retorna metadados ERC completos | `?ark=CRL0001-LURY?info` |
+| (nenhuma) | Redireciona para o artigo/edição | `?ark=SIGLA0001-ABCD` |
+| `?` | Retorna metadados ERC resumidos | `?ark=SIGLA0001-ABCD?` |
+| `??` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD??` |
+| `.info` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD.info` |
+| `&info` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD&info` |
+| `?info` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD?info` |
 
 **Exemplo:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Retorna metadados ERC\
-https://n2t.net/ark:16081/CRL0001-LURY → Redireciona para o artigo
+- `https://n2t.net/ark:16081/CRL0001-LURY??` → Retorna metadados ERC
 
-> **Nota:** A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor.
+> **Nota:** A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor, pois em "https://n2t.net/ark:16081/CRL0001-LURY?" o resolver da n2t.net entrega apenas o link sem a inflexão, levando à página do artigo.
 
 ### Data de Implementação do ARK
 
@@ -98,148 +114,159 @@ Nas configurações do plugin, você pode definir uma **data de implementação 
 - Esta data representa quando seu periódico começou a suportar identificadores ARK
 - Será exibida no campo `erc-support.when` dos metadados ERC
 - A data deve estar no formato `AAAAMMDD` (exemplo: `20260215`)
-- Se não for definida, a data de publicação do artigo será usada como fallback
+- Se não for definida, a data de publicação será usada como fallback
 
-**Exemplo de output ERC com data de implementação:** <br>
+### Exibição no Frontend
 
-> erc:\
-who: Lury Hortêncio Costa Morais\
-what: Assombrosamente maravilhoso\
-when: 20260215\
-where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
-erc-support:\
-who: Carnaubais Revista de Literatura\
-what: Permanent: Stable Content:\
-**when: 20260215**\
-where: https://n2t.net/ark:16081/
+O ARK é exibido automaticamente em:
 
-### Requisitos
-
-- OJS 3.5.x
-- PHP 7.4 ou superior
-- MySQL 5.7+ ou MariaDB 10.2+
+- **Página da edição** (issue view)
+- **Lista de edições** (issue archive)
+- **Página do artigo** (article view)
 
 ### Solução de Problemas
 
-#### Resolvedor retorna 403 Forbbiden/Acesso negado
-O plugin inclui um arquivo .htaccess que concede acesso ao resolver.php. Se você ainda receber 403, verifique se seu .htaccess principal tem regras conflitantes.
+#### Resolvedor retorna 403 Forbidden/Acesso negado?
+O plugin inclui um arquivo .htaccess que concede acesso ao resolver.php. Se você ainda receber 403, verifique se seu .htaccess principal tem regras conflitantes ou se o arquivo .htaccess do plugin foi removido acidentalmente.
 
-#### ARK não aparece no formulário do artigo
-Certifique-se de que "Habilitar ARK para Artigos" está marcado nas configurações do plugin.
+#### Resolvedor redireciona para página 404?
+Verifique se o ARK está corretamente salvo no banco de dados e se o prefixo NAAN configurado corresponde ao utilizado no ARK.
 
-#### Erro de ARK duplicado
-O plugin previne automaticamente duplicatas. Se você ver este erro, clique em "Gerar ARK" para gerar um novo identificador único.
+#### ARK não aparece no formulário?
+Certifique-se de que a opção correspondente (Artigos ou Edições) está marcada nas configurações do plugin e que o plugin está ativo.
+
+#### Erro de ARK duplicado ao salvar?
+O plugin previne automaticamente duplicatas verificando tanto artigos quanto edições. Se você encontrar este erro, clique no botão "Gerar Novo ARK" ao lado do campo para criar um identificador único.
+
+#### O botão "Gerar Novo ARK" não aparece?
+Recarregue a página (F5) e acesse diretamente a aba para gerar ARK.
+
+#### Metadados ERC retornam data incorreta?
+A data de implementação do ARK pode ser configurada nas opções do plugin. Certifique-se de que o campo "Data de Implementação" está preenchido corretamente no formato AAAAMMDD.
 
 ### Desinstalar
 
-1. Desative o plugin em Configurações > Website > Plugins
-2. Remova a pasta ark de plugins/pubIds/
-3. (Opcional) Remova os dados ARK do banco de dados usando SQL:
-   DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
+1. Desative o plugin em **Configurações > Website > Plugins**
+2. Remova a pasta `ark` de `plugins/pubIds/`
+3. (Opcional) Remova os dados ARK do banco de dados:
 
-### Licença
+```sql
+-- Remover ARKs de artigos
+DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
 
-GNU General Public License v2 - Consulte o arquivo LICENSE para detalhes.
+-- Remover ARKs de edições
+DELETE FROM issue_settings WHERE setting_name = 'pub-id::ark';
+```
 
-### Autor
 
-Lury Morais (2026)
+[Voltar ao topo](#portugues)
 
-### Créditos
+[Licença e créditos](#licenca)
 
-Baseado no plugin original pkp-ark-pubid por Yasiel Pérez Vera (2021)
-
----
-
-[⬆ Voltar ao topo](#português)
 
 ---
 
-<a name="español"></a>
+<a name="espanol"></a>
 ## 🇪🇸 Español
 
 **Plugin ARK para OJS 3.5.x**
 
 ### Características
 
-- Genera identificadores ARK solo para Artículos
-- Formato: ark:NAAN/PERSONALIZADOxxxx-yyyy (ej.: ark:16081/CRL5432-ABCD)
+- Genera identificadores ARK para **Artículos** y **Ediciones**
+- Formato: `ark:NAAN/SUSIGLAxxxx-yyyy`
 - Prefijo personalizado (2-6 letras mayúsculas)
+- **Generación automática** al acceder a la pestaña de identificadores
+- **Botón "Generar Nuevo ARK"** con confirmación para reemplazar
+- **Restauración automática** de ARKs existentes (evita pérdida de datos)
 - Detección y prevención automática de duplicados
 - Resolvedor integrado (funciona sin editar el .htaccess principal)
+- Soporte de **metadatos ERC** para artículos y ediciones
 - Listo para registro NAAN (n2t.net)
+- **Resolvedor inteligente** que detecta si el ARK es de artículo o edición
 
 ### Instalación
 
-IMPORTANTE: Cuando descargue el plugin de GitHub, la carpeta puede llamarse ark-plugin-main o ark-plugin-2.0.0. Debe renombrarla a ark antes de copiarla a su instalación de OJS.
+**IMPORTANTE:** Cuando descargue el plugin de GitHub, la carpeta puede llamarse `ark-plugin-main` o `ark-plugin-2.0.0`. Debe renombrarla a **`ark`** antes de copiarla a su instalación de OJS.
 
 1. Descargue el plugin de GitHub
-2. Renombre la carpeta a ark (si no se llama ya ark)
-3. Copie la carpeta ark a plugins/pubIds/
-4. Vaya a Configuraciones > Sitio > Plugins
+2. Renombre la carpeta a `ark` (si no se llama ya `ark`)
+3. Copie la carpeta `ark` a `plugins/pubIds/`
+4. Vaya a **Configuraciones > Sitio > Plugins**
 5. Encuentre el plugin de identificador público "ARK" y actívelo
 6. Configure el plugin:
-   - Habilitar ARK para Artículos (debe estar marcado)
-   - Prefijo ARK: El prefijo fijo (ej.: ark:16081)
-   - Prefijo Personalizado del Sufijo: El prefijo antes de la parte aleatoria (2-6 letras, ej.: MIT, UERN, CRL)
-   - URL del Resolvedor: https://n2t.net/ (o su propio resolvedor)
+
+| Configuración | Valor |
+|--------------|-------|
+| Habilitar ARK para Artículos | ✓ (opcional) |
+| Habilitar ARK para Ediciones | ✓ (opcional) |
+| Prefijo ARK | Su prefijo NAAN (ej.: `ark:12345`) |
+| Prefijo Personalizado | 2-6 letras mayúsculas (ej.: `SIGLA`) |
+| URL del Resolvedor | `https://n2t.net/` (o su propio resolvedor) |
 
 ### Ejemplo de Configuración
 
-Habilitar ARK para Artículos: Marcado\
-Prefijo ARK: ark:16081\
-Sufijo Personalizado: CRL\
-URL del Resolvedor: https://n2t.net/
+- **Habilitar ARK para Artículos:** Marcado
+- **Habilitar ARK para Ediciones:** Marcado
+- **Prefijo ARK:** `ark:12345`
+- **Prefijo Personalizado:** `SIGLA`
+- **URL del Resolvedor:** `https://n2t.net/`
 
-ARK resultante: https://n2t.net/ark:16081/CRL6522-QVWX
+**ARK resultante para artículo:** `https://n2t.net/ark:12345/SIGLA1234-ABCD`
 
-<img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
+**ARK resultante para edición:** `https://n2t.net/ark:12345/SIGLA5678-EFGH`
+
+<img width="auto" height="auto" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
 
 > Al finalizar la configuración, podrá ver una vista previa de ejemplo de sus recursos.
 
-### Registro NAAN (n2t.net)
-
-Después de instalar el plugin, configure su target NAAN en:
-
-https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=${value}
-
-Ejemplo:
-https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=${value}
-
 ### Uso
 
-- Haga clic en el botón "Generar ARK" en la sección de Identificadores del formulario del artículo
+#### Para Artículos
+- Acceda al formulario del artículo, pestaña "Identificadores"
+- Haga clic en el botón "Generar ARK" para generar un nuevo identificador
 - Los ARK duplicados o inválidos se previenen automáticamente
 
-### Integración del Resolvedor
+#### Para Ediciones
+- Acceda a **Ediciones > Editar** una edición
+- Vaya a la pestaña **"Identificadores"**
+- El ARK se genera automáticamente al cargar la página
+- Si necesita un nuevo ARK, haga clic en **"Generar Nuevo ARK"** (se mostrará una alerta de confirmación)
+- Los ARKs duplicados se previenen automáticamente
 
-El plugin incluye un resolvedor integrado que funciona sin editar su archivo .htaccess principal. El resolvedor:
+### Resolvedor y Registro NAAN (si usa n2t.net) IMPORTANTE
 
-1. Recibe el sufijo del ARK mediante el parámetro ?ark=
-2. Consulta la base de datos para encontrar el artículo correspondiente
-3. Redirige a la página del artículo (302 Found)
+> Después de instalar el plugin, configure su target NAAN en:
+> `https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=${value}`
 
-Ejemplo de acceso directo:
-https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
+El plugin incluye un **resolvedor integrado** que funciona sin editar su archivo .htaccess principal. El resolvedor:
+
+1. Recibe el identificador ARK mediante el parámetro `?ark=`
+2. **Detecta automáticamente** si el ARK pertenece a un artículo o una edición
+3. Redirige a la página correspondiente (302 Found)
+
+**Ejemplos de acceso directo:**
+
+- Artículo: `https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=SIGLA2244-AABB`
+- Edición: `https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=EDICION1234-ABCD`
 
 ### Soporte de Metadatos ERC (Inflexiones ARK)
 
-El resolvedor soporta inflexiones ARK:
+El resolvedor soporta inflexiones ARK para artículos y ediciones:
 
 | Inflexión | Comportamiento | Ejemplo |
 |-----------|----------------|---------|
-| (ninguna) | Redirige al artículo | `?ark=CRL0001-LURY` |
-| `?` | Devuelve metadatos ERC resumidos | `?ark=CRL0001-LURY?` |
-| `??` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY??` |
-| `.info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY.info` |
-| `&info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY&info` |
-| `?info` | Devuelve metadatos ERC completos | `?ark=CRL0001-LURY?info` |
+| (ninguna) | Redirige al artículo/edición | `?ark=SIGLA0001-ABCD` |
+| `?` | Devuelve metadatos ERC resumidos | `?ark=SIGLA0001-ABCD?` |
+| `??` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD??` |
+| `.info` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD.info` |
+| `&info` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD&info` |
+| `?info` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD?info` |
 
 **Ejemplo:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Devuelve metadatos ERC\
-https://n2t.net/ark:16081/CRL0001-LURY → Redirige al artículo
+- `https://n2t.net/ark:16081/CRL0001-LURY??` → Devuelve metadatos ERC
 
-> **Nota:** La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor.
+> **Nota:** La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor, ya que en `https://n2t.net/ark:16081/CRL0001-LURY?` el resolvedor de n2t.net entrega solo el enlace sin la inflexión, llevando a la página del artículo.
 
 ### Fecha de Implementación del ARK
 
@@ -248,148 +275,157 @@ En la configuración del plugin, puede definir una **fecha de implementación fi
 - Esta fecha representa cuándo su revista comenzó a soportar identificadores ARK
 - Se mostrará en el campo `erc-support.when` de los metadatos ERC
 - La fecha debe estar en formato `AAAAMMDD` (ejemplo: `20260215`)
-- Si no se define, se usará la fecha de publicación del artículo como fallback
+- Si no se define, se usará la fecha de publicación como fallback
 
-**Ejemplo de salida ERC con fecha de implementación:** <br>
+### Visualización en el Frontend
 
-> erc:\
-who: Lury Hortêncio Costa Morais\
-what: Assombrosamente maravilhoso\
-when: 20260215\
-where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
-erc-support:\
-who: Carnaubais Revista de Literatura\
-what: Permanent: Stable Content:\
-**when: 20260215**\
-where: https://n2t.net/ark:16081/
+El ARK se muestra automáticamente en:
 
-### Requisitos
-
-- OJS 3.5.x
-- PHP 7.4 o superior
-- MySQL 5.7+ o MariaDB 10.2+
+- **Página de la edición** (issue view)
+- **Lista de ediciones** (issue archive)
+- **Página del artículo** (article view)
 
 ### Solución de Problemas
 
-#### El resolvedor devuelve 403 Prohibido
-El plugin incluye un archivo .htaccess que concede acceso a resolver.php. Si aún recibe 403, verifique si su .htaccess principal tiene reglas conflictivas.
+#### ¿El resolvedor devuelve 403 Forbidden/Acceso denegado?
+El plugin incluye un archivo .htaccess que concede acceso a resolver.php. Si aún recibe 403, verifique si su .htaccess principal tiene reglas conflictivas o si el archivo .htaccess del plugin fue eliminado accidentalmente.
 
-#### ARK no aparece en el formulario del artículo
-Asegúrese de que "Habilitar ARK para Artículos" esté marcado en la configuración del plugin.
+#### ¿El resolvedor redirige a página 404?
+Verifique que el ARK esté correctamente guardado en la base de datos y que el prefijo NAAN configurado coincida con el utilizado en el ARK.
 
-#### Error de ARK duplicado
-El plugin previene automáticamente duplicados. Si ve este error, haga clic en "Generar ARK" para generar un nuevo identificador único.
+#### ¿El ARK no aparece en el formulario?
+Asegúrese de que la opción correspondiente (Artículos o Ediciones) esté marcada en la configuración del plugin y que el plugin esté activo.
 
-### Desinstalación
+#### ¿Error de ARK duplicado al guardar?
+El plugin previene automáticamente duplicados verificando tanto artículos como ediciones. Si encuentra este error, haga clic en el botón "Generar Nuevo ARK" junto al campo para crear un identificador único.
 
-1. Desactive el plugin en Configuraciones > Sitio > Plugins
-2. Elimine la carpeta ark de plugins/pubIds/
-3. (Opcional) Elimine los datos ARK de la base de datos usando SQL:
-   DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
+#### ¿El botón "Generar Nuevo ARK" no aparece?
+Recargue la página (F5) y acceda directamente a la pestaña para generar el ARK.
 
-### Licencia
+#### ¿Los metadatos ERC devuelven fecha incorrecta?
+La fecha de implementación del ARK se puede configurar en las opciones del plugin. Asegúrese de que el campo "Fecha de Implementación" esté correctamente completado en el formato AAAAMMDD.
 
-GNU General Public License v2 - Consulte el archivo LICENSE para más detalles.
+### Desinstalar
 
-### Autor
+1. Desactive el plugin en **Configuraciones > Sitio > Plugins**
+2. Elimine la carpeta `ark` de `plugins/pubIds/`
+3. (Opcional) Elimine los datos ARK de la base de datos:
 
-Lury Morais (2026)
+```sql
+-- Eliminar ARKs de artículos
+DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
 
-### Créditos
+-- Eliminar ARKs de ediciones
+DELETE FROM issue_settings WHERE setting_name = 'pub-id::ark';
+```
 
-Basado en el plugin original pkp-ark-pubid por Yasiel Pérez Vera (2021)
+[Volver al principio](#espanol)
+
+[Licencia y créditos](#licenca)
+
 
 ---
-
-[⬆ Volver al principio](#español)
-
----
-
-
 <a name="english"></a>
 ## 🇺🇸 English
 
-**Archival Resource Key (ARK) plugin for Open Journal Systems 3.5.x**
+**Archival Resource Key (ARK) Plugin for OJS 3.5.x**
 
 ### Features
 
-- Generate ARK identifiers only for Articles
-- Format: ark:NAAN/CUSTOMxxxx-yyyy (e.g., ark:16081/CRL5432-ABCD)
-- Configurable custom suffix prefix (2-6 uppercase letters)
+- Generates ARK identifiers for **Articles** and **Issues**
+- Format: `ark:NAAN/YOURPREFIXxxxx-yyyy`
+- Customizable prefix (2-6 uppercase letters)
+- **Automatic generation** when accessing the identifiers tab
+- **"Generate New ARK" button** with confirmation for replacement
+- **Automatic restoration** of existing ARKs (prevents data loss)
 - Automatic duplicate detection and prevention
 - Built-in resolver (works without editing main .htaccess)
+- **ERC metadata support** for articles and issues
 - Ready for NAAN registration (n2t.net)
+- **Smart resolver** that detects whether the ARK belongs to an article or issue
 
 ### Installation
 
-IMPORTANT: When you download the plugin from GitHub, the folder may be named ark-plugin-main or ark-plugin-2.0.0. You MUST rename it to ark before copying to your OJS installation.
+**IMPORTANT:** When you download the plugin from GitHub, the folder may be named `ark-plugin-main` or `ark-plugin-2.0.0`. You MUST rename it to **`ark`** before copying to your OJS installation.
 
 1. Download the plugin from GitHub
-2. Rename the folder to ark (if not already named ark)
-3. Copy the ark folder to plugins/pubIds/
-4. Go to Settings > Website > Plugins
-5. Find "ARK" Public Identifier Plugins and enable it
+2. Rename the folder to `ark` (if not already named `ark`)
+3. Copy the `ark` folder to `plugins/pubIds/`
+4. Go to **Settings > Website > Plugins**
+5. Find the "ARK" Public Identifier Plugin and enable it
 6. Configure the plugin:
-   - Enable ARK for Articles (must be checked)
-   - ARK Prefix: The fixed prefix (e.g., ark:16081)
-   - Custom Suffix Prefix: The prefix before the random part (2-6 letters, e.g., MIT, UERN, CRL)
-   - Resolver URL: https://n2t.net/ (or your own resolver)
+
+| Setting | Value |
+|---------|-------|
+| Enable ARK for Articles | ✓ (optional) |
+| Enable ARK for Issues | ✓ (optional) |
+| ARK Prefix | Your NAAN prefix (e.g., `ark:12345`) |
+| Custom Prefix | 2-6 uppercase letters (e.g., `PREFIX`) |
+| Resolver URL | `https://n2t.net/` (or your own resolver) |
 
 ### Configuration Example
 
-Enable ARK for Articles: Checked\
-ARK Prefix: ark:16081\
-Custom Suffix: CRL\
-Resolver URL: https://n2t.net/
+- **Enable ARK for Articles:** Checked
+- **Enable ARK for Issues:** Checked
+- **ARK Prefix:** `ark:12345`
+- **Custom Prefix:** `PREFIX`
+- **Resolver URL:** `https://n2t.net/`
 
-Resulting ARK: https://n2t.net/ark:16081/CRL6522-QVWX
+**Resulting ARK for article:** `https://n2t.net/ark:12345/PREFIX1234-ABCD`
 
-<img width="1710" height="503" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
+**Resulting ARK for issue:** `https://n2t.net/ark:12345/PREFIX5678-EFGH`
+
+<img width="auto" height="auto" alt="Image" src="https://github.com/user-attachments/assets/7c3e3a4b-96dc-44c6-a6cb-4dfa2498126f" />
 
 > At the end of the configuration, you will be able to see an example preview for your resources.
 
-### NAAN Registration (n2t.net)
-
-After installing the plugin, configure your NAAN target to:
-
-https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=${value}
-
-Example:
-https://revistacarnaubais.com.br/plugins/pubIds/ark/resolver.php?ark=${value}
-
 ### Usage
 
-- Click "Generate ARK" button in the Identifiers section of the article form
-- Duplicate or invalid ARKs are prevented automatically
+#### For Articles
+- Access the article form, "Identifiers" tab
+- Click the "Generate ARK" button to create a new identifier
+- Duplicate or invalid ARKs are automatically prevented
 
-### Resolver Integration
+#### For Issues
+- Access **Issues > Edit** an issue
+- Go to the **"Identifiers"** tab
+- The ARK is automatically generated when the page loads
+- If you need a new ARK, click the **"Generate New ARK"** button (a confirmation alert will be shown)
+- Duplicate ARKs are automatically prevented
 
-The plugin includes a built-in resolver that works without editing your main .htaccess file. The resolver:
+### Resolver and NAAN Registration (if using n2t.net) IMPORTANT
 
-1. Receives the ARK suffix via ?ark= parameter
-2. Queries the database to find the corresponding article
-3. Redirects to the article page (302 Found)
+> After installing the plugin, configure your NAAN target to:
+> `https://yourdomain.com/plugins/pubIds/ark/resolver.php?ark=${value}`
 
-Direct access example:
-https://yourjournal.com/plugins/pubIds/ark/resolver.php?ark=CRL2244-AABB
+The plugin includes a **built-in resolver** that works without editing your main .htaccess file. The resolver:
+
+1. Receives the ARK identifier via the `?ark=` parameter
+2. **Automatically detects** whether the ARK belongs to an article or an issue
+3. Redirects to the corresponding page (302 Found)
+
+**Direct access examples:**
+
+- Article: `https://yourdomain.com/plugins/pubIds/ark/resolver.php?ark=PREFIX2244-AABB`
+- Issue: `https://yourdomain.com/plugins/pubIds/ark/resolver.php?ark=ISSUE1234-ABCD`
 
 ### ERC Metadata Support (ARK Inflections)
 
-The resolver supports ARK inflections:
+The resolver supports ARK inflections for articles and issues:
+
 | Inflection | Behavior | Example |
 |------------|----------|---------|
-| (none) | Redirects to article page | `?ark=CRL0001-LURY` |
-| `?` | Returns brief ERC metadata | `?ark=CRL0001-LURY?` |
-| `??` | Returns full ERC metadata | `?ark=CRL0001-LURY??` |
-| `.info` | Returns full ERC metadata | `?ark=CRL0001-LURY.info` |
-| `&info` | Returns full ERC metadata | `?ark=CRL0001-LURY&info` |
-| `?info` | Returns full ERC metadata | `?ark=CRL0001-LURY?info` |
+| (none) | Redirects to article/issue | `?ark=PREFIX0001-ABCD` |
+| `?` | Returns brief ERC metadata | `?ark=PREFIX0001-ABCD?` |
+| `??` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD??` |
+| `.info` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD.info` |
+| `&info` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD&info` |
+| `?info` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD?info` |
 
 **Example:**
-https://n2t.net/ark:16081/CRL0001-LURY?? → Returns ERC metadata\
-https://n2t.net/ark:16081/CRL0001-LURY → Redirects to article
+- `https://n2t.net/ark:16081/CRL0001-LURY??` → Returns ERC metadata
 
-> **Note:** The `?` inflection (brief metadata) works only when accessing your resolver directly.
+> **Note:** The `?` inflection (brief metadata) only works when accessing your resolver directly, because at `https://n2t.net/ark:16081/CRL0001-LURY?` the n2t.net resolver delivers only the link without the inflection, leading to the article page.
 
 ### ARK Implementation Date
 
@@ -398,66 +434,82 @@ In the plugin settings, you can set a **fixed implementation date** for your jou
 - This date represents when your journal started supporting ARK identifiers
 - It will be displayed in the `erc-support.when` field of the ERC metadata
 - The date must be in `YYYYMMDD` format (e.g., `20260215`)
-- If not set, the article publication date is used as fallback
+- If not set, the publication date is used as fallback
 
-**Example ERC output with implementation date:** <br>
+### Frontend Display
 
-> erc:\
-who: Lury Hortêncio Costa Morais\
-what: Assombrosamente maravilhoso\
-when: 20260215\
-where: https://n2t.net/ark:16081/CRL0001-LURY/ <br>
-erc-support:\
-who: Carnaubais Revista de Literatura\
-what: Permanent: Stable Content:\
-**when: 20260215**\
-where: https://n2t.net/ark:16081/
+The ARK is automatically displayed on:
 
-### Requirements
-
-- OJS 3.5.x
-- PHP 7.4 or higher
-- MySQL 5.7+ or MariaDB 10.2+
+- **Issue page** (issue view)
+- **Issue archive list** (issue archive)
+- **Article page** (article view)
 
 ### Troubleshooting
 
-Resolver returns 403 Forbidden
-The plugin includes a .htaccess file that grants access to resolver.php. If you still get 403, check if your main .htaccess has conflicting rules.
+#### Does the resolver return 403 Forbidden/Access denied?
+The plugin includes a .htaccess file that grants access to resolver.php. If you still get 403, check if your main .htaccess has conflicting rules or if the plugin's .htaccess file was accidentally removed.
 
-ARK not appearing in article form
-Ensure "Enable ARK for Articles" is checked in plugin settings.
+#### Does the resolver redirect to a 404 page?
+Verify that the ARK is correctly saved in the database and that the configured NAAN prefix matches the one used in the ARK.
 
-Duplicate ARK error
-The plugin automatically prevents duplicates. If you see this error, click "Generate ARK" to generate a new unique identifier.
+#### Does the ARK not appear in the form?
+Make sure the corresponding option (Articles or Issues) is checked in the plugin settings and that the plugin is active.
+
+#### Getting a duplicate ARK error when saving?
+The plugin automatically prevents duplicates by checking both articles and issues. If you encounter this error, click the "Generate New ARK" button next to the field to create a unique identifier.
+
+#### Does the "Generate New ARK" button not appear?
+Refresh the page (F5) and directly access the tab to generate the ARK.
+
+#### Does ERC metadata return the wrong date?
+The ARK implementation date can be configured in the plugin options. Make sure the "Implementation Date" field is correctly filled in YYYYMMDD format.
 
 ### Uninstallation
 
-1. Disable the plugin in Settings > Website > Plugins
-2. Remove the ark folder from plugins/pubIds/
-3. (Optional) Remove ARK data from database using SQL:
-   DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
+1. Disable the plugin in **Settings > Website > Plugins**
+2. Remove the `ark` folder from `plugins/pubIds/`
+3. (Optional) Remove ARK data from the database:
 
-### License
+```sql
+-- Remove ARKs from articles
+DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
 
-GNU General Public License v2 - See LICENSE file for details.
+-- Remove ARKs from issues
+DELETE FROM issue_settings WHERE setting_name = 'pub-id::ark';
+```
 
-### Author
-
-Lury Morais (2026)
-
-### Credits
-
-Based on original pkp-ark-pubid plugin by Yasiel Pérez Vera (2021)
+[Back to top](#english)
 
 ---
 
-[⬆ Back to top](#english)
+<a name="licenca"></a>
+
+<div style="text-align:center;">
+
+## Licença / Licencia / License
+
+GNU General Public License v2.0
+
+[LICENSE](https://github.com/lurymorais/ark-plugin/blob/main/LICENSE)
 
 ---
 
-## License / Licença / Licencia
-GNU General Public License v2 - See LICENSE file for details.
 
-<br>
 
-**Built for Carnaubais Revista de Literatura**
+### Créditos / Credits
+
+Baseado no | Basado en el |
+Based on<br>
+
+plugin **pkp-ark-pubid** © Yasiel Pérez Vera (2021)
+
+---
+
+<img src="https://revistacarnaubais.com.br/imgs/favicon.png" width="64" height="64" style="width: 64px; height: 64px;">
+
+<strong>Carnaubais Revista de Literatura</strong>
+
+---
+
+<sub>Lury Morais © 2026</sub>
+</div>
