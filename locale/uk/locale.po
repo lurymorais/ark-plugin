@@ -16,7 +16,7 @@ msgid "plugins.pubIds.ark.displayName"
 msgstr "ARK"
 
 msgid "plugins.pubIds.ark.description"
-msgstr "Плагін для призначення ідентифікаторів ARK (Archival Resource Key) статтям."
+msgstr "Плагін для призначення ідентифікаторів ARK (Archival Resource Key) статтям та випускам."
 
 msgid "plugins.pubIds.ark.manager.settings.description"
 msgstr "Налаштування плагіна ARK для статей:"
@@ -25,13 +25,16 @@ msgid "plugins.pubIds.ark.manager.settings.arkObjects"
 msgstr "Типи об’єктів"
 
 msgid "plugins.pubIds.ark.manager.settings.arkObjectsRequired"
-msgstr "ARK генеруються лише для статей."
+msgstr "Виберіть принаймні один тип об'єкта (Статті або Випуски) для призначення ARK."
 
 msgid "plugins.pubIds.ark.manager.settings.explainARKs"
-msgstr "Оберіть, для яких типів об’єктів будуть створюватися ARK:"
+msgstr "Виберіть типи об’єктів, які отримають ARK:"
 
 msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
 msgstr "Статті"
+
+msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
+msgstr "Випуски"
 
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
 msgstr "Префікс ARK"
@@ -69,6 +72,18 @@ msgstr "Базовий URL для визначення ARK (наприклад, 
 msgid "plugins.pubIds.ark.manager.settings.form.arkResolverRequired"
 msgstr "Будь ласка, вкажіть URL резолвера."
 
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
+msgstr "n2t.net (стандартний)"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.custom"
+msgstr "Користувацький резолвер:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
+msgstr "URL користувацького резолвера"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.defaultHint"
+msgstr "Залиште порожнім, щоб використовувати стандартний резолвер n2t.net"
+
 msgid "plugins.pubIds.ark.manager.settings.preview"
 msgstr "Попередній перегляд"
 
@@ -84,8 +99,23 @@ msgstr "Натисніть, щоб видалити всі існуючі ARK т
 msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
 msgstr "Ви впевнені? Усі існуючі ARK буде безповоротно видалено."
 
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
+msgstr "Дата впровадження ARK. Формат: РРРРММДД (наприклад: 20260215)."
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
+msgstr "Введіть дату, коли ідентифікатори ARK почали використовуватися або плануються у вашому журналі. Ця дата буде фіксованою для всіх записів і представляє початок підтримки журналом постійних посилань."
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
+msgstr "Якщо ви використовуєте ARK вперше, введіть дату отримання вашого NAAN або дату публікації першого ARK."
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
+msgstr "Дата має бути у форматі РРРРММДД (рік, місяць, день) і містити 8 цифр."
+
 msgid "plugins.pubIds.ark.editor.ark"
 msgstr "ARK"
+
+msgid "plugins.pubIds.ark.editor.arkHelp"
+msgstr "ARK (Archival Resource Key) — це постійний ідентифікатор. Натисніть «Згенерувати ARK», щоб автоматично створити новий ідентифікатор."
 
 msgid "plugins.pubIds.ark.editor.missingPrefix"
 msgstr "ARK має починатися з {$arkPrefix}."
@@ -114,8 +144,29 @@ msgstr "Очистити"
 msgid "plugins.pubIds.ark.editor.generateArk"
 msgstr "Згенерувати ARK"
 
+msgid "plugins.pubIds.ark.editor.generateNewArk"
+msgstr "Згенерувати новий ARK"
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmReplace"
+msgstr "Це замінить існуючий ARK: %s. Ви впевнені, що хочете згенерувати новий? Старий ARK буде перезаписано після збереження."
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmNew"
+msgstr "Згенерувати новий ARK для цього випуску?"
+
+msgid "plugins.pubIds.ark.editor.duplicateArkError"
+msgstr "ПОМИЛКА: Цей ARK вже використовується іншою статтею або випуском! Використовуйте кнопку «Згенерувати новий ARK», щоб створити унікальний ідентифікатор."
+
+msgid "plugins.pubIds.ark.editor.saveSuccess"
+msgstr "ARK успішно збережено!"
+
+msgid "plugins.pubIds.ark.editor.networkError"
+msgstr "Мережева помилка. Спробуйте ще раз."
+
+msgid "plugins.pubIds.ark.editor.genericError"
+msgstr "Помилка при збереженні ARK: "
+
 msgid "plugins.pubIds.ark.suffix.random"
 msgstr "Випадковий суфікс"
 
-msgid "plugins.pubIds.ark.editor.arkHelp"
-msgstr "ARK (Archival Resource Key) — це постійний ідентифікатор для цієї статті. Формат: {$prefix}/PREFIX2345-ABCD. Натисніть «Згенерувати ARK», щоб автоматично створити новий ідентифікатор."
+msgid "common.saving"
+msgstr "Збереження..."
