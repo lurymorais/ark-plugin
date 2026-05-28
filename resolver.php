@@ -498,10 +498,6 @@ $originalInput = $arkSuffix;
 // Detect inflection (function called without arguments)
 $inflection = getInflection();
 
-// DEBUG: Ver o que está sendo recebido (remove after testing)
-error_log("ARK DEBUG: \$_GET = " . print_r($_GET, true));
-error_log("ARK DEBUG: inflection = " . ($inflection ?? 'null'));
-
 // Remove inflection suffixes from ARK value
 $arkSuffix = preg_replace('/\?info$/', '', $arkSuffix);
 $arkSuffix = preg_replace('/\.info$/', '', $arkSuffix);
@@ -571,10 +567,12 @@ try {
     }
     
     $result = null;
+    $objectType = null; // 'publication' or 'issue'
     
+    // First, search in publications (articles)
     foreach ($attempts as $suffix) {
         $stmt = $pdo->prepare("
-            SELECT ps.publication_id, s.context_id
+            SELECT ps.publication_id, s.context_id, 'publication' as type
             FROM publication_settings ps
             JOIN publications p ON ps.publication_id = p.publication_id
             JOIN submissions s ON p.submission_id = s.submission_id
@@ -586,7 +584,29 @@ try {
         
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $result = $row;
+            $objectType = 'publication';
             break;
+        }
+    }
+    
+    // If not found in publications, search in issues
+    if (!$result) {
+        foreach ($attempts as $suffix) {
+            $stmt = $pdo->prepare("
+                SELECT is2.issue_id, i.journal_id as context_id, 'issue' as type
+                FROM issue_settings is2
+                JOIN issues i ON is2.issue_id = i.issue_id
+                WHERE is2.setting_name = 'pub-id::ark' 
+                AND (is2.setting_value = ? OR is2.setting_value LIKE CONCAT('%', ?))
+                LIMIT 1
+            ");
+            $stmt->execute([$suffix, $suffix]);
+            
+            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $result = $row;
+                $objectType = 'issue';
+                break;
+            }
         }
     }
     
@@ -627,13 +647,24 @@ try {
     if ($inflection === 'brief' || $inflection === 'full') {
         $fullArkResolverUrl = $siteBaseUrl . "/plugins/pubIds/ark/resolver.php?ark=" . urlencode($originalInput);
         
-        $metadata = getMetadataForERC(
-            $pdo, 
-            $result['publication_id'], 
-            $result['context_id'], 
-            $originalInput,
-            $siteBaseUrl,
-        );
+        if ($objectType === 'publication') {
+            $metadata = getMetadataForERC(
+                $pdo, 
+                $result['publication_id'], 
+                $result['context_id'], 
+                $originalInput,
+                $siteBaseUrl,
+            );
+        } else {
+            // For issues, we need a different metadata function
+            $metadata = getMetadataForIssueERC(
+                $pdo, 
+                $result['issue_id'], 
+                $result['context_id'], 
+                $originalInput,
+                $siteBaseUrl,
+            );
+        }
         
         if ($inflection === 'brief') {
             outputBriefERC($metadata, $originalInput, $fullArkResolverUrl);
@@ -643,22 +674,28 @@ try {
         exit;
     }
     
-    // Get friendly URL if exists
-    $stmt3 = $pdo->prepare("
-        SELECT setting_value FROM publication_settings 
-        WHERE publication_id = ? AND setting_name = 'urlPath'
-        LIMIT 1
-    ");
-    $stmt3->execute([$result['publication_id']]);
-    $urlPath = $stmt3->fetch(PDO::FETCH_ASSOC);
-    
-    // Redirect to article page
-    if ($urlPath && !empty($urlPath['setting_value'])) {
-        $redirectUrl = $baseUrl . "/index.php/{$journal['path']}/article/view/{$urlPath['setting_value']}";
+    // Redirect based on object type
+    if ($objectType === 'publication') {
+        // Get friendly URL if exists for article
+        $stmt3 = $pdo->prepare("
+            SELECT setting_value FROM publication_settings 
+            WHERE publication_id = ? AND setting_name = 'urlPath'
+            LIMIT 1
+        ");
+        $stmt3->execute([$result['publication_id']]);
+        $urlPath = $stmt3->fetch(PDO::FETCH_ASSOC);
+        
+        if ($urlPath && !empty($urlPath['setting_value'])) {
+            $redirectUrl = $baseUrl . "/index.php/{$journal['path']}/article/view/{$urlPath['setting_value']}";
+        } else {
+            $redirectUrl = $baseUrl . "/index.php/{$journal['path']}/article/view/{$result['publication_id']}";
+        }
     } else {
-        $redirectUrl = $baseUrl . "/index.php/{$journal['path']}/article/view/{$result['publication_id']}";
+        // Redirect to issue page - fix double slash issue
+        $baseUrlClean = rtrim($baseUrl, '/');
+        $redirectUrl = $baseUrlClean . "/index.php/{$journal['path']}/issue/view/{$result['issue_id']}";
     }
-    
+        
     header('HTTP/1.1 302 Found');
     header('Location: ' . $redirectUrl);
     exit;
@@ -685,4 +722,143 @@ try {
         'Error: ' . $e->getMessage(),
         'Erro: ' . $e->getMessage()
     );
+}
+
+/**
+ * Get metadata for Issue ERC response
+ */
+function getMetadataForIssueERC($pdo, $issueId, $contextId, $arkSuffix, $baseUrl) {
+    $metadata = [];
+    
+    // Get issue basic info
+    $stmt = $pdo->prepare("
+        SELECT i.*, j.primary_locale, j.path as journal_path
+        FROM issues i
+        JOIN journals j ON i.journal_id = j.journal_id
+        WHERE i.issue_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$issueId]);
+    $issue = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$issue) {
+        return $metadata;
+    }
+    
+    // Get issue title
+    $stmt = $pdo->prepare("
+        SELECT setting_value FROM issue_settings
+        WHERE issue_id = ? AND setting_name = 'title'
+        LIMIT 1
+    ");
+    $stmt->execute([$issueId]);
+    $title = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // WHO: Use journal name as responsible entity for the issue
+    $stmt = $pdo->prepare("
+        SELECT setting_value FROM journal_settings
+        WHERE journal_id = ? AND setting_name = 'name'
+        LIMIT 1
+    ");
+    $stmt->execute([$contextId]);
+    $journalName = $stmt->fetch(PDO::FETCH_ASSOC);
+    $journalNameValue = $journalName ? html_entity_decode($journalName['setting_value'], ENT_QUOTES | ENT_HTML5, 'UTF-8') : 'Journal';
+    
+    $metadata['who'] = $journalNameValue . ' (Editorial)';
+    $metadata['what'] = $title ? html_entity_decode($title['setting_value'], ENT_QUOTES | ENT_HTML5, 'UTF-8') : 'Issue ' . $issueId;
+    
+    // WHEN: Use issue publication date
+    $metadata['when'] = '';
+    if (!empty($issue['date_published'])) {
+        $metadata['when'] = date('Ymd', strtotime($issue['date_published']));
+    } else {
+        $metadata['when'] = date('Ymd');
+    }
+    
+    // WHO_JOURNAL: Journal name
+    $metadata['who_journal'] = $journalNameValue;
+    
+    // ISSN
+    $stmt = $pdo->prepare("
+        SELECT setting_value FROM journal_settings
+        WHERE journal_id = ? AND (setting_name = 'printIssn' OR setting_name = 'onlineIssn')
+        LIMIT 1
+    ");
+    $stmt->execute([$contextId]);
+    $issn = $stmt->fetch(PDO::FETCH_ASSOC);
+    $metadata['issn'] = $issn ? $issn['setting_value'] : '';
+    
+    // Get the full ARK identifier from database
+    $stmt = $pdo->prepare("
+        SELECT setting_value FROM issue_settings
+        WHERE issue_id = ? AND setting_name = 'pub-id::ark'
+        LIMIT 1
+    ");
+    $stmt->execute([$issueId]);
+    $arkFull = $stmt->fetch(PDO::FETCH_ASSOC);
+    $fullArkId = $arkFull ? $arkFull['setting_value'] : '';
+    
+    // Resolver configuration
+    $resolverType = 'n2t';
+    $customResolver = null;
+    
+    $stmt = $pdo->prepare("
+        SELECT setting_value FROM journal_settings
+        WHERE journal_id = ? AND setting_name = 'resolverType'
+        LIMIT 1
+    ");
+    $stmt->execute([$contextId]);
+    $resolverTypeRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    $resolverType = $resolverTypeRow ? $resolverTypeRow['setting_value'] : 'n2t';
+    
+    if ($resolverType === 'custom') {
+        $stmt = $pdo->prepare("
+            SELECT setting_value FROM journal_settings
+            WHERE journal_id = ? AND setting_name = 'arkResolver'
+            LIMIT 1
+        ");
+        $stmt->execute([$contextId]);
+        $customResolverRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        $customResolver = $customResolverRow ? $customResolverRow['setting_value'] : null;
+    }
+    
+    // First 'where' field: Complete ARK URL
+    if ($resolverType === 'custom' && !empty($customResolver)) {
+        $baseResolver = rtrim($customResolver, '/');
+        $metadata['ark_url'] = $baseResolver . '/' . ltrim($fullArkId, '/');
+    } else {
+        $metadata['ark_url'] = 'https://n2t.net/' . ltrim($fullArkId, '/');
+    }
+    
+    // Second 'where' field (erc-support): Base ARK URL up to NAAN
+    $naan = '';
+    if (!empty($fullArkId)) {
+        if (preg_match('/ark:([0-9]+)/', $fullArkId, $matches)) {
+            $naan = $matches[1];
+        }
+    }
+    
+    if ($resolverType === 'custom' && !empty($customResolver)) {
+        $baseResolver = rtrim($customResolver, '/');
+        $metadata['base_ark_url'] = $baseResolver . '/ark:' . $naan . '/';
+    } else {
+        $metadata['base_ark_url'] = 'https://n2t.net/ark:' . $naan . '/';
+    }
+    
+    // SUPPORT_WHEN: Use implementation date from settings
+    $stmt = $pdo->prepare("
+        SELECT setting_value FROM journal_settings
+        WHERE journal_id = ? AND setting_name = 'arkImplementationDate' AND (locale = '' OR locale IS NULL)
+        LIMIT 1
+    ");
+    $stmt->execute([$contextId]);
+    $implDate = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $metadata['support_when'] = ($implDate && !empty($implDate['setting_value'])) ? $implDate['setting_value'] : $metadata['when'];
+    
+    $metadata['primary_locale'] = $issue['primary_locale'] ?? 'en';
+    $metadata['site_url'] = rtrim($baseUrl, '/');
+    $metadata['journal_path'] = $issue['journal_path'] ?? '';
+    
+    return $metadata;
 }

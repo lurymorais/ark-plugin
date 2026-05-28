@@ -16,7 +16,7 @@ msgid "plugins.pubIds.ark.displayName"
 msgstr "ARK"
 
 msgid "plugins.pubIds.ark.description"
-msgstr "Plugin para atribuir identificadores ARK (Archival Resource Key) aos artigos."
+msgstr "Plugin para atribuir identificadores ARK (Archival Resource Key) aos artigos e edições."
 
 msgid "plugins.pubIds.ark.manager.settings.description"
 msgstr "Configure o plugin ARK para artigos:"
@@ -25,13 +25,16 @@ msgid "plugins.pubIds.ark.manager.settings.arkObjects"
 msgstr "Tipos de objeto"
 
 msgid "plugins.pubIds.ark.manager.settings.arkObjectsRequired"
-msgstr "Os ARKs são gerados apenas para artigos."
+msgstr "Selecione pelo menos um tipo de objeto (Artigos ou Edições) para atribuir ARKs."
 
 msgid "plugins.pubIds.ark.manager.settings.explainARKs"
 msgstr "Selecione os tipos de objeto que receberão ARK:"
 
 msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
 msgstr "Artigos"
+
+msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
+msgstr "Edições"
 
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
 msgstr "Prefixo ARK"
@@ -69,6 +72,18 @@ msgstr "URL base para resolução dos ARKs (ex: https://n2t.net/)"
 msgid "plugins.pubIds.ark.manager.settings.form.arkResolverRequired"
 msgstr "Informe a URL do resolvedor."
 
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
+msgstr "n2t.net (Padrão)"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.custom"
+msgstr "Resolvedor personalizado:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
+msgstr "URL do resolvedor personalizado"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.defaultHint"
+msgstr "Deixe em branco para usar o resolvedor padrão n2t.net"
+
 msgid "plugins.pubIds.ark.manager.settings.preview"
 msgstr "Pré-visualização"
 
@@ -84,8 +99,23 @@ msgstr "Clique para remover todos os ARKs existentes e reatribuir com as novas c
 msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
 msgstr "Tem certeza? Todos os ARKs existentes serão permanentemente removidos."
 
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
+msgstr "Data de Implementação do ARK. Formato: AAAAMMDD (Exemplo: 20260215)."
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
+msgstr "Insira a data em que os identificadores ARK começaram a ser usados ou planejados no seu periódico. Esta data será fixa para todos os registros e representa o início do suporte do periódico aos links permanentes."
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
+msgstr "Se este for o seu primeiro uso do ARK, insira a data que recebeu seu NAAN ou a data de publicação do primeiro ARK."
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
+msgstr "A data deve estar no formato AAAAMMDD (ano, mês, dia) com 8 dígitos."
+
 msgid "plugins.pubIds.ark.editor.ark"
 msgstr "ARK"
+
+msgid "plugins.pubIds.ark.editor.arkHelp"
+msgstr "O ARK (Archival Resource Key) é um identificador persistente. Clique em 'Gerar ARK' para criar um novo identificador automaticamente."
 
 msgid "plugins.pubIds.ark.editor.missingPrefix"
 msgstr "O ARK deve começar com {$arkPrefix}."
@@ -114,33 +144,29 @@ msgstr "Limpar"
 msgid "plugins.pubIds.ark.editor.generateArk"
 msgstr "Gerar ARK"
 
+msgid "plugins.pubIds.ark.editor.generateNewArk"
+msgstr "Gerar Novo ARK"
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmReplace"
+msgstr "Isto irá substituir o ARK existente: %s. Tem certeza que deseja gerar um novo? O ARK antigo será sobrescrito quando você salvar."
+
+msgid "plugins.pubIds.ark.editor.generateNewArk.confirmNew"
+msgstr "Gerar um novo ARK para esta edição?"
+
+msgid "plugins.pubIds.ark.editor.duplicateArkError"
+msgstr "ERRO: Este ARK já está em uso por outro artigo ou edição! Use o botão 'Gerar Novo ARK' para criar um identificador único."
+
+msgid "plugins.pubIds.ark.editor.saveSuccess"
+msgstr "ARK salvo com sucesso!"
+
+msgid "plugins.pubIds.ark.editor.networkError"
+msgstr "Erro de rede. Tente novamente."
+
+msgid "plugins.pubIds.ark.editor.genericError"
+msgstr "Erro ao salvar ARK: "
+
 msgid "plugins.pubIds.ark.suffix.random"
 msgstr "Sufixo aleatório"
 
-msgid "plugins.pubIds.ark.editor.arkHelp"
-msgstr "O ARK (Archival Resource Key) é um identificador persistente para este artigo. O formato é {$prefix}/PREFIX2345-ABCD. Clique em 'Gerar ARK' para criar um novo identificador automaticamente."
-
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
-msgstr "n2t.net (Padrão)"
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.custom"
-msgstr "Resolvedor personalizado:"
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
-msgstr "URL do resolvedor personalizado"
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.defaultHint"
-msgstr "Deixe em branco para usar o resolvedor padrão n2t.net"
-
-msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
-msgstr "Data de Implementação do ARK. Formato: AAAAMMDD (Exemplo: 20260215)."
-
-msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
-msgstr "Insira a data em que os identificadores ARK começaram a ser usados ou planejados no seu periódico. Esta data será fixa para todos os registros e representa o início do suporte do periódico aos links permanentes."
-
-msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
-msgstr "Se este for o seu primeiro uso do ARK, insira a data que recebeu seu NAAN ou a data de publicação do primeiro ARK."
-
-msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
-msgstr "A data deve estar no formato AAAAMMDD (ano, mês, dia) com 8 dígitos."
+msgid "common.saving"
+msgstr "Salvando..."

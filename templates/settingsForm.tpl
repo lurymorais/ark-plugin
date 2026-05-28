@@ -38,7 +38,8 @@
     {fbvFormArea id="arkObjectsFormArea" title="plugins.pubIds.ark.manager.settings.arkObjects"}
         <p class="pkp_help">{translate key="plugins.pubIds.ark.manager.settings.explainARKs"}</p>
         {fbvFormSection list="true"}
-            {fbvElement type="checkbox" label="plugins.pubIds.ark.manager.settings.enablePublicationARK" id="enablePublicationARK" name="enablePublicationARK" checked=$enablePublicationARK|compare:true}
+            {fbvElement type="checkbox" label="plugins.pubIds.ark.manager.settings.enablePublicationARK" id="enablePublicationARK" name="enablePublicationARK" checked=$enablePublicationARK}
+            {fbvElement type="checkbox" label="plugins.pubIds.ark.manager.settings.enableIssueARK" id="enableIssueARK" name="enableIssueARK" checked=$enableIssueARK}
         {/fbvFormSection}
     {/fbvFormArea}
 
@@ -71,7 +72,14 @@
             <p style="border-left: 4px solid rgb(208, 10, 108); padding: 10px; margin: 10px 0; border-radius: 4px;">
                 <strong>{translate key="plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"}</strong>
             </p>
-            {fbvElement type="text" id="arkImplementationDate" name="arkImplementationDate" value=$arkImplementationDate label="plugins.pubIds.ark.manager.settings.arkImplementationDate" maxlength="8" size=$fbvStyles.size.SMALL}
+            <input type="text" 
+                   id="arkImplementationDate" 
+                   name="arkImplementationDate" 
+                   value="{$arkImplementationDate|escape}" 
+                   maxlength="8" 
+                   style="width: 150px; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                   placeholder="YYYYMMDD">
+            <span class="instruct">{translate key="plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"}</span>
         {/fbvFormSection}
     {/fbvFormArea}
 

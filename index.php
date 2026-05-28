@@ -1,10 +1,6 @@
 <?php
 
 /**
- * @defgroup plugins_pubIds_ark ARK Pub ID Plugin
- */
-
-/**
  * @file plugins/pubIds/ark/index.php
  *
  * Copyright (c) 2026 Lury Morais

@@ -3,13 +3,10 @@
 /**
  * @file plugins/pubIds/ark/ARKPubIdPlugin.inc.php
  *
+ * @brief ARK PubId plugin for OJS 3.5.x - Supports articles and issues
+ * 
  * Copyright (c) 2026 Lury Morais
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
- *
- * @class ARKPubIdPlugin
- * @ingroup plugins_pubIds_ark
- *
- * @brief ARK PubId plugin for OJS 3.5.x - Apenas para artigos
  */
 
 use PKP\plugins\PKPPubIdPlugin;
@@ -20,210 +17,654 @@ use PKP\template\TemplateManager;
 use APP\facades\Repo;
 use APP\core\Application;
 use Illuminate\Support\Facades\DB;
-use PKP\components\forms\FormComponent;
 use PKP\components\forms\FieldText;
 
 class ARKPubIdPlugin extends PKPPubIdPlugin
 {
+    private static $registered = false;
+    
     public function register($category, $path, $mainContextId = null)
     {
+        if (self::$registered) {
+            return true;
+        }
+        
         $success = parent::register($category, $path, $mainContextId);
-        if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return $success;
+        
+        if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
+            return $success;
+        }
 
         if ($success && $this->getEnabled($mainContextId)) {
+            
             \HookRegistry::register('Publication::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
             \HookRegistry::register('Publication::getProperties::fullProperties', [$this, 'modifyObjectProperties']);
-            \HookRegistry::register('Publication::getProperties::values', [$this, 'modifyObjectPropertyValues']);
+            \HookRegistry::register('Publication::getProperties::values', [$this, 'modifyArticlePropertyValues']);
             \HookRegistry::register('Publication::validate', [$this, 'validatePublicationArk']);
+            \HookRegistry::register('Form::config::before', [$this, 'addPublicationFormFields']);
             \HookRegistry::register('TemplateManager::display', [$this, 'loadArkFieldComponent']);
             
-            // Hook para adicionar o campo no formulário de publicação
-            \HookRegistry::register('Form::config::before', [$this, 'addPublicationFormFields']);
+            \HookRegistry::register('Publication::add', [$this, 'onPublicationAdd']);
+            \HookRegistry::register('Publication::edit', [$this, 'onPublicationEdit']);
+            \HookRegistry::register('Form::execute', [$this, 'onFormExecute']);
+            
+            \HookRegistry::register('TemplateManager::display', [$this, 'injectIssueArkField']);
+            \HookRegistry::register('IssueDAO::insertIssue', [$this, 'onIssueInsert']);
+            \HookRegistry::register('IssueDAO::updateIssue', [$this, 'onIssueUpdate']);
+            \HookRegistry::register('Form::execute', [$this, 'issueFormExecute']);
+            
+            \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnFrontend']);
+            \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnArchive']);
+
+            \HookRegistry::register('TemplateManager::display', [$this, 'loadArticleStyles']);
         }
+        
+        self::$registered = true;
         return $success;
     }
 
-    public function getDisplayName() { return __('plugins.pubIds.ark.displayName'); }
-    public function getDescription() { return __('plugins.pubIds.ark.description'); }
-    public function constructPubId($pubIdPrefix, $pubIdSuffix, $contextId) { 
-        return $pubIdPrefix . '/' . $pubIdSuffix; 
-    }
-    public function getPubIdType() { return 'ark'; }
-    public function getPubIdDisplayType() { return 'ARK'; }
-    public function getPubIdFullName() { return 'Archival Resource Key'; }
-    public function getResolvingURL($contextId, $pubId) {
-        $resolverType = $this->getSetting($contextId, 'resolverType');
-        
-        // Se for n2t ou não definido, usa o resolvedor global
-        if ($resolverType !== 'custom') {
-            return 'https://n2t.net/' . $pubId;
-        }
-        
-        // Se for custom, usa o resolver personalizado
-        $resolver = $this->getSetting($contextId, 'arkResolver');
-        if (!empty($resolver)) {
-            return rtrim($resolver, '/') . '/' . $pubId;
-        }
-        
-        // Fallback para n2t
-        return 'https://n2t.net/' . $pubId;
-    }
-    public function getPubIdMetadataFile() { return $this->getTemplateResource('arkSuffixEdit.tpl'); }
-    public function addJavaScript($request, $templateMgr) { }
-    public function getPubIdAssignFile() { return $this->getTemplateResource('arkAssign.tpl'); }
-    
-    public function instantiateSettingsForm($contextId) {
-        require_once($this->getPluginPath() . '/classes/form/ARKSettingsForm.inc.php');
-        return new ARKSettingsForm($this, $contextId);
-    }
-    
-    public function getFormFieldNames() { return ['arkSuffix']; }
-    public function getAssignFormFieldName() { return 'assignARK'; }
-    public function getPrefixFieldName() { return 'arkPrefix'; }
-    public function getSuffixFieldName() { return 'arkSuffix'; }
-
-    public function getLinkActions($pubObject) {
-        $linkActions = [];
+    /**
+     * Load ARK styles on article frontend pages
+     */
+    public function loadArticleStyles($hookName, $args)
+    {
+        $templateMgr = $args[0];
         $request = Application::get()->getRequest();
-        $userVars = $request->getUserVars();
-        $userVars['pubIdPlugIn'] = get_class($this);
         
-        $linkActions['clearPubIdLinkActionARK'] = new LinkAction(
-            'clearPubId', 
-            new RemoteActionConfirmationModal(
-                $request->getSession(),
-                __('plugins.pubIds.ark.editor.clearObjectsARK.confirm'),
-                __('common.delete'),
-                $request->url(null, null, null, ['clearPubId'], null, $userVars),
-                'modal_delete'
-            ),
-            __('plugins.pubIds.ark.editor.clearObjectsARK'),
-            'delete',
-            __('plugins.pubIds.ark.editor.clearObjectsARK')
-        );
+        $context = $request->getContext();
+        if (!$context) return false;
         
-        return $linkActions;
-    }
-
-    public function getSuffixPatternsFieldNames() { return []; }
-    public function getDAOFieldNames() { return ['pub-id::ark']; }
-    public function getSuffixTypeOptions() { return ['random' => 'plugins.pubIds.ark.suffix.random']; }
-
-    /**
-     * Gera sufixo no formato: PREFIXOxxxx-yyyy
-     */
-    public function generateSuffix($customPrefix = null) {
-        if (!$customPrefix) {
-            $customPrefix = 'CRL';
+        $enabled = $this->getSetting($context->getId(), 'enablePublicationARK');
+        if (!$enabled) return false;
+        
+        // Check if we are on an article page
+        $router = $request->getRouter();
+        $page = $router->getRequestedPage($request);
+        
+        if ($page === 'article') {
+            $templateMgr->addStyleSheet(
+                'ark-article-styles',
+                $request->getBaseUrl() . '/' . $this->getPluginPath() . '/css/ark.css?v=1.00' . time(),
+                ['contexts' => 'frontend', 'priority' => STYLE_SEQUENCE_LAST]
+            );
         }
         
-        $customPrefix = strtoupper(substr(trim($customPrefix), 0, 6));
-        if (strlen($customPrefix) < 2) $customPrefix = 'ABC';
-        
-        $numbers = '23456789';
-        $xxxx = '';
-        for ($i = 0; $i < 4; $i++) {
-            $xxxx .= $numbers[random_int(0, strlen($numbers) - 1)];
-        }
-        
-        $letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-        $yyyy = '';
-        for ($i = 0; $i < 4; $i++) {
-            $yyyy .= $letters[random_int(0, strlen($letters) - 1)];
-        }
-        
-        return $customPrefix . $xxxx . '-' . $yyyy;
-    }
-
-    /**
-     * Obtém o ARK para uma publicação (apenas artigos)
-     */
-    public function getPubId($pubObject) {
-        // Apenas para publicações (artigos)
-        if (!is_a($pubObject, 'Publication')) {
-            return null;
-        }
-        
-        $contextId = $pubObject->getData('contextId');
-        $storedId = $pubObject->getStoredPubId('ark');
-        if (!empty($storedId)) return $storedId;
-        
-        // Verifica se ARK está habilitado para artigos
-        $enabled = $this->getSetting($contextId, 'enablePublicationARK');
-        if (!$enabled) return null;
-        
-        $prefix = $this->getSetting($contextId, 'arkPrefix');
-        $customPrefix = $this->getSetting($contextId, 'arkCustomPrefix');
-        
-        if (empty($prefix)) return null;
-        if (empty($customPrefix)) $customPrefix = 'CRL';
-        
-        // Gera sufixo único
-        $maxAttempts = 10;
-        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
-            $suffix = $this->generateSuffix($customPrefix);
-            $fullArk = $this->constructPubId($prefix, $suffix, $contextId);
-            
-            if ($this->checkDuplicate($fullArk, $pubObject, $contextId)) {
-                return $fullArk;
-            }
-        }
-        
-        error_log("ARKPubIdPlugin: Não foi possível gerar ARK único após {$maxAttempts} tentativas");
-        return null;
-    }
-
-    /**
-     * Verifica se um ARK já existe na base
-     * @return bool true se NÃO houver duplicata
-     */
-    public function checkDuplicate($pubId, $pubObject, $contextId) {
-        $pubObjectId = $pubObject ? $pubObject->getId() : null;
-        
-        $sql = 'SELECT COUNT(*) as count FROM publication_settings ps 
-                INNER JOIN publications p ON ps.publication_id = p.publication_id
-                INNER JOIN submissions s ON p.submission_id = s.submission_id 
-                WHERE s.context_id = ? 
-                AND ps.setting_name = ? 
-                AND ps.setting_value = ?';
-        $params = [$contextId, 'pub-id::ark', $pubId];
-        
-        if ($pubObjectId) {
-            $sql .= ' AND p.publication_id != ?';
-            $params[] = $pubObjectId;
-        }
-        
-        $result = DB::selectOne($sql, $params);
-        return $result->count == 0;
-    }
-
-    public function getNotUniqueErrorMsg() { 
-        return __('plugins.pubIds.ark.editor.arkSuffixNotUnique'); 
-    }
-
-    public function isObjectTypeEnabled($pubObjectType, $contextId) { 
-        if ($pubObjectType == 'Publication') {
-            return (bool) $this->getSetting($contextId, 'enablePublicationARK');
-        }
         return false;
     }
 
+    // ==================== PUBLICATION METHODS ====================
+    
+    public function onPublicationAdd($hookName, $args) {
+        $publication = $args[0];
+        $this->saveArkForPublication($publication);
+    }
+    
+    public function onPublicationEdit($hookName, $args) {
+        $publication = $args[0];
+        $this->saveArkForPublication($publication);
+    }
+    
+    private function saveArkForPublication($publication) {
+        if (!is_a($publication, 'Publication')) return;
+        
+        $publicationId = $publication->getId();
+        if (!$publicationId) return;
+        
+        $contextId = $publication->getData('contextId');
+        $enabled = $this->getSetting($contextId, 'enablePublicationARK');
+        
+        if (!$enabled) return;
+        
+        $existingArk = $this->getArkFromDB($publicationId, 'publication');
+        if ($existingArk) return;
+        
+        $prefix = rtrim($this->getSetting($contextId, 'arkPrefix'), '/');
+        $customPrefix = $this->getSetting($contextId, 'arkCustomPrefix');
+        if (empty($customPrefix)) $customPrefix = 'CRL';
+        
+        $suffix = $this->generateSuffix($customPrefix);
+        $fullArk = $prefix . '/' . $suffix;
+        
+        try {
+            DB::table('publication_settings')->updateOrInsert(
+                [
+                    'publication_id' => $publicationId,
+                    'setting_name' => 'pub-id::ark',
+                    'locale' => ''
+                ],
+                ['setting_value' => $fullArk]
+            );
+        } catch (\Exception $e) {
+            error_log("[ARK] Error saving publication: " . $e->getMessage());
+        }
+    }
+    
+    private function getArkFromDB($objectId, $type = 'publication') {
+        try {
+            $table = ($type === 'publication') ? 'publication_settings' : 'issue_settings';
+            $idField = $type . '_id';
+            
+            return DB::table($table)
+                ->where($idField, $objectId)
+                ->where('setting_name', 'pub-id::ark')
+                ->value('setting_value');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+    
+    // ==================== ISSUE METHODS ====================
+    
+    public function onIssueInsert($hookName, $args) {
+        $issue = $args[0];
+        $issueId = $issue->getId();
+        return false;
+    }
+    
+    public function onIssueUpdate($hookName, $args) {
+        $issue = $args[0];
+        $issueId = $issue->getId();
+        return false;
+    }
+    
+    public function issueFormExecute($hookName, $form) {
+        $arkValue = $form->getData('arkSuffix');
+        $issueId = $form->issueId ?? $form->getData('issueId');
+        
+        if (!empty($arkValue) && $issueId) {
+            // Check global duplicate before saving
+            $duplicateInArticles = DB::table('publication_settings')
+                ->where('setting_name', 'pub-id::ark')
+                ->where('setting_value', $arkValue)
+                ->exists();
+            
+            $duplicateInIssues = DB::table('issue_settings')
+                ->where('setting_name', 'pub-id::ark')
+                ->where('setting_value', $arkValue)
+                ->where('issue_id', '!=', $issueId)
+                ->exists();
+            
+            if ($duplicateInArticles || $duplicateInIssues) {
+                if (method_exists($form, 'addError')) {
+                    $form->addError('arkSuffix', __('plugins.pubIds.ark.editor.arkSuffixNotUnique'));
+                }
+                return false;
+            }
+            
+            try {
+                DB::table('issue_settings')->updateOrInsert(
+                    [
+                        'issue_id' => $issueId,
+                        'setting_name' => 'pub-id::ark',
+                        'locale' => ''
+                    ],
+                    ['setting_value' => $arkValue]
+                );
+            } catch (\Exception $e) {
+                error_log("[ARK] Error saving issue: " . $e->getMessage());
+            }
+        }
+        return false;
+    }
+    
+    // ==================== ISSUE FORM INJECTION (BACKEND) ====================
+    
+    public function injectIssueArkField($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $request = Application::get()->getRequest();
+        
+        $context = $request->getContext();
+        if (!$context) return;
+        
+        $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
+        if (!$enabled) return;
+        
+        $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
+        $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
+        if (empty($customPrefix)) $customPrefix = 'ISSUE';
+        
+        $saveUrl = $request->getBaseUrl() . '/plugins/pubIds/ark/save_ajax.php';
+        
+        $confirmReplaceMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmReplace', ['%s']));
+        $confirmNewMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmNew'));
+        $generateButtonText = addslashes(__('plugins.pubIds.ark.editor.generateNewArk'));
+        $duplicateArkError = addslashes(__('plugins.pubIds.ark.editor.duplicateArkError'));
+        $saveSuccessMsg = addslashes(__('plugins.pubIds.ark.editor.saveSuccess'));
+        $networkErrorMsg = addslashes(__('plugins.pubIds.ark.editor.networkError'));
+        $genericErrorMsg = addslashes(__('plugins.pubIds.ark.editor.genericError'));
+        $savingText = addslashes(__('common.saving'));
+
+        $jsCode = '
+(function() {
+    var prefix = "' . addslashes($prefix) . '";
+    var customPrefix = "' . addslashes($customPrefix) . '";
+    var saveUrl = "' . $saveUrl . '";
+    var currentIssueId = null;
+    var alreadyFilled = false;
+    
+    var confirmReplaceMsg = "' . $confirmReplaceMsg . '";
+    var confirmNewMsg = "' . $confirmNewMsg . '";
+    var generateButtonText = "' . $generateButtonText . '";
+    var duplicateArkError = "' . $duplicateArkError . '";
+    var saveSuccessMsg = "' . $saveSuccessMsg . '";
+    var networkErrorMsg = "' . $networkErrorMsg . '";
+    var genericErrorMsg = "' . $genericErrorMsg . '";
+    var savingText = "' . $savingText . '";
+    
+    function generateArk() {
+        var numbers = "23456789";
+        var letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        var xxxx = "", yyyy = "";
+        for (var i = 0; i < 4; i++) {
+            xxxx += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            yyyy += letters.charAt(Math.floor(Math.random() * letters.length));
+        }
+        return prefix + "/" + customPrefix + xxxx + "-" + yyyy;
+    }
+    
+    function extractIssueIdFromUrl(url) {
+        var match = url.match(/issueId=(\d+)/);
+        if (match) return match[1];
+        match = url.match(/editIssue\/(\d+)/);
+        if (match) return match[1];
+        return null;
+    }
+    
+    function showNotification(message, type) {
+        var notification = $("<div>")
+            .addClass("ark-notification ark-notification-" + type)
+            .text(message)
+            .css({
+                "position": "fixed",
+                "top": "20px",
+                "right": "20px",
+                "padding": "12px 20px",
+                "background": type === "success" ? "#00b24e" : (type === "error" ? "#d00a0a" : "#006798"),
+                "color": "white",
+                "border-radius": "4px",
+                "z-index": "9999",
+                "box-shadow": "0 2px 10px rgba(0,0,0,0.2)",
+                "font-size": "14px",
+                "font-weight": "500",
+                "max-width": "400px",
+                "word-wrap": "break-word"
+            });
+        
+        $("body").append(notification);
+        
+        var duration = (type === "error" || type === "info") ? 10000 : 5000;
+        setTimeout(function() {
+            notification.fadeOut(500, function() { $(this).remove(); });
+        }, duration);
+    }
+    
+    function checkExistingArk(issueId, callback) {
+        fetch(saveUrl + "?check=1&issueId=" + issueId)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                callback(data.exists ? data.ark : null);
+            })
+            .catch(function() { callback(null); });
+    }
+    
+    function fillArkFieldIfNeeded() {
+        if (alreadyFilled) return;
+        
+        var $arkField = $("input[name=\'arkSuffix\']");
+        if (!$arkField.length) return;
+        
+        if (!$arkField.val() && currentIssueId) {
+            checkExistingArk(currentIssueId, function(existingArk) {
+                if (existingArk) {
+                    $arkField.val(existingArk);
+                    alreadyFilled = true;
+                } else if (!$arkField.val()) {
+                    var newArk = generateArk();
+                    $arkField.val(newArk);
+                    alreadyFilled = true;
+                }
+            });
+        }
+    }
+    
+    function generateNewArk() {
+        var $arkField = $("input[name=\'arkSuffix\']");
+        var oldArk = $arkField.val();
+        var confirmMsg = "";
+        if (oldArk) {
+            confirmMsg = confirmReplaceMsg.replace("%s", oldArk);
+        } else {
+            confirmMsg = confirmNewMsg;
+        }
+        
+        if (confirm(confirmMsg)) {
+            var newArk = generateArk();
+            $arkField.val(newArk);
+        }
+    }
+    
+    function saveArk() {
+        var $arkField = $("input[name=\'arkSuffix\']");
+        var arkValue = $arkField.val();
+        
+        if (!arkValue || !currentIssueId) return;
+        
+        var $saveBtn = $("button[type=\'submit\'], input[type=\'submit\'], .pkpButton").first();
+        var originalText = $saveBtn.text();
+        $saveBtn.text(savingText).css("opacity", "0.7");
+        
+        fetch(saveUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "issueId=" + currentIssueId + "&arkValue=" + encodeURIComponent(arkValue)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            $saveBtn.text(originalText).css("opacity", "1");
+            
+            if (data.status) {
+                alreadyFilled = true;
+                showNotification(saveSuccessMsg, "success");
+            } else {
+                if (data.error_code === "DUPLICATE_ARK") {
+                    showNotification(duplicateArkError, "error");
+                    $(".ark-generate-btn").css({
+                        "animation": "pulse 0.5s ease-in-out 3",
+                        "box-shadow": "0 0 0 3px rgba(208,10,108,0.3)"
+                    });
+                    setTimeout(function() {
+                        $(".ark-generate-btn").css({
+                            "animation": "",
+                            "box-shadow": ""
+                        });
+                    }, 2000);
+                } else {
+                    showNotification(genericErrorMsg + (data.error || "Unknown error"), "error");
+                }
+            }
+        })
+        .catch(function(err) {
+            $saveBtn.text(originalText).css("opacity", "1");
+            showNotification(networkErrorMsg, "error");
+        });
+    }
+    
+    function addGenerateButton() {
+        var $arkField = $("input[name=\'arkSuffix\']");
+        if (!$arkField.length || $arkField.next(".ark-generate-btn").length) return;
+        
+        var $wrapper = $("<div>").css({
+            "display": "flex",
+            "align-items": "center",
+            "gap": "8px",
+            "width": "100%"
+        });
+        
+        $arkField.wrap($wrapper);
+        $arkField.css({ "flex": "1", "margin": "0" });
+        
+        var $btn = $("<button>")
+            .attr("type", "button")
+            .addClass("pkpButton ark-generate-btn")
+            .text(generateButtonText)
+            .css({
+                "white-space": "nowrap",
+                "margin": "0",
+                "background": "#fff",
+                "border": "1px solid #ddd",
+                "border-radius": "2px",
+                "padding": "0 .5em",
+                "font-size": ".875rem",
+                "line-height": "2rem",
+                "font-weight": "700",
+                "color": "#006798",
+                "text-decoration": "none",
+                "box-shadow": "0 1px 0 #ddd",
+                "cursor": "pointer"
+            });
+        
+        $btn.hover(
+            function() {
+                $(this).css({ "background": "#f8f9fa", "border-color": "#006798" });
+            },
+            function() {
+                $(this).css({ "background": "#fff", "border-color": "#ddd" });
+            }
+        );
+        
+        $btn.click(function(e) {
+            e.preventDefault();
+            generateNewArk();
+        });
+        
+        $arkField.after($btn);
+    }
+    
+    $(document).on("click", "a.pkp_linkaction_edit, a[id*=\"edit-button\"]", function(e) {
+        var href = $(this).attr("href");
+        if (href) {
+            currentIssueId = extractIssueIdFromUrl(href);
+            if (currentIssueId) {
+                alreadyFilled = false;
+            }
+        }
+    });
+    
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if (settings.url && settings.url.includes("identifiers")) {
+            var issueId = extractIssueIdFromUrl(settings.url);
+            if (issueId) {
+                currentIssueId = issueId;
+                setTimeout(function() {
+                    fillArkFieldIfNeeded();
+                    addGenerateButton();
+                }, 300);
+                setTimeout(function() {
+                    fillArkFieldIfNeeded();
+                    addGenerateButton();
+                }, 600);
+            }
+        }
+    });
+    
+    $(document).on("click", "button[type=\'submit\'], input[type=\'submit\'], .pkpButton", function() {
+        if (currentIssueId) {
+            setTimeout(saveArk, 200);
+        }
+    });
+})();
+';
+        
+        $templateMgr->addJavaScript('ark-issue-field', $jsCode, ['contexts' => 'backend', 'inline' => true]);
+    }
+    
+    // ==================== PUBLICATION FORM METHODS ====================
+    
+    public function onFormExecute($hookName, $form) {
+        if ($form->id === 'publication' || $form->id === 'publicationIdentifiers') {
+            $arkValue = $form->getData('pub-id::ark');
+            
+            if (!empty($arkValue) && isset($form->publication)) {
+                $publicationId = $form->publication->getId();
+                
+                $duplicateInArticles = DB::table('publication_settings')
+                    ->where('setting_name', 'pub-id::ark')
+                    ->where('setting_value', $arkValue)
+                    ->where('publication_id', '!=', $publicationId)
+                    ->exists();
+                
+                $duplicateInIssues = DB::table('issue_settings')
+                    ->where('setting_name', 'pub-id::ark')
+                    ->where('setting_value', $arkValue)
+                    ->exists();
+                
+                if ($duplicateInArticles || $duplicateInIssues) {
+                    return false;
+                }
+                
+                try {
+                    DB::table('publication_settings')->updateOrInsert(
+                        [
+                            'publication_id' => $publicationId,
+                            'setting_name' => 'pub-id::ark',
+                            'locale' => ''
+                        ],
+                        ['setting_value' => $arkValue]
+                    );
+                } catch (\Exception $e) {
+                    error_log("[ARK] Error saving publication: " . $e->getMessage());
+                }
+            }
+        }
+        return false;
+    }
+    
+    public function addPublicationFormFields($hookName, $form)
+    {
+        if ($form->id !== 'publication' && $form->id !== 'publicationIdentifiers') {
+            return;
+        }
+        
+        $contextId = $form->submissionContext->getId();
+        $enabled = $this->getSetting($contextId, 'enablePublicationARK');
+        
+        if (!$enabled) return;
+        
+        $prefix = rtrim($this->getSetting($contextId, 'arkPrefix'), '/');
+        $publicationId = $form->publication->getId();
+        $existingArk = $publicationId ? $this->getArkFromDB($publicationId, 'publication') : null;
+        
+        $arkField = new FieldText('pub-id::ark', [
+            'label' => __('plugins.pubIds.ark.displayName'),
+            'value' => $existingArk,
+            'isMultilingual' => false,
+            'groupId' => 'identifiers',
+            'help' => __('plugins.pubIds.ark.editor.arkHelp', ['prefix' => $prefix]),
+        ]);
+        
+        $form->addField($arkField);
+    }
+    
+    // ==================== FRONTEND DISPLAY METHODS ====================
+    
+    public function displayArkOnFrontend($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $request = Application::get()->getRequest();
+        
+        $templateMgr->addStyleSheet(
+            'ark-unified-styles',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/css/ark.css?v=1.00',
+            ['contexts' => 'frontend']
+        );
+        
+        $router = $request->getRouter();
+        $page = $router->getRequestedPage($request);
+        $op = $router->getRequestedOp($request);
+        
+        if ($page !== 'issue' || $op !== 'view') {
+            return false;
+        }
+        
+        $context = $request->getContext();
+        if (!$context) return false;
+        
+        $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
+        if (!$enabled) return false;
+        
+        $pathArgs = $router->getRequestedArgs($request);
+        $issueId = isset($pathArgs[0]) ? (int)$pathArgs[0] : null;
+        
+        if (!$issueId) {
+            return false;
+        }
+        
+        $ark = $this->getArkFromDB($issueId, 'issue');
+        if (!$ark) {
+            return false;
+        }
+        
+        $resolvingUrl = $this->getResolvingURL($context->getId(), $ark);
+        $displayName = __('plugins.pubIds.ark.displayName');
+        
+        $jsCode = '
+(function() {
+    var displayName = "' . addslashes($displayName) . '";
+    var arkValue = "' . addslashes($ark) . '";
+    var resolvingUrl = "' . addslashes($resolvingUrl) . '";
+    
+    function findTargetContainer() {
+        var selectors = [
+            ".obj_issue_toc .heading",
+            ".issue-details",
+            ".obj_issue_toc",
+            ".issue",
+            "main .container"
+        ];
+        
+        for (var i = 0; i < selectors.length; i++) {
+            var element = document.querySelector(selectors[i]);
+            if (element) return element;
+        }
+        
+        var doiElement = document.querySelector(".pub_id.doi");
+        if (doiElement && doiElement.parentNode) return doiElement.parentNode;
+        
+        return document.body;
+    }
+    
+    function injectArk() {
+        if (document.getElementById("ark-frontend-injected")) return;
+        
+        var target = findTargetContainer();
+        if (!target) return;
+        
+        var arkHtml = \'<div id="ark-frontend-injected" class="pub_id ark">\' +
+            \'<span class="type">\' + displayName + \'</span>\' +
+            \'<span class="id"><a href="\' + resolvingUrl + \'" target="_blank">\' + arkValue + \'</a></span>\' +
+        \'</div>\';
+        
+        target.insertAdjacentHTML("beforeend", arkHtml);
+    }
+    
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", injectArk);
+    } else {
+        injectArk();
+    }
+    
+    setTimeout(injectArk, 1000);
+    setTimeout(injectArk, 2000);
+    setTimeout(injectArk, 3000);
+})();
+';
+        
+        $templateMgr->addJavaScript('ark-frontend', $jsCode, ['contexts' => 'frontend', 'inline' => true]);
+        
+        return false;
+    }
+    
+    // ==================== PROPERTY METHODS ====================
+    
     public function modifyObjectProperties($hookName, $args) { 
         $props = &$args[0]; 
-        $props[] = 'pub-id::ark'; 
+        if (!in_array('pub-id::ark', $props)) {
+            $props[] = 'pub-id::ark';
+        }
     }
-
-    public function modifyObjectPropertyValues($hookName, $args) {
+    
+    public function modifyArticlePropertyValues($hookName, $args) {
         $values = &$args[0]; 
         $object = $args[1]; 
         $props = $args[2];
         
         if (in_array('pub-id::ark', $props) && is_a($object, 'Publication')) { 
-            $pubId = $this->getPubId($object); 
-            $values['pub-id::ark'] = $pubId ? $pubId : null; 
+            $pubId = $this->getArkFromDB($object->getId(), 'publication'); 
+            $values['pub-id::ark'] = $pubId ?: null;
         }
     }
-
+    
     public function validatePublicationArk($hookName, $args) {
         $errors = &$args[0];
         $props = &$args[2];
@@ -263,50 +704,151 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             return;
         }
         
-        if (!$this->checkDuplicate($arkFull, $publication, $contextId)) {
+        $duplicateInArticles = DB::table('publication_settings')
+            ->where('setting_name', 'pub-id::ark')
+            ->where('setting_value', $arkFull)
+            ->when($currentId, function($query) use ($currentId) {
+                return $query->where('publication_id', '!=', $currentId);
+            })
+            ->exists();
+        
+        $duplicateInIssues = DB::table('issue_settings')
+            ->where('setting_name', 'pub-id::ark')
+            ->where('setting_value', $arkFull)
+            ->exists();
+        
+        if ($duplicateInArticles || $duplicateInIssues) {
             $errors['pub-id::ark'][] = $this->getNotUniqueErrorMsg();
         }
     }
-
-    /**
-     * Adiciona o campo ARK no formulário de publicação
-     */
-    public function addPublicationFormFields($hookName, $form)
-    {
-        // Verifica se é o formulário correto
-        if ($form->id !== 'publication' && $form->id !== 'publicationIdentifiers') {
-            return;
+    
+    // ==================== BASIC PLUGIN METHODS ====================
+    
+    public function getDisplayName() { 
+        return __('plugins.pubIds.ark.displayName'); 
+    }
+    
+    public function getDescription() { 
+        return __('plugins.pubIds.ark.description'); 
+    }
+    
+    public function constructPubId($pubIdPrefix, $pubIdSuffix, $contextId) { 
+        $prefix = rtrim($pubIdPrefix, '/');
+        return $prefix . '/' . $pubIdSuffix; 
+    }
+    
+    public function getPubIdType() { return 'ark'; }
+    public function getPubIdDisplayType() { return 'ARK'; }
+    public function getPubIdFullName() { return 'Archival Resource Key'; }
+    
+    public function getResolvingURL($contextId, $pubId) {
+        $resolverType = $this->getSetting($contextId, 'resolverType');
+        $customResolver = $this->getSetting($contextId, 'arkResolver');
+        
+        if ($resolverType === 'custom' && !empty($customResolver)) {
+            $baseResolver = rtrim($customResolver, '/');
+            return $baseResolver . '/' . ltrim($pubId, '/');
         }
         
-        $contextId = $form->submissionContext->getId();
-        $enabled = $this->getSetting($contextId, 'enablePublicationARK');
-        
-        if (!$enabled) return;
-        
-        $prefix = $this->getSetting($contextId, 'arkPrefix');
-        $existingArk = $form->publication->getData('pub-id::ark');
-        
-        // Campo ARK personalizado
-        $arkField = new FieldText('pub-id::ark', [
-            'label' => __('plugins.pubIds.ark.displayName'),
-            'value' => $existingArk,
-            'isMultilingual' => false,
-            'groupId' => 'identifiers',
-            'help' => __('plugins.pubIds.ark.editor.arkHelp', ['prefix' => $prefix]),
-        ]);
-        
-        $form->addField($arkField);
+        return 'https://n2t.net/' . ltrim($pubId, '/');
     }
-
+    
+    public function getPubIdMetadataFile() { 
+        return $this->getTemplateResource('arkSuffixEdit.tpl');
+    }
+    
+    public function addJavaScript($request, $templateMgr) { }
+    public function getPubIdAssignFile() { return $this->getTemplateResource('arkAssign.tpl'); }
+    
+    public function instantiateSettingsForm($contextId) {
+        require_once($this->getPluginPath() . '/classes/form/ARKSettingsForm.inc.php');
+        return new ARKSettingsForm($this, $contextId);
+    }
+    
+    public function getFormFieldNames() { return ['arkSuffix']; }
+    public function getAssignFormFieldName() { return 'assignARK'; }
+    public function getPrefixFieldName() { return 'arkPrefix'; }
+    public function getSuffixFieldName() { return 'arkSuffix'; }
+    public function getSuffixPatternsFieldNames() { return []; }
+    public function getDAOFieldNames() { return ['pub-id::ark']; }
+    public function getSuffixTypeOptions() { return ['random' => 'plugins.pubIds.ark.suffix.random']; }
+    
+    public function getLinkActions($pubObject) {
+        $linkActions = [];
+        $request = Application::get()->getRequest();
+        
+        if (is_a($pubObject, 'Publication')) {
+            $ark = $this->getArkFromDB($pubObject->getId(), 'publication');
+            if ($ark) {
+                $linkActions['clearPubIdLinkActionARK'] = new LinkAction(
+                    'clearPubId',
+                    new RemoteActionConfirmationModal(
+                        $request->getSession(),
+                        __('plugins.pubIds.ark.editor.clearObjectsARK.confirm'),
+                        __('common.delete'),
+                        $request->url(null, null, null, ['clearPubId' => $pubObject->getId()]),
+                        'modal_delete'
+                    ),
+                    __('plugins.pubIds.ark.editor.clearObjectsARK'),
+                    'delete'
+                );
+            }
+        }
+        
+        return $linkActions;
+    }
+    
+    public function generateSuffix($customPrefix = null) {
+        if (!$customPrefix) $customPrefix = 'CRL';
+        $customPrefix = strtoupper(substr(trim($customPrefix), 0, 6));
+        if (strlen($customPrefix) < 2) $customPrefix = 'ABC';
+        
+        $numbers = '23456789';
+        $xxxx = '';
+        for ($i = 0; $i < 4; $i++) {
+            $xxxx .= $numbers[random_int(0, strlen($numbers) - 1)];
+        }
+        
+        $letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $yyyy = '';
+        for ($i = 0; $i < 4; $i++) {
+            $yyyy .= $letters[random_int(0, strlen($letters) - 1)];
+        }
+        
+        return $customPrefix . $xxxx . '-' . $yyyy;
+    }
+    
+    public function getPubId($pubObject) {
+        if (is_a($pubObject, 'Publication')) {
+            return $this->getArkFromDB($pubObject->getId(), 'publication');
+        }
+        if (is_a($pubObject, 'Issue')) {
+            return $this->getArkFromDB($pubObject->getId(), 'issue');
+        }
+        return null;
+    }
+    
+    public function getNotUniqueErrorMsg() { 
+        return __('plugins.pubIds.ark.editor.arkSuffixNotUnique'); 
+    }
+    
+    public function isObjectTypeEnabled($pubObjectType, $contextId) { 
+        if ($pubObjectType == 'Publication') {
+            return (bool) $this->getSetting($contextId, 'enablePublicationARK');
+        }
+        if ($pubObjectType == 'Issue') {
+            return (bool) $this->getSetting($contextId, 'enableIssueARK');
+        }
+        return false;
+    }
+    
     public function loadArkFieldComponent($hookName, $args)
     {
         $templateMgr = $args[0];
         $request = Application::get()->getRequest();
         
         $router = $request->getRouter();
-        if (!is_a($router, 'PKP\core\PKPPageRouter')) {
-            return;
-        }
+        if (!is_a($router, 'PKP\core\PKPPageRouter')) return;
 
         $context = $request->getContext();
         if (!$context) return;
@@ -314,16 +856,18 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         $enabled = $this->getSetting($context->getId(), 'enablePublicationARK');
         if (!$enabled) return;
         
-        $prefix = $this->getSetting($context->getId(), 'arkPrefix');
+        $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
         $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
         
-        // Carrega o JavaScript do botão "Gerar ARK"
+        $saveUrl = $request->getBaseUrl() . '/plugins/pubIds/ark/save_ajax.php';
+        
         $templateMgr->addJavaScript(
             'ark-field-injector-vars',
             'window.arkPluginConfig = { 
                 prefix: "' . $prefix . '", 
                 customPrefix: "' . ($customPrefix ?: 'CRL') . '",
-                generateLabel: "' . __('plugins.pubIds.ark.editor.generateArk') . '"
+                generateLabel: "' . __('plugins.pubIds.ark.editor.generateArk') . '",
+                saveUrl: "' . $saveUrl . '"
             };',
             ['contexts' => 'backend', 'inline' => true]
         );
@@ -333,49 +877,134 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/FieldArk.js?v=' . time(),
             ['contexts' => 'backend', 'priority' => STYLE_SEQUENCE_LAST]
         );
-
-        // CSS para o botão e campo
-        $templateMgr->addStyleSheet(
-            'ark-field-injector-css',
-            '
-            .ark-field-wrapper {
-                display: flex !important;
-                align-items: center !important;
-                width: 100%;
-                gap: 0.5rem;
-            }
-            .ark-field-wrapper input {
-                flex-grow: 0 !important;
-                width: 400px !important;
-                max-width: 100% !important;
-            }
-            .ark-generate-btn {
-                display: inline-flex !important;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.875rem !important;
-                line-height: 1.25rem !important;
-                font-weight: 600 !important;
-                color: #d00a6c !important;
-                background-color: #fff !important;
-                border: 1px solid #aaa !important;
-                border-radius: 4px !important;
-                padding: 0.4375rem 0.75rem !important;
-                margin-left: 0.5rem !important;
-                height: 2.5rem !important;
-                white-space: nowrap;
-                cursor: pointer;
-            }
-            .ark-generate-btn:hover {
-                background-color: #f5f5f5 !important;
-                border-color: #d00a6c !important;
-            }
-            .ark-readonly-field {
-                background-color: #f5f5f5 !important;
-                color: #666 !important;
-            }
-            ',
-            ['contexts' => 'backend', 'inline' => true]
-        );
     }
+
+    /**
+     * Display ARK on the issue archive list page
+     */
+    public function displayArkOnArchive($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $request = Application::get()->getRequest();
+        
+        $templateMgr->addStyleSheet(
+            'ark-unified-styles',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/css/ark.css?v=1.00',
+            ['contexts' => 'frontend']
+        );
+        
+        $router = $request->getRouter();
+        $page = $router->getRequestedPage($request);
+        $op = $router->getRequestedOp($request);
+        
+        if ($page !== 'issue' || $op !== 'archive') {
+            return false;
+        }
+        
+        $context = $request->getContext();
+        if (!$context) return false;
+        
+        $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
+        if (!$enabled) return false;
+        
+        $issues = $templateMgr->getTemplateVars('issues');
+        if (!$issues || empty($issues)) {
+            $issues = $templateMgr->getTemplateVars('publishedIssues');
+        }
+        
+        $arks = [];
+        if ($issues && is_array($issues)) {
+            foreach ($issues as $issue) {
+                $issueId = $issue->getId();
+                $ark = $this->getArkFromDB($issueId, 'issue');
+                if ($ark) {
+                    $resolvingUrl = $this->getResolvingURL($context->getId(), $ark);
+                    $arks[$issueId] = [
+                        'ark' => $ark,
+                        'url' => $resolvingUrl
+                    ];
+                }
+            }
+        }
+        
+        $jsCode = '
+(function() {
+    var issueArks = ' . json_encode($arks) . ';
+    
+    function injectArksIntoArchive() {
+        var selectors = [
+            ".issue-summary",
+            ".obj_issue_summary", 
+            ".issue-item",
+            ".issue",
+            "li.issue"
+        ];
+        
+        var issueItems = [];
+        for (var i = 0; i < selectors.length; i++) {
+            var items = document.querySelectorAll(selectors[i]);
+            if (items.length) {
+                issueItems = items;
+                break;
+            }
+        }
+        
+        if (issueItems.length === 0) {
+            setTimeout(injectArksIntoArchive, 500);
+            return;
+        }
+        
+        for (var i = 0; i < issueItems.length; i++) {
+            var item = issueItems[i];
+            var issueId = null;
+            
+            if (item.getAttribute("data-issue-id")) {
+                issueId = item.getAttribute("data-issue-id");
+            }
+            
+            var link = item.querySelector("a:first-child");
+            if (!issueId && link) {
+                var href = link.getAttribute("href");
+                var match = href.match(/view\/(\d+)/);
+                if (match) issueId = match[1];
+                match = href.match(/issueId=(\d+)/);
+                if (match) issueId = match[1];
+            }
+            
+            if (!issueId && item.id) {
+                var match = item.id.match(/issue-(\d+)/);
+                if (match) issueId = match[1];
+            }
+            
+            if (issueId && issueArks[issueId]) {
+                if (item.querySelector(".ark-archive-injected")) continue;
+                
+                var arkHtml = \'<div class="pub_id ark ark-archive-injected">\' +
+                    \'<span class="type">ARK</span>\' +
+                    \'<span class="id"><a href="\' + issueArks[issueId].url + \'" target="_blank">\' + issueArks[issueId].ark + \'</a></span>\' +
+                \'</div>\';
+                
+                item.insertAdjacentHTML("beforeend", arkHtml);
+            }
+        }
+    }
+    
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", injectArksIntoArchive);
+    } else {
+        injectArksIntoArchive();
+    }
+    
+    setTimeout(injectArksIntoArchive, 1000);
+    setTimeout(injectArksIntoArchive, 2000);
+    setTimeout(injectArksIntoArchive, 3000);
+    setTimeout(injectArksIntoArchive, 5000);
+})();
+';
+        
+        $templateMgr->addJavaScript('ark-archive-injector', $jsCode, ['contexts' => 'frontend', 'inline' => true]);
+        
+        return false;
+    }
+    
 }
