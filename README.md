@@ -84,11 +84,6 @@ O plugin inclui um **resolvedor integrado** que funciona sem editar seu arquivo 
 2. **Detecta automaticamente** se o ARK pertence a um artigo ou uma edição
 3. Redireciona para a página correspondente (302 Found)
 
-**Exemplos de acesso direto:**
-
-- Artigo: `https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=SIGLA2244-AABB`
-- Edição: `https://seudominio.com/plugins/pubIds/ark/resolver.php?ark=EDICAO1234-ABCD`
-
 ### Suporte a Metadados ERC (Inflexões ARK)
 
 O resolvedor suporta inflexões ARK para artigos e edições:
@@ -96,7 +91,7 @@ O resolvedor suporta inflexões ARK para artigos e edições:
 | Inflexão | Comportamento | Exemplo |
 |----------|---------------|---------|
 | (nenhuma) | Redireciona para o artigo/edição | `?ark=SIGLA0001-ABCD` |
-| `?` | Retorna metadados ERC resumidos | `?ark=SIGLA0001-ABCD?` |
+| `?` | Retorna metadados ERC resumidos* | `?ark=SIGLA0001-ABCD?` |
 | `??` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD??` |
 | `.info` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD.info` |
 | `&info` | Retorna metadados ERC completos | `?ark=SIGLA0001-ABCD&info` |
@@ -105,7 +100,7 @@ O resolvedor suporta inflexões ARK para artigos e edições:
 **Exemplo:**
 - `https://n2t.net/ark:16081/CRL0001-LURY??` → Retorna metadados ERC
 
-> **Nota:** A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor, pois em "https://n2t.net/ark:16081/CRL0001-LURY?" o resolver da n2t.net entrega apenas o link sem a inflexão, levando à página do artigo.
+> ***Nota:** A inflexão `?` (metadados resumidos) funciona apenas no acesso direto ao resolvedor, pois em "https://n2t.net/ark:16081/CRL0001-LURY?" o resolver da n2t.net entrega apenas o link sem a inflexão, levando à página do artigo.
 
 ### Data de Implementação do ARK
 
@@ -148,15 +143,6 @@ A data de implementação do ARK pode ser configurada nas opções do plugin. Ce
 
 1. Desative o plugin em **Configurações > Website > Plugins**
 2. Remova a pasta `ark` de `plugins/pubIds/`
-3. (Opcional) Remova os dados ARK do banco de dados:
-
-```sql
--- Remover ARKs de artigos
-DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
-
--- Remover ARKs de edições
-DELETE FROM issue_settings WHERE setting_name = 'pub-id::ark';
-```
 
 
 [Voltar ao topo](#portugues)
@@ -245,11 +231,6 @@ El plugin incluye un **resolvedor integrado** que funciona sin editar su archivo
 2. **Detecta automáticamente** si el ARK pertenece a un artículo o una edición
 3. Redirige a la página correspondiente (302 Found)
 
-**Ejemplos de acceso directo:**
-
-- Artículo: `https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=SIGLA2244-AABB`
-- Edición: `https://sudominio.com/plugins/pubIds/ark/resolver.php?ark=EDICION1234-ABCD`
-
 ### Soporte de Metadatos ERC (Inflexiones ARK)
 
 El resolvedor soporta inflexiones ARK para artículos y ediciones:
@@ -257,7 +238,7 @@ El resolvedor soporta inflexiones ARK para artículos y ediciones:
 | Inflexión | Comportamiento | Ejemplo |
 |-----------|----------------|---------|
 | (ninguna) | Redirige al artículo/edición | `?ark=SIGLA0001-ABCD` |
-| `?` | Devuelve metadatos ERC resumidos | `?ark=SIGLA0001-ABCD?` |
+| `?` | Devuelve metadatos ERC resumidos* | `?ark=SIGLA0001-ABCD?` |
 | `??` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD??` |
 | `.info` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD.info` |
 | `&info` | Devuelve metadatos ERC completos | `?ark=SIGLA0001-ABCD&info` |
@@ -266,7 +247,7 @@ El resolvedor soporta inflexiones ARK para artículos y ediciones:
 **Ejemplo:**
 - `https://n2t.net/ark:16081/CRL0001-LURY??` → Devuelve metadatos ERC
 
-> **Nota:** La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor, ya que en `https://n2t.net/ark:16081/CRL0001-LURY?` el resolvedor de n2t.net entrega solo el enlace sin la inflexión, llevando a la página del artículo.
+> ***Nota:** La inflexión `?` (metadatos resumidos) funciona solo en acceso directo al resolvedor, ya que en `https://n2t.net/ark:16081/CRL0001-LURY?` el resolvedor de n2t.net entrega solo el enlace sin la inflexión, llevando a la página del artículo.
 
 ### Fecha de Implementación del ARK
 
@@ -309,15 +290,7 @@ La fecha de implementación del ARK se puede configurar en las opciones del plug
 
 1. Desactive el plugin en **Configuraciones > Sitio > Plugins**
 2. Elimine la carpeta `ark` de `plugins/pubIds/`
-3. (Opcional) Elimine los datos ARK de la base de datos:
 
-```sql
--- Eliminar ARKs de artículos
-DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
-
--- Eliminar ARKs de ediciones
-DELETE FROM issue_settings WHERE setting_name = 'pub-id::ark';
-```
 
 [Volver al principio](#espanol)
 
@@ -404,11 +377,6 @@ The plugin includes a **built-in resolver** that works without editing your main
 2. **Automatically detects** whether the ARK belongs to an article or an issue
 3. Redirects to the corresponding page (302 Found)
 
-**Direct access examples:**
-
-- Article: `https://yourdomain.com/plugins/pubIds/ark/resolver.php?ark=PREFIX2244-AABB`
-- Issue: `https://yourdomain.com/plugins/pubIds/ark/resolver.php?ark=ISSUE1234-ABCD`
-
 ### ERC Metadata Support (ARK Inflections)
 
 The resolver supports ARK inflections for articles and issues:
@@ -416,7 +384,7 @@ The resolver supports ARK inflections for articles and issues:
 | Inflection | Behavior | Example |
 |------------|----------|---------|
 | (none) | Redirects to article/issue | `?ark=PREFIX0001-ABCD` |
-| `?` | Returns brief ERC metadata | `?ark=PREFIX0001-ABCD?` |
+| `?` | Returns brief ERC metadata* | `?ark=PREFIX0001-ABCD?` |
 | `??` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD??` |
 | `.info` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD.info` |
 | `&info` | Returns full ERC metadata | `?ark=PREFIX0001-ABCD&info` |
@@ -425,7 +393,7 @@ The resolver supports ARK inflections for articles and issues:
 **Example:**
 - `https://n2t.net/ark:16081/CRL0001-LURY??` → Returns ERC metadata
 
-> **Note:** The `?` inflection (brief metadata) only works when accessing your resolver directly, because at `https://n2t.net/ark:16081/CRL0001-LURY?` the n2t.net resolver delivers only the link without the inflection, leading to the article page.
+> ***Note:** The `?` inflection (brief metadata) only works when accessing your resolver directly, because at `https://n2t.net/ark:16081/CRL0001-LURY?` the n2t.net resolver delivers only the link without the inflection, leading to the article page.
 
 ### ARK Implementation Date
 
@@ -468,15 +436,7 @@ The ARK implementation date can be configured in the plugin options. Make sure t
 
 1. Disable the plugin in **Settings > Website > Plugins**
 2. Remove the `ark` folder from `plugins/pubIds/`
-3. (Optional) Remove ARK data from the database:
 
-```sql
--- Remove ARKs from articles
-DELETE FROM publication_settings WHERE setting_name = 'pub-id::ark';
-
--- Remove ARKs from issues
-DELETE FROM issue_settings WHERE setting_name = 'pub-id::ark';
-```
 
 [Back to top](#english)
 
