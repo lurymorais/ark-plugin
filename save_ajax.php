@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// ============ LOAD DATABASE CONFIGURATION ============
+// Load database configuration from OJS config.inc.php
 $configFile = dirname(__FILE__, 4) . '/config.inc.php';
 
 if (!file_exists($configFile)) {
@@ -58,7 +58,14 @@ if (empty($dbConfig['host']) || empty($dbConfig['name'])) {
 
 $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['name']};charset=utf8";
 
-// ============ FUNCTION TO CHECK GLOBAL DUPLICATE ============
+/**
+ * Check if an ARK is already in use (globally)
+ * 
+ * @param PDO $pdo Database connection
+ * @param string $arkValue ARK to check
+ * @param int|null $currentIssueId Issue ID to exclude (for updates)
+ * @return bool True if duplicate exists
+ */
 function isArkDuplicate($pdo, $arkValue, $currentIssueId = null) {
     // Check in publication_settings (articles)
     $stmt = $pdo->prepare("
@@ -91,7 +98,7 @@ function isArkDuplicate($pdo, $arkValue, $currentIssueId = null) {
     return $result['count'] > 0;
 }
 
-// ============ CHECK REQUEST FOR ISSUE ============
+// Check if this is a request to fetch existing ARK
 if (isset($_GET['check']) && $_GET['check'] == 1 && isset($_GET['issueId'])) {
     $issueId = (int)$_GET['issueId'];
     
@@ -119,7 +126,7 @@ if (isset($_GET['check']) && $_GET['check'] == 1 && isset($_GET['issueId'])) {
     }
 }
 
-// ============ CHECK REQUEST FOR ARTICLE ============
+// Check if this is a request to validate article ARK duplicate
 if (isset($_GET['check_article']) && $_GET['check_article'] == 1 && isset($_GET['publicationId']) && isset($_GET['ark'])) {
     $publicationId = (int)$_GET['publicationId'];
     $arkValue = $_GET['ark'];
@@ -162,7 +169,7 @@ if (isset($_GET['check_article']) && $_GET['check_article'] == 1 && isset($_GET[
     }
 }
 
-// ============ PROCESS NORMAL SAVE REQUEST ============
+// Process save request
 $issueId = 0;
 $arkValue = '';
 

@@ -6,7 +6,7 @@
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  */
 
-namespace Plugins\PubIds\Ark\Classes\Form;
+namespace APP\plugins\pubIds\ark\classes\form;
 
 use PKP\components\forms\FieldText;
 

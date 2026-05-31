@@ -1,26 +1,29 @@
-# ARK Plugin - Permite acesso ao resolvedor
-# Este arquivo é necessário para que o resolver.php funcione
-# sem exigir edição do .htaccess principal
+# ============================================
+# ARK PLUGIN - PROTEÇÃO SIMPLIFICADA
+# ============================================
 
+# Bloquear acesso a todos os arquivos PHP
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+
+# Permitir arquivos essenciais
 <Files "resolver.php">
     Require all granted
 </Files>
 
 <Files "save_ajax.php">
     Require all granted
-    Satisfy Any
-    <IfModule mod_php.c>
-        php_value auto_prepend_file ""
-        php_value auto_append_file ""
-    </IfModule>
 </Files>
 
-# Impede listagem de diretório por segurança
-Options -Indexes
+<Files "index.php">
+    Require all granted
+</Files>
 
-# Protege arquivos sensíveis do plugin
-<FilesMatch "\.(inc|tpl|po|mo|json|md|txt)$">
-    Require all denied
+# Permitir arquivos estáticos
+<FilesMatch "\.(css|js)$">
+    Require all granted
 </FilesMatch>
 
-# DON'T DELET
+# Impedir listagem de diretórios
+Options -Indexes
