@@ -6,6 +6,9 @@
 
 ---
 
+<a href="https://revistacarnaubais.com.br/ark-telemetry/stats.php"><img src="https://img.shields.io/endpoint?url=https://revistacarnaubais.com.br/ark-telemetry/api.php&style=for-the-badge" alt="ARKs" width="150"></a>
+
+
 <a name="portugues"></a>
 ## 🇧🇷 Português
 
