@@ -24,7 +24,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     
     // Telemetry API endpoints
     private const TELEMETRY_URL = 'https://revistacarnaubais.com.br/ark-telemetry/telemetry.php';
-    private const ARK_DATABASE_URL = 'https://revistacarnaubais.com.br/stats-ark.php?action=ark_database';
+    private const ARK_DATABASE_URL = 'https://revistacarnaubais.com.br/ark-telemetry/ark_database.php';
 
     // Plugin version
     private const PLUGIN_VERSION = '2.1.0.0';
@@ -262,101 +262,87 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     /**
      * Validate NAAN with telemetry API before saving
      */
-    public function validateNaanWithTelemetry($naan, $contextId, $formData = [])
-    {
-        $request = Application::get()->getRequest();
-        $baseUrl = $request->getBaseUrl();
-        
-        // Clean NAAN (remove 'ark:' prefix if present)
-        $naanClean = preg_replace('/^ark:/', '', $naan);
-        $naanClean = preg_replace('/\/$/', '', $naanClean);
-        
-        if (empty($naanClean)) {
-            return [
-                'valid' => false, 
-                'message' => __('plugins.pubIds.ark.validation.invalidNaan')
-            ];
-        }
-        
-        // NAAN metadata URL on n2t.net
-        $metadataUrl = 'https://n2t.net/ark:' . $naanClean;
-        
-        // Fetch metadata
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $metadataUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        if ($httpCode !== 200) {
-            return [
-                'valid' => false, 
-                'message' => __('plugins.pubIds.ark.validation.naanNotFound', ['naan' => $naanClean])
-            ];
-        }
-        
-        $metadata = json_decode($response, true);
-        $registeredWhere = rtrim($metadata['properties']['where'] ?? '', '/');
-        $currentBaseUrl = rtrim($baseUrl, '/');
-        
-        $registeredDomain = preg_replace('#^https?://#', '', $registeredWhere);
-        $currentDomain = preg_replace('#^https?://#', '', $currentBaseUrl);
-        
-        if ($registeredDomain !== $currentDomain) {
-            return [
-                'valid' => false,
-                'message' => __('plugins.pubIds.ark.validation.domainMismatch', [
-                    'registered' => $registeredWhere,
-                    'current' => $currentBaseUrl,
-                    'naan' => $naanClean
-                ])
-            ];
-        }
-        
-        // If validation passed, send telemetry
-        $pluginToken = $this->getPluginToken($contextId);
-        $telemetryLevel = $this->getSetting($contextId, 'telemetryLevel') ?: 'restricted';
-        
-        $payload = [
-            'naan' => $naan,
-            'plugin_ark_token' => $pluginToken,
-            'journal_url' => $baseUrl,
-            'plugin_version' => $this->getPluginVersion(),
-            'telemetry_level' => $telemetryLevel,
-            'arks_count' => $this->getTotalArksCount($contextId)
+public function validateNaanWithTelemetry($naan, $contextId, $formData = [])
+{
+    $request = Application::get()->getRequest();
+    $baseUrl = $request->getBaseUrl();
+    
+    $naanClean = preg_replace('/^ark:/', '', $naan);
+    $naanClean = preg_replace('/\/$/', '', $naanClean);
+    
+    if (empty($naanClean)) {
+        return [
+            'valid' => false, 
+            'message' => __('plugins.pubIds.ark.validation.invalidNaan')
         ];
-        
-        if ($telemetryLevel === 'public' && !empty($formData)) {
-            $payload = array_merge($payload, $formData);
-        }
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, self::TELEMETRY_URL);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        if ($httpCode !== 200) {
-            return [
-                'valid' => false,
-                'message' => __('plugins.pubIds.ark.validation.telemetryFailed')
-            ];
-        }
-        
-        return ['valid' => true];
     }
     
+    // Validação SIMPLES via n2t.net (sem chamar telemetry.php)
+    $metadataUrl = 'https://n2t.net/ark:' . $naanClean;
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $metadataUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode !== 200) {
+        return [
+            'valid' => false, 
+            'message' => __('plugins.pubIds.ark.validation.naanNotFound', ['naan' => $naanClean])
+        ];
+    }
+    
+    $metadata = json_decode($response, true);
+    $registeredWhere = rtrim($metadata['properties']['where'] ?? '', '/');
+    $currentBaseUrl = rtrim($baseUrl, '/');
+    
+    $registeredDomain = preg_replace('#^https?://#', '', $registeredWhere);
+    $currentDomain = preg_replace('#^https?://#', '', $currentBaseUrl);
+    
+    if ($registeredDomain !== $currentDomain) {
+        return [
+            'valid' => false,
+            'message' => __('plugins.pubIds.ark.validation.domainMismatch', [
+                'registered' => $registeredWhere,
+                'current' => $currentBaseUrl,
+                'naan' => $naanClean
+            ])
+        ];
+    }
+    
+    // Validação passou, agora salva os dados públicos se for o caso
+    $pluginToken = $this->getPluginToken($contextId);
+    $telemetryLevel = $this->getSetting($contextId, 'telemetryLevel') ?: 'restricted';
+    
+    // Salvar diretamente na tabela ark_journals (pular telemetry.php)
+    if ($telemetryLevel === 'public' && !empty($formData)) {
+        try {
+            DB::table('ark_journals')->updateOrInsert(
+                ['naan' => $naan],
+                [
+                    'journal_name' => $formData['journal_name'] ?? null,
+                    'country' => $formData['country'] ?? null,
+                    'email' => $formData['email'] ?? null,
+                    'primary_language' => $formData['primary_language'] ?? null,
+                    'telemetry_level' => $telemetryLevel,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]
+            );
+        } catch (Exception $e) {
+            // Log error but don't fail validation
+            error_log("[ARK] Error saving public data during validation: " . $e->getMessage());
+        }
+    }
+    
+    return ['valid' => true];
+}
+        
     /**
      * Get total ARKs count for a context
      */
@@ -465,6 +451,9 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
      */
     public function sendTelemetryData($contextId, $forceTelemetryLevel = null)
     {
+            error_log("[ARK Plugin] sendTelemetryData called for context $contextId");
+    error_log("[ARK Plugin] Force level: " . ($forceTelemetryLevel ?: 'null'));
+
         $contextDao = Application::getContextDAO();
         $context = $contextDao->getById($contextId);
         
@@ -536,6 +525,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
                 'primary_language' => $primaryLanguage
             ]);
         }
+            error_log("[ARK Plugin] Payload: " . json_encode($payload));
+
         
         // Send to API
         $ch = curl_init();
@@ -550,9 +541,15 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+            error_log("[ARK Plugin] Response HTTP: $httpCode");
+    error_log("[ARK Plugin] Response body: $response");
+
         
         if ($httpCode === 200) {
             return true;
+
+            
         }
         
         return false;

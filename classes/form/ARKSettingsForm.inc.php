@@ -91,21 +91,18 @@ class ARKSettingsForm extends Form {
         $contextId = $this->_getContextId();
         $plugin = $this->_getPlugin();
         
-        // Read arkPrefix directly from database (bypass cache)
         $arkPrefix = DB::table('journal_settings')
             ->where('journal_id', $contextId)
             ->where('setting_name', 'arkPrefix')
             ->where('locale', '')
             ->value('setting_value');
         
-        // Read telemetryLevel directly from database (bypass cache)
         $telemetryLevel = DB::table('journal_settings')
             ->where('journal_id', $contextId)
             ->where('setting_name', 'telemetryLevel')
             ->where('locale', '')
             ->value('setting_value');
         
-        // Fallback to default if not found
         if (empty($telemetryLevel)) {
             $telemetryLevel = $plugin->getSetting($contextId, 'telemetryLevel');
             if (empty($telemetryLevel)) {
@@ -156,15 +153,11 @@ class ARKSettingsForm extends Form {
         ]);
     }
 
-    /**
-     * Handle token recovery via AJAX
-     */
     public function handleTokenRecovery($request)
     {
         $plugin = $this->_getPlugin();
         $contextId = $this->_getContextId();
         
-        // Check rate limiting (once per hour)
         $lastAttempt = $plugin->getSetting($contextId, 'lastRecoveryAttempt');
         if ($lastAttempt && (time() - $lastAttempt) < 3600) {
             $timeRemaining = 3600 - (time() - $lastAttempt);
@@ -175,25 +168,25 @@ class ARKSettingsForm extends Form {
             ];
         }
         
-        // Update last attempt timestamp
         $plugin->updateSetting($contextId, 'lastRecoveryAttempt', time());
-        
-        // Request token recovery
         $result = $plugin->requestTokenRecovery($contextId);
         
         return $result;
     }
 
-    /**
-     * Execute the form - Save settings
-     */
     public function execute(...$functionArgs) {
+        // ============================================
+        // DEBUG INICIADO
+        // ============================================
+        error_log("[ARK_FORM] ========== INICIANDO EXECUTE ==========");
+        
         $contextId = $this->_getContextId();
         $plugin = $this->_getPlugin();
-        
         $naan = $this->getData('arkPrefix');
         
-        // Get context correctly
+        error_log("[ARK_FORM] Context ID: {$contextId}");
+        error_log("[ARK_FORM] NAAN recebido: " . ($naan ?: 'VAZIO'));
+        
         $request = Application::get()->getRequest();
         $context = $request->getContext();
         
@@ -204,25 +197,48 @@ class ARKSettingsForm extends Form {
         
         $telemetryData = [];
         $telemetryLevel = $this->getData('telemetryLevel');
+        error_log("[ARK_FORM] Telemetry Level: " . ($telemetryLevel ?: 'restricted'));
         
         if ($telemetryLevel === 'public' && $context) {
+            $journalName = $context->getData('name');
+            if (is_array($journalName)) {
+                $primaryLocale = $context->getPrimaryLocale();
+                $journalName = $journalName[$primaryLocale] ?? reset($journalName);
+            }
+            if (is_array($journalName)) {
+                $journalName = implode(', ', $journalName);
+            }
+            
+            $country = $context->getData('country');
+            if (is_array($country)) {
+                $primaryLocale = $context->getPrimaryLocale();
+                $country = $country[$primaryLocale] ?? reset($country);
+            }
+            
             $telemetryData = [
-                'journal_name' => $context->getData('name'),
-                'country' => $context->getData('country'),
+                'journal_name' => $journalName,
+                'country' => $country,
                 'email' => $context->getData('contactEmail'),
                 'primary_language' => $context->getPrimaryLocale()
             ];
+            error_log("[ARK_FORM] Dados públicos coletados: " . json_encode($telemetryData));
         }
-        
-        // Validation temporarily disabled for testing
-        // $validation = $plugin->validateNaanWithTelemetry($naan, $contextId, $telemetryData);
-        //
-        // if (!$validation['valid']) {
-        //     $this->addError('arkPrefix', $validation['message']);
-        //     return false;
-        // }
-        
-        // Save settings
+
+        // ============================================
+        // VALIDAÇÃO DO NAAN - DESATIVADA TEMPORARIAMENTE
+        // ============================================
+        error_log("[ARK_FORM] Iniciando validação do NAAN...");
+        $validation = $plugin->validateNaanWithTelemetry($naan, $contextId, $telemetryData);
+        error_log("[ARK_FORM] Validação resultado: " . ($validation['valid'] ? 'APROVADO' : 'REPROVADO'));
+
+        if (!$validation['valid']) {
+            error_log("[ARK_FORM] ERRO de validação: " . ($validation['message'] ?? 'sem mensagem'));
+            $this->addError('arkPrefix', $validation['message']);
+            return false;
+        }
+        // ============================================
+        // SALVANDO CONFIGURAÇÕES
+        // ============================================
         $enablePublication = $this->getData('enablePublicationARK');
         $enableIssue = $this->getData('enableIssueARK');
         $arkSuffix = $this->getData('arkSuffix');
@@ -232,47 +248,22 @@ class ARKSettingsForm extends Form {
         $arkImplementationDate = $this->getData('arkImplementationDate');
         $telemetryLevel = $this->getData('telemetryLevel');
 
-        // After saving settings, register with central server
-        $plugin = $this->_getPlugin();
-        $contextId = $this->_getContextId();
-        $naan = $this->getData('arkPrefix');
         $token = $plugin->getPluginToken($contextId);
         $adminSecret = $plugin->getSetting($contextId, 'ark_admin_secret');
         if (empty($adminSecret)) {
             $adminSecret = bin2hex(random_bytes(32));
             $plugin->updateSetting($contextId, 'ark_admin_secret', $adminSecret);
         }
-        $request = Application::get()->getRequest();
-        $context = $request->getContext();
+        
         $apiEndpoint = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-api/telemetry';
-        $payload = [
-            'naan' => $naan,
-            'plugin_ark_token' => $token,
-            'admin_secret' => $adminSecret,
-            'api_endpoint' => $apiEndpoint,
-            'journal_url' => $request->getBaseUrl(),
-            'plugin_version' => $plugin->getPluginVersion(),
-            'telemetry_level' => $this->getData('telemetryLevel'),
-            'arks_count' => $plugin->getTotalArksCount($contextId)
-        ];
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://revistacarnaubais.com.br/ark-telemetry/register.php');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($httpCode === 200) {
-            $res = json_decode($response, true);
-            if ($res['success']) {
-                $plugin->updateSetting($contextId, 'next_pull_at', $res['next_pull_at']);
-            }
-        }
+        error_log("[ARK_FORM] API Endpoint: " . $apiEndpoint);
         
         try {
+            // ============================================
+            // SALVANDO NO journal_settings
+            // ============================================
+            error_log("[ARK_FORM] Salvando no journal_settings...");
+            
             DB::table('journal_settings')->updateOrInsert(
                 ['journal_id' => $contextId, 'setting_name' => 'arkPrefix', 'locale' => ''],
                 ['setting_value' => $naan]
@@ -318,20 +309,82 @@ class ARKSettingsForm extends Form {
                     ['journal_id' => $contextId, 'setting_name' => 'arkResolver', 'locale' => ''],
                     ['setting_value' => $arkResolver]
                 );
-            } else {
-                DB::table('journal_settings')->updateOrInsert(
-                    ['journal_id' => $contextId, 'setting_name' => 'arkResolver', 'locale' => ''],
-                    ['setting_value' => '']
-                );
             }
             
-            // Generate token if it doesn't exist yet
-            $plugin->initializePluginToken($contextId);
+            error_log("[ARK_FORM] journal_settings salvo com sucesso!");
             
-            // Send telemetry to API
+            // ============================================
+            // SALVANDO NA ark_journals
+            // ============================================
+            error_log("[ARK_FORM] Salvando na tabela ark_journals...");
+            
+            $journalNameForDb = $context->getData('name');
+            if (is_array($journalNameForDb)) {
+                $primaryLocale = $context->getPrimaryLocale();
+                $journalNameForDb = $journalNameForDb[$primaryLocale] ?? reset($journalNameForDb);
+            }
+            if (is_array($journalNameForDb)) {
+                $journalNameForDb = implode(', ', $journalNameForDb);
+            }
+            
+            $countryForDb = $context->getData('country');
+            if (is_array($countryForDb)) {
+                $primaryLocale = $context->getPrimaryLocale();
+                $countryForDb = $countryForDb[$primaryLocale] ?? reset($countryForDb);
+            }
+            
+            $scheduledDay = rand(1, 28);
+            $nextPullDate = date('Y-m-d', strtotime('+' . ($scheduledDay - date('j')) . ' days'));
+            
+            DB::table('ark_journals')->updateOrInsert(
+                ['naan' => $naan],
+                [
+                    'plugin_token' => $token,
+                    'admin_secret' => $adminSecret,
+                    'journal_url' => $request->getBaseUrl(),
+                    'journal_name' => $journalNameForDb,
+                    'country' => $countryForDb,
+                    'email' => $context->getData('contactEmail'),
+                    'primary_language' => $context->getPrimaryLocale(),
+                    'telemetry_level' => $telemetryLevel,
+                    'arks_count' => $plugin->getTotalArksCount($contextId),
+                    'plugin_version' => $plugin->getPluginVersion(),
+                    'api_endpoint' => $apiEndpoint,
+                    'status' => 'active',
+                    'last_sync' => date('Y-m-d H:i:s'),
+                    'sync_attempts' => 0,
+                    'error_message' => null,
+                    'scheduled_day' => $scheduledDay,
+                    'next_pull' => $nextPullDate,
+                    'last_pull' => null,
+                    'pull_interval' => 'monthly'
+                ]
+            );
+            
+            error_log("[ARK_FORM] ark_journals salvo com sucesso!");
+            
+            // ============================================
+            // REGISTRANDO LOG
+            // ============================================
+            DB::table('ark_sync_log')->insert([
+                'naan' => $naan,
+                'action' => 'register',
+                'status' => 'success',
+                'message' => 'Journal registered with telemetry_level: ' . $telemetryLevel
+            ]);
+            
+            error_log("[ARK_FORM] Log registrado com sucesso!");
+            
+            // ============================================
+            // ENVIANDO TELEMETRIA
+            // ============================================
             $plugin->sendTelemetryData($contextId, $telemetryLevel);
             
-        } catch (\Exception $e) {
+            error_log("[ARK_FORM] ========== EXECUTE FINALIZADO COM SUCESSO ==========");
+            
+        } catch (Exception $e) {
+            error_log("[ARK_FORM] ERRO CRÍTICO: " . $e->getMessage());
+            error_log("[ARK_FORM] Stack trace: " . $e->getTraceAsString());
             $this->addError('form', 'Error saving settings: ' . $e->getMessage());
             return false;
         }
