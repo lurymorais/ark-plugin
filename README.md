@@ -6,7 +6,14 @@
 
 ---
 
-![Endpoint Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fapi.php&style=for-the-badge&label=ARKs%20Total%20N.&link=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fstats.php)
+<a href="https://revistacarnaubais.com.br/ark-telemetry/stats.php">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/endpoint?url=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fapi.php%3Ftheme%3Ddark&style=for-the-badge&label=ARKs%20Total%20N.">
+    <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/endpoint?url=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fapi.php%3Ftheme%3Dlight&style=for-the-badge&label=ARKs%20Total%20N.">
+    <img alt="ARKs Total N." src="https://img.shields.io/endpoint?url=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fapi.php%3Ftheme%3Ddark&style=for-the-badge&label=ARKs%20Total%20N.">
+  </picture>
+</a>
+
 
 
 <a name="portugues"></a>
