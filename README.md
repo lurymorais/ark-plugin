@@ -6,7 +6,7 @@
 
 ---
 
-<a href="https://revistacarnaubais.com.br/ark-telemetry/stats.php"><img src="https://img.shields.io/endpoint?url=https://revistacarnaubais.com.br/ark-telemetry/api.php&style=for-the-badge" alt="ARKs" width="150"></a>
+![Endpoint Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fapi.php&style=for-the-badge&label=ARKs%20Total%20N.&link=https%3A%2F%2Frevistacarnaubais.com.br%2Fark-telemetry%2Fstats.php)
 
 
 <a name="portugues"></a>
