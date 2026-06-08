@@ -11,7 +11,7 @@
  * @brief A field for entering a ARK.
  */
 
-namespace Plugins\PubIds\Ark\Classes\Form;
+namespace APP\plugins\pubIds\ark\classes\form;
 
 use PKP\components\forms\FieldText;
 
@@ -35,4 +35,3 @@ class FieldArk extends FieldText
         return $config;
     }
 }
-

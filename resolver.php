@@ -8,7 +8,7 @@
  * @license GNU GPL v2
  */
 
-// BLOCK SEARCH ENGINES - Must be before any output
+// Block search engines - Must be before any output
 header('X-Robots-Tag: noindex, nofollow');
 
 /**
@@ -90,7 +90,6 @@ function getDbConfig() {
  * Detects '?info', '.info', '??' (full metadata) and '?' (brief metadata)
  * Modifies the ARK value by reference to remove inflection characters
  * 
- * @param string &$arkValue The ARK value (passed by reference, may be modified)
  * @return string|null 'brief' for '?', 'full' for '?info'/'info'/'??', or null if no inflection
  */
 function getInflection() {
@@ -323,8 +322,7 @@ function outputFullERC($metadata, $arkSuffix, $fullArkResolverUrl) {
     if (!empty($metadata['issn'])) {
         echo "issn: " . $metadata['issn'] . "\n";
     }
-    echo "
-";
+    echo "\n";
     
     // Messages in multiple languages without duplicates
     $primary = $metadata['primary_locale'];
@@ -440,7 +438,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
         <h1>ARK Resolver</h1>
         
         <div class="language-section language-pt">
-            <div class="language-label">PORTUGUÊS</div>
+            <div class="language-label">PORTUGUES</div>
             <h2>' . htmlspecialchars($titlePt) . '</h2>
             <p>' . str_replace('<strong>', '<span class="identifier">', str_replace('</strong>', '</span>', htmlspecialchars($messagePt))) . '</p>';
     
@@ -449,7 +447,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
     }
     
     echo '
-            <p><a href="' . htmlspecialchars($siteUrl) . '">Voltar para a página inicial</a></p>
+            <p><a href="' . htmlspecialchars($siteUrl) . '">Voltar para a pagina inicial</a></p>
         </div>
         
         <div class="language-section language-en">
@@ -484,7 +482,7 @@ if (empty($_GET['ark']) && empty($_GET['id'])) {
     showErrorPage(
         400,
         'Missing Parameter',
-        'Parâmetro Ausente',
+        'Parametro Ausente',
         'No ARK identifier was provided.',
         'Nenhum identificador ARK foi fornecido.',
         'Expected usage: resolver.php?ark=CRL1234-ABCD or resolver.php?ark=CRL1234ABCD',
@@ -515,11 +513,11 @@ if (strlen($arkSuffix) < 4) {
     showErrorPage(
         400,
         'Invalid ARK Format',
-        'Formato de ARK Inválido',
+        'Formato de ARK Invalido',
         'The provided identifier is too short.',
-        'O identificador fornecido é muito curto.',
+        'O identificador fornecido e muito curto.',
         'You tried: ' . htmlspecialchars($originalInput) . '. Minimum length is 4 characters.',
-        'Você tentou: ' . htmlspecialchars($originalInput) . '. O tamanho mínimo é 4 caracteres.'
+        'Voce tentou: ' . htmlspecialchars($originalInput) . '. O tamanho minimo e 4 caracteres.'
     );
 }
 
@@ -527,11 +525,11 @@ if (strlen($arkSuffix) > 50) {
     showErrorPage(
         400,
         'Invalid ARK Format',
-        'Formato de ARK Inválido',
+        'Formato de ARK Invalido',
         'The provided identifier is too long.',
-        'O identificador fornecido é muito longo.',
+        'O identificador fornecido e muito longo.',
         'You tried: ' . htmlspecialchars($originalInput) . '. Maximum length is 50 characters.',
-        'Você tentou: ' . htmlspecialchars($originalInput) . '. O tamanho máximo é 50 caracteres.'
+        'Voce tentou: ' . htmlspecialchars($originalInput) . '. O tamanho maximo e 50 caracteres.'
     );
 }
 
@@ -614,11 +612,11 @@ try {
         showErrorPage(
             404,
             'ARK Not Found',
-            'ARK Não Encontrado',
+            'ARK Nao Encontrado',
             'The identifier was not found in our database.',
-            'O identificador não foi encontrado em nossa base de dados.',
+            'O identificador nao foi encontrado em nossa base de dados.',
             'You tried: ' . htmlspecialchars($originalInput),
-            'Você tentou: ' . htmlspecialchars($originalInput)
+            'Voce tentou: ' . htmlspecialchars($originalInput)
         );
     }
     
@@ -631,9 +629,9 @@ try {
         showErrorPage(
             500,
             'Journal Error',
-            'Erro no Periódico',
+            'Erro no Periodico',
             'Could not identify the journal associated with this ARK.',
-            'Não foi possível identificar o periódico associado a este ARK.',
+            'Nao foi possivel identificar o periodico associado a este ARK.',
             'Contact the system administrator.',
             'Entre em contato com o administrador do sistema.'
         );
@@ -707,7 +705,7 @@ try {
         'Database Error',
         'Erro no Banco de Dados',
         'Could not connect to the database.',
-        'Não foi possível conectar ao banco de dados.',
+        'Nao foi possivel conectar ao banco de dados.',
         'Error: ' . $e->getMessage(),
         'Erro: ' . $e->getMessage()
     );

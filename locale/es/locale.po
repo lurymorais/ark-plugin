@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ARK Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 10:00-0300\n"
-"PO-Revision-Date: 2026-01-19 10:00-0300\n"
+"POT-Creation-Date: 2026-05-29 10:00-0300\n"
+"PO-Revision-Date: 2026-05-26 10:00-0300\n"
 "Last-Translator: Lury Morais\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
@@ -16,25 +16,31 @@ msgid "plugins.pubIds.ark.displayName"
 msgstr "ARK"
 
 msgid "plugins.pubIds.ark.description"
-msgstr "Plugin para asignar identificadores ARK (Archival Resource Key) a los artículos."
+msgstr "Plugin para asignar identificadores ARK (Archival Resource Key) a artículos y ediciones."
 
 msgid "plugins.pubIds.ark.manager.settings.description"
-msgstr "Configure el plugin ARK para artículos:"
+msgstr "Configure el plugin ARK:"
 
 msgid "plugins.pubIds.ark.manager.settings.arkObjects"
-msgstr "Tipos de objeto"
+msgstr "Tipos de contenido"
 
 msgid "plugins.pubIds.ark.manager.settings.arkObjectsRequired"
-msgstr "Los ARKs se generan solo para artículos."
+msgstr "Seleccione al menos un tipo de contenido (Artículos o Ediciones) para asignar ARKs."
 
 msgid "plugins.pubIds.ark.manager.settings.explainARKs"
-msgstr "Seleccione los tipos de objeto que recibirán ARK:"
+msgstr "Seleccione los tipos de contenido que recibirán ARK:"
+
+msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
+msgstr "Artículos"
+
+msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
+msgstr "Ediciones"
 
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
 msgstr "Prefijo ARK"
 
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix.description"
-msgstr "Prefijo fijo del ARK (ej: ARK, ark:12345). Será seguido por '/' y el sufijo."
+msgstr "Prefijo fijo del ARK (ej: ark:12345)."
 
 msgid "plugins.pubIds.ark.manager.settings.form.arkPrefixPattern"
 msgstr "El prefijo debe contener 2-40 caracteres (letras, números, :, _)."
@@ -66,6 +72,18 @@ msgstr "URL base para resolución de ARKs (ej: https://n2t.net/)"
 msgid "plugins.pubIds.ark.manager.settings.form.arkResolverRequired"
 msgstr "Indique la URL del resolvedor."
 
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
+msgstr "n2t.net (Predeterminado)"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.custom"
+msgstr "Resolvedor personalizado:"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
+msgstr "URL del resolvedor personalizado"
+
+msgid "plugins.pubIds.ark.manager.settings.arkResolver.defaultHint"
+msgstr "Deje en blanco para usar el resolvedor n2t.net por defecto"
+
 msgid "plugins.pubIds.ark.manager.settings.preview"
 msgstr "Vista previa"
 
@@ -81,8 +99,23 @@ msgstr "Haga clic para eliminar todos los ARKs existentes y reasignar con las nu
 msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
 msgstr "¿Está seguro? Todos los ARKs existentes serán eliminados permanentemente."
 
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
+msgstr "Fecha de Implementación del ARK"
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
+msgstr "Ingrese la fecha en que los identificadores ARK comenzaron a usarse en su revista."
+
+msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
+msgstr "Si es la primera vez que usa ARK, ingrese la fecha en que recibió su NAAN o la fecha de publicación del primer ARK."
+
+msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
+msgstr "La fecha debe estar en formato AAAAMMDD (año, mes, día) con 8 dígitos."
+
 msgid "plugins.pubIds.ark.editor.ark"
 msgstr "ARK"
+
+msgid "plugins.pubIds.ark.editor.arkHelp"
+msgstr "El ARK (Archival Resource Key) es un identificador persistente. Haga clic en 'Generar ARK' para crear un nuevo identificador automáticamente."
 
 msgid "plugins.pubIds.ark.editor.missingPrefix"
 msgstr "El ARK debe comenzar con {$arkPrefix}."
@@ -111,33 +144,6 @@ msgstr "Limpiar"
 msgid "plugins.pubIds.ark.editor.generateArk"
 msgstr "Generar ARK"
 
-msgid "plugins.pubIds.ark.suffix.random"
-msgstr "Sufijo aleatorio"
-
-msgid "plugins.pubIds.ark.editor.arkHelp"
-msgstr "El ARK (Archival Resource Key) es un identificador persistente. Haga clic en 'Generar ARK' para crear un nuevo identificador automáticamente."
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.n2t"
-msgstr "n2t.net (Predeterminado)"
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.custom"
-msgstr "Resolvedor personalizado:"
-
-msgid "plugins.pubIds.ark.manager.settings.arkResolver.customUrl"
-msgstr "URL del resolvedor personalizado"
-
-msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
-msgstr "Fecha de Implementación del ARK. Formato: AAAAMMDD (Ejemplo: 20260215)."
-
-msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.description"
-msgstr "Ingrese la fecha en que los identificadores ARK comenzaron a usarse o planificarse en su revista. Esta fecha será fija para todos los registros y representa el inicio del soporte de la revista para enlaces persistentes."
-
-msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate.recommendation"
-msgstr "Si es la primera vez que usa ARK, ingrese la fecha en que recibió su NAAN o la fecha de publicación del primer ARK."
-
-msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
-msgstr "La fecha debe estar en formato AAAAMMDD (año, mes, día) con 8 dígitos."
-
 msgid "plugins.pubIds.ark.editor.generateNewArk"
 msgstr "Generar Nuevo ARK"
 
@@ -151,7 +157,7 @@ msgid "plugins.pubIds.ark.editor.duplicateArkError"
 msgstr "ERROR: ¡Este ARK ya está en uso por otro artículo o edición! Utilice el botón 'Generar Nuevo ARK' para crear un identificador único."
 
 msgid "plugins.pubIds.ark.editor.saveSuccess"
-msgstr "¡ARK guardado con éxito!"
+msgstr "ARK guardado con éxito!"
 
 msgid "plugins.pubIds.ark.editor.networkError"
 msgstr "Error de red. Inténtelo de nuevo."
@@ -159,11 +165,140 @@ msgstr "Error de red. Inténtelo de nuevo."
 msgid "plugins.pubIds.ark.editor.genericError"
 msgstr "Error al guardar ARK: "
 
+msgid "plugins.pubIds.ark.suffix.random"
+msgstr "Sufijo aleatorio"
+
 msgid "common.saving"
 msgstr "Guardando..."
 
-msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
-msgstr "Ediciones"
+msgid "plugins.pubIds.ark.validation.naanAlreadyUsed"
+msgstr "Este identificador NAAN ya está siendo usado por otra revista. Si es el propietario legítimo, haga clic en el botón de abajo para verificar su propiedad. De lo contrario, contacte a m.luryhortencio@gmail.com"
 
-msgid "plugins.pubIds.ark.manager.settings.enablePublicationARK"
-msgstr "Artículos"
+msgid "plugins.pubIds.ark.recovery.title"
+msgstr "Verificación de Propiedad"
+
+msgid "plugins.pubIds.ark.recovery.instructions"
+msgstr "Para confirmar que es el propietario de este NAAN, haga clic en el botón de abajo. El sistema verificará automáticamente si el dominio registrado en el NAAN coincide con su sitio actual."
+
+msgid "plugins.pubIds.ark.recovery.button"
+msgstr "Verificar Propiedad"
+
+msgid "plugins.pubIds.ark.recovery.failed"
+msgstr "No fue posible verificar su propiedad. Asegúrese de que su NAAN esté registrado correctamente."
+
+msgid "plugins.pubIds.ark.recovery.rateLimit"
+msgstr "Espere {$minutes} minutos antes de intentar nuevamente."
+
+msgid "plugins.pubIds.ark.settings.telemetryLevel"
+msgstr "Compartición de datos"
+
+msgid "plugins.pubIds.ark.settings.telemetryLevel.restricted"
+msgstr "Básico (solo datos técnicos)"
+
+msgid "plugins.pubIds.ark.settings.telemetryLevel.public"
+msgstr "Completo (comparte datos de la revista)"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryLevel.description"
+msgstr "Elija lo que desea compartir para ayudarnos a mejorar el plugin:"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryLevel.restricted.description"
+msgstr "Comparte solo el identificador NAAN, cantidad de ARKs, versión del plugin y URL del sitio"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryLevel.public.description"
+msgstr "Comparte nombre de la revista, país, correo electrónico e idioma, además de los datos básicos"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryInfo"
+msgstr "Compartir estos datos nos ayuda a prevenir fraudes y mejorar el servicio. Sus datos están protegidos conforme a la LGPD."
+
+msgid "plugins.pubIds.ark.manager.settings.publicInfo.title"
+msgstr "Modo Completo Activado"
+
+msgid "plugins.pubIds.ark.manager.settings.publicInfo.description"
+msgstr "El nombre de su revista y la cantidad de ARKs generados aparecerán en las estadísticas públicas del ecosistema."
+
+msgid "plugins.pubIds.ark.manager.settings.publicInfo.dataSent"
+msgstr "Datos públicos: Nombre de la revista y cantidad de ARKs. Sus datos de contacto se usan solo internamente."
+
+msgid "plugins.pubIds.ark.recovery.title"
+msgstr "Área de Seguridad"
+
+msgid "plugins.pubIds.ark.recovery.securityArea"
+msgstr "Área de Seguridad"
+
+msgid "plugins.pubIds.ark.recovery.securityNote"
+msgstr "Esta área se usa SOLO si recibió el mensaje de que su NAAN ya está en uso. Aquí puede comprobar que es el propietario legítimo."
+
+msgid "plugins.pubIds.ark.recovery.button"
+msgstr "Verificar Mi Propiedad"
+
+msgid "plugins.pubIds.ark.recovery.howItWorks"
+msgstr "Cómo funciona la verificación:"
+
+msgid "plugins.pubIds.ark.recovery.step1"
+msgstr "Verificamos la dirección (dominio) registrada en su NAAN"
+
+msgid "plugins.pubIds.ark.recovery.step2"
+msgstr "Comparamos con la dirección actual de su sitio"
+
+msgid "plugins.pubIds.ark.recovery.step3"
+msgstr "Si son iguales, su acceso se libera automáticamente"
+
+msgid "plugins.pubIds.ark.recovery.step4"
+msgstr "Si son diferentes, deberá actualizar el registro de su NAAN"
+
+msgid "plugins.pubIds.ark.recovery.targetHintLabel"
+msgstr "Dirección correcta para registrar en el NAAN:"
+
+msgid "plugins.pubIds.ark.recovery.failed"
+msgstr "No fue posible verificar su propiedad. Verifique que su NAAN esté registrado correctamente."
+
+msgid "plugins.pubIds.ark.recovery.success"
+msgstr "Propiedad confirmada. Su acceso ha sido restaurado con éxito."
+
+msgid "plugins.pubIds.ark.recovery.domainMismatch"
+msgstr "La dirección registrada para este NAAN es diferente de su sitio actual. Para corregirlo, acceda al sitio de ARK Alliance y actualice su registro a la dirección mostrada abajo."
+
+msgid "plugins.pubIds.ark.recovery.metadataFailed"
+msgstr "No fue posible verificar los metadatos de su NAAN. Verifique que esté registrado correctamente."
+
+msgid "plugins.pubIds.ark.recovery.noNaan"
+msgstr "Ningún NAAN configurado. Configure el prefijo ARK primero."
+
+msgid "plugins.pubIds.ark.recovery.error.pluginNotFound"
+msgstr "Error interno: Plugin ARK no encontrado. Contacte al administrador del sistema."
+
+msgid "plugins.pubIds.ark.recovery.error.noContext"
+msgstr "Error interno: Contexto de la revista no encontrado. Contacte al administrador del sistema."
+
+msgid "plugins.pubIds.ark.recovery.error.network"
+msgstr "Error de red: No fue posible conectar al servidor n2t.net. Detalle: {$error}. Verifique su conexión a internet."
+
+msgid "plugins.pubIds.ark.recovery.error.naanNotFound"
+msgstr "NAAN '{$naan}' no encontrado en el sistema n2t.net. Verifique que esté registrado correctamente en ARK Alliance."
+
+msgid "plugins.pubIds.ark.recovery.error.httpError"
+msgstr "El servidor n2t.net retornó error HTTP {$code}. Intente nuevamente más tarde."
+
+msgid "plugins.pubIds.ark.recovery.error.emptyResponse"
+msgstr "Respuesta vacía del servidor n2t.net. Intente nuevamente más tarde."
+
+msgid "plugins.pubIds.ark.recovery.error.invalidJson"
+msgstr "Respuesta inválida del servidor n2t.net. El formato de los datos no es reconocido."
+
+msgid "plugins.pubIds.ark.recovery.error.missingWhere"
+msgstr "Metadatos del NAAN incompletos. El campo 'where' (dirección del sitio) no fue encontrado."
+
+msgid "plugins.pubIds.ark.recovery.waitMessage"
+msgstr "Espere {$minutes} minutos antes de intentar nuevamente."
+
+msgid "plugins.pubIds.ark.validation.invalidNaan"
+msgstr "Formato de NAAN inválido. Use 'ark:12345' o solo el número."
+
+msgid "plugins.pubIds.ark.validation.naanNotFound"
+msgstr "El NAAN '{$naan}' no está registrado en ARK Alliance. Regístrese en: https://forms.gle/2a8HQUNJRAcvq5UGA"
+
+msgid "plugins.pubIds.ark.validation.domainMismatch"
+msgstr "Este NAAN pertenece al dominio '{$registered}', pero su sitio está en '{$current}'. Para usar este NAAN, actualice su registro en ARK Alliance."
+
+msgid "plugins.pubIds.ark.validation.telemetryFailed"
+msgstr "No fue posible completar la validación. Intente nuevamente más tarde."
