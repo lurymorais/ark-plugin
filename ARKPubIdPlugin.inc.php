@@ -308,7 +308,6 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
                 ['setting_value' => $fullArk]
             );
         } catch (\Exception $e) {
-            // Silent fail - log only in debug mode
         }
     }
     
@@ -369,7 +368,6 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
                     ['setting_value' => $arkValue]
                 );
             } catch (\Exception $e) {
-                // Silent fail - log only in debug mode
             }
         }
         return false;
@@ -682,7 +680,6 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
                         ['setting_value' => $arkValue]
                     );
                 } catch (\Exception $e) {
-                    // Silent fail
                 }
             }
         }
