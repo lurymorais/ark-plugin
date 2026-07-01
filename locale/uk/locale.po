@@ -200,3 +200,15 @@ msgstr "Резолвер ARK"
 
 msgid "plugins.pubIds.ark.resolver.loading"
 msgstr "Виконання ARK..."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
+msgstr "Ідентифікатор NAAN (публічний)"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
+msgstr "Кількість згенерованих ARK"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
+msgstr "Версія плагіна"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
+msgstr "Політика конфіденційності"

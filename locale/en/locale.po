@@ -200,3 +200,15 @@ msgstr "ARK Resolver"
 
 msgid "plugins.pubIds.ark.resolver.loading"
 msgstr "Resolving ARK..."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
+msgstr "NAAN identifier (public)"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
+msgstr "Number of ARKs generated"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
+msgstr "Plugin version"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
+msgstr "Privacy Policy"
