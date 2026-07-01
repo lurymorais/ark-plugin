@@ -22,12 +22,12 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
 {
     private static $registered = false;
     
-    // Telemetry API endpoints
-    private const TELEMETRY_URL = 'https://revistacarnaubais.com.br/ark-telemetry/telemetry.php';
-    private const ARK_DATABASE_URL = 'https://revistacarnaubais.com.br/ark-telemetry/ark_database.php';
-
+    // Validation server endpoint (only for NAAN validation)
+    private const VALIDATION_SERVER_URL = 'https://revistacarnaubais.com.br/ark-telemetry/validate';
+    private const STATISTICS_COLLECT_URL = 'https://revistacarnaubais.com.br/ark-telemetry/collect';
+    
     // Plugin version
-    private const PLUGIN_VERSION = '2.1.0.0';
+    private const PLUGIN_VERSION = '3.1.0.0';
     
     public function register($category, $path, $mainContextId = null)
     {
@@ -43,26 +43,12 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
 
         if ($success && $this->getEnabled($mainContextId)) {
             
-            // Register handler for token recovery
-            \HookRegistry::register('LoadHandler', function($hookName, $args) {
-                $page = $args[0];
-                $op = $args[1];
-                $source = $args[2];
-                if ($op === 'recoverToken') {
-                    require_once($this->getPluginPath() . '/classes/handler/ARKRecoveryHandler.inc.php');
-                    $handler = new ARKRecoveryHandler();
-                    $handler->recoverToken([], Application::get()->getRequest()); exit;}return false;});
-            
             // Hook for API endpoints
             \HookRegistry::register('LoadHandler', function($hookName, $args) {
                 $page = $args[0];
                 $op = $args[1];
-                if ($page === 'ark-api') {
-                    if ($op === 'telemetry') {
-                        $this->handleTelemetryApi();exit;}
-                    if ($op === 'regenerate') {
-                        $this->handleRegenerateToken();
-                        exit;}}return false;});
+                return false;
+            });
 
             \HookRegistry::register('Publication::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
             \HookRegistry::register('Publication::getProperties::fullProperties', [$this, 'modifyObjectProperties']);
@@ -91,258 +77,130 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     }
     
     /**
-     * Install plugin - generate token and register scheduled task
+     * Install plugin
      */
     public function install($category, $path)
     {
         $success = parent::install($category, $path);
-        
-        if ($success) {
-            // Generate and store plugin token
-            $this->initializePluginToken();
-        }
-        
         return $success;
     }
 
     /**
-     * Handle telemetry data request (pull) - Accepts requests ON or AFTER scheduled time
+     * Validate NAAN with remote server (secure, server-side validation)
+     * The plugin does NOT validate locally - this prevents fake-validation attacks
      * 
-     * @param int $code HTTP status code
-     * @param array $data Response data
+     * @param string $naan The NAAN to validate
+     * @param string $domain The domain to validate against
+     * @return array ['valid' => bool, 'message' => string]
      */
-    private function sendApiResponse(int $code, array $data): void
+    private function validateNaanRemotely($naan, $domain)
     {
-        http_response_code($code);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-    }
-
-    /**
-     * Handle telemetry data request (pull)
-     * Accepts requests if current time >= scheduled time
-     */
-    public function handleTelemetryApi(): void
-    {
-        $request = Application::get()->getRequest();
-        $context = $request->getContext();
+        $naanClean = preg_replace('/^ark:/', '', $naan);
+        $naanClean = preg_replace('/\/$/', '', $naanClean);
         
-        if (!$context) {
-            $this->sendApiResponse(400, ['error' => 'Journal not found']);
-            return;
+        if (empty($naanClean)) {
+            return [
+                'valid' => false, 
+                'message' => __('plugins.pubIds.ark.validation.invalidNaan')
+            ];
         }
         
-        $contextId = $context->getId();
-        $naan = $request->getUserVar('naan');
-        $token = $request->getUserVar('token');
-        
-        $storedToken = $this->getPluginToken($contextId);
-        $storedNaan = $this->getSetting($contextId, 'arkPrefix');
-        
-        // Validate token first
-        if ($token !== $storedToken || $naan !== $storedNaan) {
-            $this->sendApiResponse(401, ['error' => 'Unauthorized']);
-            return;
-        }
-        
-        // Check if request is allowed based on scheduled time
-        $nextPullAt = (int)$this->getSetting($contextId, 'next_pull_at');
-        $currentTime = time();
-        
-        // Accept request if NO schedule exists (first time) OR current time >= scheduled time
-        if ($nextPullAt > 0 && $currentTime < $nextPullAt) {
-            $this->sendApiResponse(425, [  // HTTP 425 Too Early
-                'error' => 'Too early',
-                'message' => 'Please wait until scheduled time',
-                'scheduled_at' => $nextPullAt,
-                'scheduled_human' => date('Y-m-d H:i:s', $nextPullAt),
-                'current_time' => $currentTime,
-                'wait_seconds' => $nextPullAt - $currentTime
-            ]);
-            return;
-        }
-        
-        // Collect and return telemetry data
-        $data = [
-            'naan' => $storedNaan,
-            'plugin_ark_token' => $storedToken,
-            'journal_url' => $request->getBaseUrl(),
-            'plugin_version' => $this->getPluginVersion(),
-            'telemetry_level' => $this->getSetting($contextId, 'telemetryLevel') ?: 'restricted',
-            'arks_count' => $this->getTotalArksCount($contextId)
+        $payload = [
+            'naan' => 'ark:' . $naanClean,
+            'domain' => $domain,
+            'timestamp' => time()
         ];
         
-        if ($data['telemetry_level'] === 'public') {
-            $data['journal_name'] = $context->getData('name');
-            $data['country'] = $context->getData('country');
-            $data['email'] = $context->getData('contactEmail');
-            $data['primary_language'] = $context->getPrimaryLocale();
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, self::VALIDATION_SERVER_URL);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . self::PLUGIN_VERSION);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+        
+        if ($httpCode !== 200 || empty($response)) {
+            error_log("[ARK Plugin] Validation server error: HTTP {$httpCode} - " . $curlError);
+            return [
+                'valid' => false,
+                'message' => __('plugins.pubIds.ark.validation.serverUnavailable')
+            ];
         }
         
-        $this->sendApiResponse(200, $data);
+        $result = json_decode($response, true);
+        
+        if (!isset($result['valid'])) {
+            return [
+                'valid' => false,
+                'message' => __('plugins.pubIds.ark.validation.invalidResponse')
+            ];
+        }
+        
+        return $result;
     }
 
     /**
-     * Handle token regeneration request from central server
-     */
-    public function handleRegenerateToken()
-    {
-        $request = Application::get()->getRequest();
-        $context = $request->getContext();
-        if (!$context) {
-            $this->sendApiResponse(400, ['error' => 'Journal not found']);
-            return;
-        }
-        $contextId = $context->getId();
-        $providedSecret = $request->getUserVar('admin_secret');
-        $storedSecret = $this->getSetting($contextId, 'ark_admin_secret');
-        if (!$storedSecret || $providedSecret !== $storedSecret) {
-            $this->sendApiResponse(403, ['error' => 'Forbidden']);
-            return;
-        }
-        $newToken = bin2hex(random_bytes(32));
-        $this->updateSetting($contextId, 'ark_token', $newToken);
-        $this->sendApiResponse(200, [
-            'success' => true,
-            'plugin_ark_token' => $newToken
-        ]);
-    }
-
-    
-    /**
-     * Initialize or retrieve the plugin token for a specific context
+     * Send aggregated statistics to server (PUSH model, monthly)
      * 
      * @param int $contextId Journal ID
-     * @return string The token
+     * @return bool
      */
-    public function initializePluginToken($contextId)
+    public function sendStatistics($contextId)
     {
-        $token = $this->getSetting($contextId, 'ark_token');
+        $contextDao = Application::getContextDAO();
+        $context = $contextDao->getById($contextId);
         
-        if (empty($token)) {
-            $token = bin2hex(random_bytes(32));
-            $this->updateSetting($contextId, 'ark_token', $token);
+        if (!$context) {
+            return false;
         }
         
-        return $token;
-    }
-
-    /**
-     * Get plugin token for a specific context
-     * 
-     * @param int $contextId Journal ID
-     * @return string The token
-     */
-    public function getPluginToken($contextId)
-    {
-        $token = $this->getSetting($contextId, 'ark_token');
-        
-        if (empty($token)) {
-            $token = $this->initializePluginToken($contextId);
+        // Check if telemetry is enabled (opt-in)
+        $telemetryEnabled = $this->getSetting($contextId, 'telemetryEnabled');
+        if ($telemetryEnabled !== '1') {
+            return false;
         }
         
-        return $token;
-    }
-
-    /**
-     * Get plugin version from version.xml
-     * 
-     * @return string Plugin version
-     */
-    public function getPluginVersion()
-    {
-        $versionFile = $this->getPluginPath() . '/version.xml';
-        if (file_exists($versionFile)) {
-            $xml = simplexml_load_file($versionFile);
-            return (string)$xml->release;
+        $naan = $this->getSetting($contextId, 'arkPrefix');
+        if (empty($naan)) {
+            return false;
         }
-        return self::PLUGIN_VERSION;
-    }
-    
-    /**
-     * Validate NAAN with telemetry API before saving
-     */
-public function validateNaanWithTelemetry($naan, $contextId, $formData = [])
-{
-    $request = Application::get()->getRequest();
-    $baseUrl = $request->getBaseUrl();
-    
-    $naanClean = preg_replace('/^ark:/', '', $naan);
-    $naanClean = preg_replace('/\/$/', '', $naanClean);
-    
-    if (empty($naanClean)) {
-        return [
-            'valid' => false, 
-            'message' => __('plugins.pubIds.ark.validation.invalidNaan')
+        
+        $payload = [
+            'naan' => $naan,
+            'arks_count' => $this->getTotalArksCount($contextId),
+            'plugin_version' => self::PLUGIN_VERSION
         ];
-    }
-    
-    // Validação SIMPLES via n2t.net (sem chamar telemetry.php)
-    $metadataUrl = 'https://n2t.net/ark:' . $naanClean;
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $metadataUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    if ($httpCode !== 200) {
-        return [
-            'valid' => false, 
-            'message' => __('plugins.pubIds.ark.validation.naanNotFound', ['naan' => $naanClean])
-        ];
-    }
-    
-    $metadata = json_decode($response, true);
-    $registeredWhere = rtrim($metadata['properties']['where'] ?? '', '/');
-    $currentBaseUrl = rtrim($baseUrl, '/');
-    
-    $registeredDomain = preg_replace('#^https?://#', '', $registeredWhere);
-    $currentDomain = preg_replace('#^https?://#', '', $currentBaseUrl);
-    
-    if ($registeredDomain !== $currentDomain) {
-        return [
-            'valid' => false,
-            'message' => __('plugins.pubIds.ark.validation.domainMismatch', [
-                'registered' => $registeredWhere,
-                'current' => $currentBaseUrl,
-                'naan' => $naanClean
-            ])
-        ];
-    }
-    
-    // Validação passou, agora salva os dados públicos se for o caso
-    $pluginToken = $this->getPluginToken($contextId);
-    $telemetryLevel = $this->getSetting($contextId, 'telemetryLevel') ?: 'restricted';
-    
-    // Salvar diretamente na tabela ark_journals (pular telemetry.php)
-    if ($telemetryLevel === 'public' && !empty($formData)) {
-        try {
-            DB::table('ark_journals')->updateOrInsert(
-                ['naan' => $naan],
-                [
-                    'journal_name' => $formData['journal_name'] ?? null,
-                    'country' => $formData['country'] ?? null,
-                    'email' => $formData['email'] ?? null,
-                    'primary_language' => $formData['primary_language'] ?? null,
-                    'telemetry_level' => $telemetryLevel,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]
-            );
-        } catch (Exception $e) {
-            // Log error but don't fail validation
-            error_log("[ARK] Error saving public data during validation: " . $e->getMessage());
-        }
-    }
-    
-    return ['valid' => true];
-}
         
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, self::STATISTICS_COLLECT_URL);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . self::PLUGIN_VERSION);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 202) {
+            error_log("[ARK Plugin] Statistics sent successfully for {$naan}");
+            return true;
+        }
+        
+        error_log("[ARK Plugin] Failed to send statistics: HTTP {$httpCode}");
+        return false;
+    }
+    
     /**
      * Get total ARKs count for a context
      */
@@ -366,193 +224,6 @@ public function validateNaanWithTelemetry($naan, $contextId, $formData = [])
         } catch (\Exception $e) {
             return 0;
         }
-    }
-    
-    /**
-     * Request token recovery via n2t.net metadata validation
-     * 
-     * @param int $contextId Journal ID
-     * @return array Result with success and message
-     */
-    public function requestTokenRecovery($contextId)
-    {
-        $request = Application::get()->getRequest();
-        $context = $request->getContext();
-        $baseUrl = $request->getBaseUrl();
-        $naan = $this->getSetting($contextId, 'arkPrefix');
-        
-        $naanClean = preg_replace('/^ark:/', '', $naan);
-        $naanClean = preg_replace('/\/$/', '', $naanClean);
-        
-        if (empty($naanClean)) {
-            return [
-                'success' => false, 
-                'message' => __('plugins.pubIds.ark.recovery.noNaan')
-            ];
-        }
-        
-        $metadataUrl = 'https://n2t.net/ark:' . $naanClean;
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $metadataUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        if ($httpCode !== 200) {
-            return [
-                'success' => false,
-                'message' => __('plugins.pubIds.ark.recovery.metadataFailed', ['url' => $metadataUrl])
-            ];
-        }
-        
-        $metadata = json_decode($response, true);
-        $registeredWhere = rtrim($metadata['properties']['where'] ?? '', '/');
-        $currentBaseUrl = rtrim($baseUrl, '/');
-        
-        $registeredDomain = preg_replace('#^https?://#', '', $registeredWhere);
-        $currentDomain = preg_replace('#^https?://#', '', $currentBaseUrl);
-        
-        if ($registeredDomain === $currentDomain) {
-            // Generate new token for this context
-            $newToken = bin2hex(random_bytes(32));
-            $this->updateSetting($contextId, 'ark_token', $newToken);
-            
-            return [
-                'success' => true,
-                'message' => __('plugins.pubIds.ark.recovery.success', ['naan' => $naanClean])
-            ];
-        } else {
-            $correctTarget = rtrim($currentBaseUrl, '/') . '/plugins/pubIds/ark/resolver.php?ark=${value}';
-            
-            return [
-                'success' => false,
-                'message' => __('plugins.pubIds.ark.recovery.domainMismatch', [
-                    'naan' => $naanClean,
-                    'registered' => $registeredWhere,
-                    'current' => $currentBaseUrl,
-                    'target' => $correctTarget
-                ])
-            ];
-        }
-    }
-    
-    /**
-     * Send telemetry data to API (called by scheduled task)
-     * 
-     * @param int $contextId Journal ID
-     * @param string|null $forceTelemetryLevel Optional - force a specific telemetry level (null = use saved setting)
-     * @return bool
-     */
-    public function sendTelemetryData($contextId, $forceTelemetryLevel = null)
-    {
-            error_log("[ARK Plugin] sendTelemetryData called for context $contextId");
-    error_log("[ARK Plugin] Force level: " . ($forceTelemetryLevel ?: 'null'));
-
-        $contextDao = Application::getContextDAO();
-        $context = $contextDao->getById($contextId);
-        
-        if (!$context) {
-            return false;
-        }
-        
-        // Use forced level or saved setting
-        if ($forceTelemetryLevel !== null) {
-            $telemetryLevel = $forceTelemetryLevel;
-        } else {
-            $telemetryLevel = $this->getSetting($contextId, 'telemetryLevel');
-            if (empty($telemetryLevel)) {
-                $telemetryLevel = 'restricted';
-            }
-        }
-        
-        $request = Application::get()->getRequest();
-        $baseUrl = $request->getBaseUrl();
-        $pluginToken = $this->getPluginToken($contextId);
-        $naan = $this->getSetting($contextId, 'arkPrefix');
-        
-        if (empty($naan)) {
-            return false;
-        }
-        
-        $payload = [
-            'naan' => $naan,
-            'plugin_ark_token' => $pluginToken,
-            'journal_url' => $baseUrl,
-            'plugin_version' => self::PLUGIN_VERSION,
-            'telemetry_level' => $telemetryLevel,
-            'arks_count' => $this->getTotalArksCount($contextId)
-        ];
-        
-        // Add public data if allowed
-        if ($telemetryLevel === 'public') {
-            // Get journal name
-            $journalName = $context->getData('name');
-            if (is_array($journalName)) {
-                $primaryLocale = $context->getPrimaryLocale();
-                $journalName = $journalName[$primaryLocale] ?? reset($journalName);
-            }
-                        
-            // Get country (ISO2 code)
-            $countryCode = $context->getData('country');
-            
-            // Get email
-            $email = $context->getData('contactEmail');
-            if (empty($email)) {
-                $email = $context->getData('principalContactEmail');
-            }
-            
-            // Primary language
-            $primaryLanguage = $context->getPrimaryLocale();
-            
-            // Convert country code to name using OJS CountryDAO
-            $countryName = $countryCode;
-            if (class_exists('PKP\i18n\CountryDAO')) {
-                $countryDao = \PKP\i18n\CountryDAO::getInstance();
-                $countries = $countryDao->getCountries();
-                $countryName = $countries[$countryCode] ?? $countryCode;
-            }
-            
-            $payload = array_merge($payload, [
-                'journal_name' => $journalName,
-                'country' => $countryName,
-                'email' => $email,
-                'primary_language' => $primaryLanguage
-            ]);
-        }
-            error_log("[ARK Plugin] Payload: " . json_encode($payload));
-
-        
-        // Send to API
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, self::ARK_DATABASE_URL);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-            error_log("[ARK Plugin] Response HTTP: $httpCode");
-    error_log("[ARK Plugin] Response body: $response");
-
-        
-        if ($httpCode === 200) {
-            return true;
-
-            
-        }
-        
-        return false;
     }
 
     // ==================== EXISTING METHODS ====================
@@ -1504,7 +1175,7 @@ public function validateNaanWithTelemetry($naan, $contextId, $formData = [])
      */
     public function getSetting($contextId, $name) {
         // For arkPrefix and ark_token, read directly from database (bypass cache)
-        if ($name === 'arkPrefix' || $name === 'ark_token' || $name === 'ark_admin_secret') {
+        if ($name === 'arkPrefix') {
             $result = DB::table('journal_settings')
                 ->where('journal_id', $contextId)
                 ->where('setting_name', $name)

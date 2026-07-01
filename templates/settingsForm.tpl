@@ -112,70 +112,31 @@
         {/fbvFormSection}
     {/fbvFormArea}
 
-    {fbvFormArea id="telemetryArea" title="plugins.pubIds.ark.settings.telemetryLevel"}
+    {* ========== TELEMETRY (OPT-OUT) ========== *}
+    {fbvFormArea id="telemetryArea" title="plugins.pubIds.ark.manager.settings.telemetryEnabled"}
         {fbvFormSection}
-            <p class="pkp_help">{translate key="plugins.pubIds.ark.manager.settings.telemetryLevel.description"}</p>
-            
-            <div style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                <div style="margin-bottom: 10px;">
-                    <label style="font-weight: normal;">
-                        <input type="radio" name="telemetryLevel" value="restricted" {if $telemetryLevel != 'public'}checked="checked"{/if}>
-                        <span style="font-weight: bold;">{translate key="plugins.pubIds.ark.settings.telemetryLevel.restricted"}</span>
-                    </label>
-                    <div style="margin-left: 25px; font-size: 12px; color: #666;">
-                        {translate key="plugins.pubIds.ark.manager.settings.telemetryLevel.restricted.description"}
-                    </div>
-                </div>
-                
-                <div>
-                    <label style="font-weight: normal;">
-                        <input type="radio" name="telemetryLevel" value="public" {if $telemetryLevel == 'public'}checked="checked"{/if}>
-                        <span style="font-weight: bold;">{translate key="plugins.pubIds.ark.settings.telemetryLevel.public"}</span>
-                    </label>
-                    <div style="margin-left: 25px; font-size: 12px; color: #666;">
-                        {translate key="plugins.pubIds.ark.manager.settings.telemetryLevel.public.description"}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="pkp_helpers_alert pkp_helpers_alert--info" style="margin-top: 10px;">
-                {translate key="plugins.pubIds.ark.manager.settings.telemetryInfo"}
-            </div>
-        {/fbvFormSection}
-    {/fbvFormArea}
-
-    {fbvFormArea id="tokenRecoveryArea" title="plugins.pubIds.ark.recovery.title"}
-        {fbvFormSection}
-            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 20px; margin: 15px 0;">
-                <h4 style="color: #856404; margin-top: 0; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 20px;">🔒</span> 
-                    {translate key="plugins.pubIds.ark.recovery.securityArea"}
-                </h4>
-                
-                <p style="color: #856404; margin-bottom: 15px;">
-                    {translate key="plugins.pubIds.ark.recovery.securityNote"}
+            <div style="background: #e8f4f8; border-left: 4px solid #006798; padding: 15px; margin: 10px 0; border-radius: 4px;">
+                <p style="margin: 0 0 10px 0;">
+                    <strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.description"}</strong>
                 </p>
                 
-                <hr style="border-color: #ffeeba; margin: 15px 0;">
+                {fbvElement type="checkbox" label="plugins.pubIds.ark.manager.settings.telemetryEnabled" id="telemetryEnabled" name="telemetryEnabled" checked=$telemetryEnabled}
                 
-                <p><strong>{translate key="plugins.pubIds.ark.recovery.howItWorks"}</strong></p>
-                <ol style="margin: 10px 0 15px 20px; color: #333;">
-                    <li>{translate key="plugins.pubIds.ark.recovery.step1"}</li>
-                    <li>{translate key="plugins.pubIds.ark.recovery.step2"}</li>
-                    <li>{translate key="plugins.pubIds.ark.recovery.step3"}</li>
-                    <li>{translate key="plugins.pubIds.ark.recovery.step4"}</li>
-                </ol>
-                
-                <div style="background: #e8f4f8; border-left: 4px solid #006798; padding: 12px; margin: 15px 0; border-radius: 4px;">
-                    <p style="margin: 0; font-size: 13px;">
-                        <strong>{translate key="plugins.pubIds.ark.recovery.targetHintLabel"}</strong><br>
-                        <code style="word-break: break-all;">{$baseUrl}/plugins/pubIds/ark/resolver.php?ark={literal}${value}{/literal}</code>
+                <div style="margin-top: 10px; font-size: 13px; color: #555;">
+                    <p style="margin: 5px 0;">
+                        <strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.help"}</strong>
+                    </p>
+                    <ul style="margin: 5px 0 5px 20px; padding: 0;">
+                        <li>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"}</li>
+                        <li>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"}</li>
+                        <li>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"}</li>
+                    </ul>
+                    <p style="margin: 5px 0;">
+                        <a href="https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md" target="_blank">
+                            {translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"}
+                        </a>
                     </p>
                 </div>
-                
-                <button type="button" id="recoveryButton" class="pkp_button">
-                    {translate key="plugins.pubIds.ark.recovery.button"}
-                </button>
             </div>
         {/fbvFormSection}
     {/fbvFormArea}
@@ -183,75 +144,14 @@
     {literal}
 
     <script>
-    // Force telemetryLevel value to be sent in the form
+    // Ensure telemetryEnabled value is sent in the form
+    // The checkbox value will be sent automatically via form submission
     $(document).ready(function() {
-        // Make sure the default value is sent
         $('form#arkSettingsForm').on('submit', function() {
-            var selectedLevel = $('input[name="telemetryLevel"]:checked').val();
-            if (!selectedLevel) {
-                $('input[name="telemetryLevel"][value="restricted"]').prop('checked', true);
-            }
+            var checked = $('#telemetryEnabled').is(':checked');
         });
     });
-    </script>
 
-    <script>
-        var lastRecoveryAttempt = 0;
-        var RECOVERY_COOLDOWN = 3600000;
-
-        $(document).ready(function() {
-            // Load timestamp of last server attempt
-            $.ajax({
-                url: 'https://revistacarnaubais.com.br/ark-telemetry/recovery.php?check=1',
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    if (data.lastAttempt && data.canAttempt === false) {
-                        var remaining = data.remainingMinutes;
-                        $('#recoveryButton').prop('disabled', true);
-                        $('#recoveryButton').text('Aguarde ' + remaining + ' minutos');
-                    }
-                }
-            });
-            
-            $('#recoveryButton').on('click', function() {
-                var $btn = $(this);
-                var now = Date.now();
-                
-                // Check local rate limit
-                if (lastRecoveryAttempt > 0 && (now - lastRecoveryAttempt) < RECOVERY_COOLDOWN) {
-                    var remaining = Math.ceil((RECOVERY_COOLDOWN - (now - lastRecoveryAttempt)) / 60000);
-                    alert('Aguarde ' + remaining + ' minutos antes de tentar novamente.');
-                    return;
-                }
-                
-                var originalText = $btn.text();
-                $btn.text('Verificando...').prop('disabled', true);
-                lastRecoveryAttempt = now;
-                
-                $.ajax({
-                    url: 'https://revistacarnaubais.com.br/ark-telemetry/recovery.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function(response) {
-                        $btn.text(originalText).prop('disabled', false);
-                        alert(response.content || response.message || 'Verificação concluída');
-                        
-                        if (response.status === true) {
-                            location.reload();
-                        }
-                    },
-                    error: function(xhr) {
-                        $btn.text(originalText).prop('disabled', false);
-                        var errorMsg = xhr.responseJSON?.content || 'Erro na verificação. Tente novamente.';
-                        alert(errorMsg);
-                    }
-                });
-            });
-        });
-    </script>
-
-    <script>
     (function() {
         var updateInterval = null;
         var ROTATION_INTERVAL = 5000;
@@ -441,61 +341,7 @@
             setupListeners();
         }
     })();
-    </script>
 
-    <script>
-        // Recovery button - with full diagnostics
-        $(document).ready(function() {
-            $('#recoveryButton').on('click', function() {
-                var $btn = $(this);
-                var originalText = $btn.text();
-                $btn.text('Verificando...').prop('disabled', true);
-                
-                var recoveryUrl = 'https://revistacarnaubais.com.br/ark-telemetry/recovery.php';
-                
-                $.ajax({
-                    url: recoveryUrl,
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function(response) {
-                        $btn.text(originalText).prop('disabled', false);
-                        
-                        // Display exact message returned by server
-                        var msg = response.content || response.message || 'Resposta sem mensagem';
-                        alert(msg);
-                        
-                        if (response.status === true) {
-                            location.reload();
-                        }
-                    },
-                    error: function(xhr) {
-                        $btn.text(originalText).prop('disabled', false);
-                        
-                        // Try to extract real error message
-                        var errorMsg = '';
-                        
-                        if (xhr.responseJSON) {
-                            errorMsg = xhr.responseJSON.content || xhr.responseJSON.message || JSON.stringify(xhr.responseJSON);
-                        } else if (xhr.responseText) {
-                            errorMsg = xhr.responseText.substring(0, 500);
-                        } else if (xhr.status === 0) {
-                            errorMsg = 'Não foi possível conectar ao servidor.';
-                        } else if (xhr.status === 404) {
-                            errorMsg = 'Endpoint não encontrado: ' + recoveryUrl;
-                        } else if (xhr.status === 500) {
-                            errorMsg = 'Erro interno no servidor.';
-                        } else {
-                            errorMsg = 'Erro HTTP ' + xhr.status + ': ' + xhr.statusText;
-                        }
-                        
-                        alert('Erro: ' + errorMsg);
-                    }
-                });
-            });
-        });
-    </script>
-
-    <script>
 // NAAN validation before submitting the form
 $(document).ready(function() {
 
@@ -504,9 +350,10 @@ $(document).ready(function() {
         
         // Make AJAX request to validate NAAN before sending
         $.ajax({
-            url: 'https://revistacarnaubais.com.br/ark-telemetry/validate-naan.php',
+            url: 'https://revistacarnaubais.com.br/ark-telemetry/validate',
             type: 'POST',
-            data: { naan: naan, domain: window.location.hostname },
+            data: JSON.stringify({ naan: naan, domain: window.location.hostname }),
+            contentType: 'application/json',
             dataType: 'json',
             async: false, // Wait for response
             success: function(response) {

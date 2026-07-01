@@ -15,7 +15,6 @@
 </a>
 
 
-
 <a name="portugues"></a>
 ## 🇧🇷 Português
 
@@ -33,7 +32,6 @@
 - Suporte a **metadados ERC** para artigos e edições
 - Pronto para registro NAAN (n2t.net)
 - **Resolvedor inteligente** que detecta se o ARK é de artigo ou edição
-- **Verificação de propriedade do NAAN** via n2t.net para recuperar acesso
 
 ### Instalação
 
@@ -51,7 +49,6 @@
 | Prefixo ARK | Seu prefixo NAAN (ex.: `ark:12345`) |
 | Prefixo Personalizado | 2-6 letras maiúsculas (ex.: `SIGLA`) |
 | URL do Resolvedor | `https://n2t.net/` (ou seu próprio resolvedor) |
-| Compartilhamento de dados | Básico (apenas dados técnicos) ou Completo (compartilha dados da revista) |
 
 ### Exemplo de Configuração
 
@@ -60,7 +57,6 @@
 - **Prefixo ARK:** `ark:12345`
 - **Prefixo Personalizado:** `SIGLA`
 - **URL do Resolvedor:** `https://n2t.net/`
-- **Compartilhamento de dados:** Básico
 
 **ARK resultante para artigo:** `https://n2t.net/ark:12345/SIGLA1234-ABCD`
 
@@ -70,46 +66,25 @@
 
 > Ao fim da configuração, você verá um pré-visualizador.
 
-### Compartilhamento de Dados
+### Compartilhamento de Dados (Opt-out)
 
-O plugin recolhe dados de publicação para caso de bugs na versão usada. O plugin oferece duas opções de compartilhamento de dados para ajudar na melhoria do serviço:
+Por padrão, o plugin envia dados anônimos de uso mensalmente para ajudar a melhorar o serviço. Você pode desabilitar isso a qualquer momento nas configurações do plugin.
 
-| Nível | Dados compartilhados |
-|-------|---------------------|
-| **Básico** | Apenas identificador NAAN, quantidade de ARKs gerados, versão do plugin e URL do site |
-| **Completo** | Todos os dados do nível básico, mais o nome da revista, país, e-mail e idioma principal |
+**Dados enviados mensalmente:**
+- Identificador NAAN (público)
+- Quantidade de ARKs gerados
+- Versão do plugin
 
-> Seus dados são protegidos em conformidade com a **LGPD (Lei Geral de Proteção de Dados - Brasil)** e o **GDPR (Regulamento Geral de Proteção de Dados - União Europeia)**. Não recolhemos nenhum outro dado além destes nem usaremos seus dados para outros serviços.
+**Nenhum dado pessoal é coletado**
 
-O modo completo permite que sua revista apareça nas estatísticas públicas do ecossistema. Disponível em [Estatísticas do plugin ARK](https://revistacarnaubais.com.br/ark-telemetry/stats.php?lang=pt_BR)
+> Seus dados são protegidos em conformidade com a **LGPD (Lei Geral de Proteção de Dados - Brasil)** e o **GDPR (Regulamento Geral de Proteção de Dados - União Europeia)**.
 
-<img width="auto" height="auto" alt="página de estatísticas" src="https://github-production-user-asset-6210df.s3.amazonaws.com/243876433/600558996-8914db21-15a0-480b-a3dc-ddc4d7dc9d9c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260531T033706Z&X-Amz-Expires=300&X-Amz-Signature=cfc7827dc0425a8ac6b4c4605e8f2093ea7a30d4e79e09a6264ab7407ce1a28a&X-Amz-SignedHeaders=host&response-content-type=image%2Fpng" />
+**Como desabilitar:**
+1. Acesse **Configurações > Website > Plugins > ARK**
+2. Desmarque a opção **"Enviar estatísticas anônimas"**
+3. Clique em Salvar
 
-### Como Funciona a Telemetria (Modelo Pull)
-
-O plugin utiliza um **sistema de telemetria baseado em pull** onde o servidor central coleta dados das revistas de forma mensal programada:
-
-1. Quando você salva as configurações do plugin, sua revista se registra no servidor central
-2. O servidor atribui sua revista a um dia específico do mês (1-30) para coleta de dados
-3. Nesse dia, o servidor puxa automaticamente os dados de telemetria da sua revista
-4. Nenhum cron job ou tarefa agendada é necessária no seu servidor!
-
-**Benefícios para gestores de revistas:**
-- Configuração zero além das configurações do plugin
-- Sem impacto no desempenho do seu servidor
-- Seus dados ajudam a melhorar o ecossistema do plugin
-
-### Verificação de Propriedade (Área de Segurança)
-
-Se você reinstalar o plugin ou migrar de servidor e receber a mensagem de que seu NAAN já está em uso, utilize a **Área de Segurança** nas configurações do plugin:
-
-1. Clique no botão **"Verificar Minha Propriedade"**
-2. O sistema consulta os metadados do seu NAAN no n2t.net
-3. Compara o domínio registrado com o domínio atual do seu site
-4. Se forem iguais, seu acesso é restaurado automaticamente
-5. Se forem diferentes, você precisará atualizar o cadastro do seu NAAN na ARK Alliance
-
-> Esta verificação só pode ser feita uma vez por hora, por segurança.
+**Política de Privacidade:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
 
 ### Uso
 
@@ -195,9 +170,6 @@ Recarregue a página (F5) e acesse diretamente a aba para gerar ARK.
 #### Metadados ERC retornam data incorreta?
 A data de implementação do ARK pode ser configurada nas opções do plugin. Certifique-se de que o campo "Data de Implementação" está preenchido corretamente no formato AAAAMMDD.
 
-#### Recebi a mensagem "Este NAAN já está em uso" após reinstalar o plugin?
-Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Verificar Minha Propriedade" para restaurar seu acesso automaticamente. A verificação é feita via n2t.net e compara o domínio registrado no seu NAAN.
-
 ### Desinstalar
 
 1. Desative o plugin em **Configurações > Website > Plugins**
@@ -206,7 +178,6 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 [Voltar ao topo](#top)
 
 [Licença e créditos](#licenca)
-
 
 ---
 
@@ -227,7 +198,6 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 - Soporte de **metadatos ERC** para artículos y ediciones
 - Listo para registro NAAN (n2t.net)
 - **Resolvedor inteligente** que detecta si el ARK es de artículo o edición
-- **Verificación de propiedad del NAAN** vía n2t.net para recuperar acceso
 
 ### Instalación
 
@@ -245,7 +215,6 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 | Prefijo ARK | Su prefijo NAAN (ej.: `ark:12345`) |
 | Prefijo Personalizado | 2-6 letras mayúsculas (ej.: `SIGLA`) |
 | URL del Resolvedor | `https://n2t.net/` (o su propio resolvedor) |
-| Compartir datos | Básico (solo datos técnicos) o Completo (comparte datos de la revista) |
 
 ### Ejemplo de Configuración
 
@@ -254,7 +223,6 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 - **Prefijo ARK:** `ark:12345`
 - **Prefijo Personalizado:** `SIGLA`
 - **URL del Resolvedor:** `https://n2t.net/`
-- **Compartir datos:** Básico
 
 **ARK resultante para artículo:** `https://n2t.net/ark:12345/SIGLA1234-ABCD`
 
@@ -264,46 +232,25 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 
 > Al finalizar la configuración, podrá ver una vista previa de ejemplo de sus recursos.
 
-### Compartir Datos
+### Compartir Datos (Opt-out)
 
-El plugin recopila datos de publicación para casos de errores en la versión utilizada. El plugin ofrece dos opciones de intercambio de datos para ayudar a mejorar el servicio:
+Por defecto, el plugin envía datos anónimos de uso mensualmente para ayudar a mejorar el servicio. Puede deshabilitar esto en cualquier momento en la configuración del plugin.
 
-| Nivel | Datos compartidos |
-|-------|---------------------|
-| **Básico** | Solo identificador NAAN, cantidad de ARKs generados, versión del plugin y URL del sitio |
-| **Completo** | Todos los datos del nivel básico, más el nombre de la revista, país, correo electrónico e idioma principal |
+**Datos enviados mensualmente:**
+- Identificador NAAN (público)
+- Cantidad de ARKs generados
+- Versión del plugin
 
-> Sus datos están protegidos en cumplimiento con la **LGPD (Ley General de Protección de Datos - Brasil)** y el **RGPD (Reglamento General de Protección de Datos - Unión Europea)**. No recopilamos ningún otro dato además de estos ni usaremos sus datos para otros servicios.
+**No se recopilan datos personales**
 
-El modo completo permite que su revista aparezca en las estadísticas públicas del ecosistema. Disponible en [Estadísticas del plugin ARK](https://revistacarnaubais.com.br/ark-telemetry/stats.php?lang=es)
+> Sus datos están protegidos en cumplimiento con la **LGPD (Ley General de Protección de Datos - Brasil)** y el **RGPD (Reglamento General de Protección de Datos - Unión Europea)**.
 
-<img width="auto" height="auto" alt="usage stats page" src="https://github-production-user-asset-6210df.s3.amazonaws.com/243876433/600558996-8914db21-15a0-480b-a3dc-ddc4d7dc9d9c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260531T033706Z&X-Amz-Expires=300&X-Amz-Signature=cfc7827dc0425a8ac6b4c4605e8f2093ea7a30d4e79e09a6264ab7407ce1a28a&X-Amz-SignedHeaders=host&response-content-type=image%2Fpng" />
+**Cómo deshabilitar:**
+1. Vaya a **Configuraciones > Sitio > Plugins > ARK**
+2. Desmarque la opción **"Enviar estadísticas anónimas"**
+3. Haga clic en Guardar
 
-### Cómo Funciona la Telemetría (Modelo Pull)
-
-El plugin utiliza un **sistema de telemetría basado en pull** donde el servidor central recopila datos de las revistas de forma mensual programada:
-
-1. Cuando guarda la configuración del plugin, su revista se registra en el servidor central
-2. El servidor asigna su revista a un día específico del mes (1-30) para la recolección de datos
-3. Ese día, el servidor extrae automáticamente los datos de telemetría de su revista
-4. ¡No necesita crons ni tareas programadas en su servidor!
-
-**Beneficios para los gestores de revistas:**
-- Configuración cero más allá de los ajustes del plugin
-- Sin impacto en el rendimiento de su servidor
-- Sus datos ayudan a mejorar el ecosistema del plugin
-
-### Verificación de Propiedad (Área de Seguridad)
-
-Si reinstala el plugin o migra de servidor y recibe el mensaje de que su NAAN ya está en uso, utilice el **Área de Seguridad** en la configuración del plugin:
-
-1. Haga clic en el botón **"Verificar Mi Propiedad"**
-2. El sistema consulta los metadatos de su NAAN en n2t.net
-3. Compara el dominio registrado con el dominio actual de su sitio
-4. Si son iguales, su acceso se restaura automáticamente
-5. Si son diferentes, deberá actualizar el registro de su NAAN en ARK Alliance
-
-> Esta verificación solo se puede realizar una vez por hora, por seguridad.
+**Política de Privacidad:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
 
 ### Uso
 
@@ -389,9 +336,6 @@ Recargue la página (F5) y acceda directamente a la pestaña para generar el ARK
 #### ¿Los metadatos ERC devuelven fecha incorrecta?
 La fecha de implementación del ARK se puede configurar en las opciones del plugin. Asegúrese de que el campo "Fecha de Implementación" esté correctamente completado en el formato AAAAMMDD.
 
-#### ¿Recibí el mensaje "Este NAAN ya está en uso" después de reinstalar el plugin?
-Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en "Verificar Mi Propiedad" para restaurar su acceso automáticamente. La verificación se realiza vía n2t.net y compara el dominio registrado en su NAAN.
-
 ### Desinstalar
 
 1. Desactive el plugin en **Configuraciones > Sitio > Plugins**
@@ -400,7 +344,6 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 [Volver al principio](#top)
 
 [Licencia y créditos](#licenca)
-
 
 ---
 
@@ -421,7 +364,6 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 - **ERC metadata support** for articles and issues
 - Ready for NAAN registration (n2t.net)
 - **Smart resolver** that detects whether the ARK belongs to an article or issue
-- **NAAN Ownership verification** via n2t.net to recover access
 
 ### Installation
 
@@ -439,7 +381,6 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 | ARK Prefix | Your NAAN prefix (e.g., `ark:12345`) |
 | Custom Prefix | 2-6 uppercase letters (e.g., `PREFIX`) |
 | Resolver URL | `https://n2t.net/` (or your own resolver) |
-| Data sharing | Basic (technical data only) or Complete (shares journal data) |
 
 ### Configuration Example
 
@@ -448,7 +389,6 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 - **ARK Prefix:** `ark:12345`
 - **Custom Prefix:** `PREFIX`
 - **Resolver URL:** `https://n2t.net/`
-- **Data sharing:** Basic
 
 **Resulting ARK for article:** `https://n2t.net/ark:12345/PREFIX1234-ABCD`
 
@@ -458,46 +398,25 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 
 > At the end of the configuration, you will be able to see an example preview for your resources.
 
-### Data Sharing
+### Data Sharing (Opt-out)
 
-The plugin collects publication data for bug tracking purposes regarding the version used. The plugin offers two data sharing options to help improve the service:
+By default, the plugin sends anonymous usage data monthly to help improve the service. You can disable this at any time in the plugin settings.
 
-| Level | Data shared |
-|-------|-------------|
-| **Basic** | Only NAAN identifier, number of ARKs generated, plugin version and site URL |
-| **Complete** | All Basic level data, plus journal name, country, email and primary language |
+**Data sent monthly:**
+- NAAN identifier (public)
+- Number of ARKs generated
+- Plugin version
 
-> Your data is protected in compliance with **LGPD (Brazilian General Data Protection Law)** and **GDPR (General Data Protection Regulation - European Union)**. We do not collect any other data beyond these nor will we use your data for other services.
+**No personal data is collected**
 
-Complete mode allows your journal to appear in public ecosystem statistics. Available at [ARK Plugin Statistics](https://revistacarnaubais.com.br/ark-telemetry/stats.php?lang=en)
+> Your data is protected in compliance with **LGPD (Brazilian General Data Protection Law)** and **GDPR (General Data Protection Regulation - European Union)**.
 
-<img width="auto" height="auto" alt="usage stats page" src="https://github-production-user-asset-6210df.s3.amazonaws.com/243876433/600558996-8914db21-15a0-480b-a3dc-ddc4d7dc9d9c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260531T033706Z&X-Amz-Expires=300&X-Amz-Signature=cfc7827dc0425a8ac6b4c4605e8f2093ea7a30d4e79e09a6264ab7407ce1a28a&X-Amz-SignedHeaders=host&response-content-type=image%2Fpng" />
+**How to disable:**
+1. Go to **Settings > Website > Plugins > ARK**
+2. Uncheck **"Send anonymous statistics"**
+3. Click Save
 
-### How Telemetry Works (Pull Model)
-
-The plugin uses a **pull-based telemetry system** where the central server collects data from journals on a scheduled monthly basis:
-
-1. When you save the plugin settings, your journal registers with the central server
-2. The server assigns your journal to a specific day of the month (1-30) for data collection
-3. On that day, the server automatically pulls telemetry data from your journal
-4. No cron jobs or scheduled tasks are needed on your server!
-
-**Benefits for journal managers:**
-- Zero configuration required beyond plugin settings
-- No impact on your server's performance
-- Your data helps improve the plugin ecosystem
-
-### Ownership Verification (Security Area)
-
-If you reinstall the plugin or migrate servers and receive a message that your NAAN is already in use, use the **Security Area** in the plugin settings:
-
-1. Click the **"Verify My Ownership"** button
-2. The system queries your NAAN metadata on n2t.net
-3. Compares the registered domain with your current site domain
-4. If they match, your access is restored automatically
-5. If they differ, you need to update your NAAN registration with ARK Alliance
-
-> This verification can only be performed once per hour for security reasons.
+**Privacy Policy:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
 
 ### Usage
 
@@ -582,9 +501,6 @@ Refresh the page (F5) and directly access the tab to generate the ARK.
 
 #### Does ERC metadata return the wrong date?
 The ARK implementation date can be configured in the plugin options. Make sure the "Implementation Date" field is correctly filled in YYYYMMDD format.
-
-#### Did I receive the message "This NAAN is already in use" after reinstalling the plugin?
-Use the **Security Area** in the plugin settings. Click "Verify My Ownership" to restore your access automatically. Verification is done via n2t.net and compares the domain registered in your NAAN.
 
 ### Uninstallation
 

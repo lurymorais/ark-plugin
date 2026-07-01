@@ -567,6 +567,7 @@ try {
     $result = null;
     $objectType = null; // 'publication' or 'issue'
     
+    // ================== Search exact match ================== 
     // First, search in publications (articles)
     foreach ($attempts as $suffix) {
         $stmt = $pdo->prepare("
@@ -575,10 +576,10 @@ try {
             JOIN publications p ON ps.publication_id = p.publication_id
             JOIN submissions s ON p.submission_id = s.submission_id
             WHERE ps.setting_name = 'pub-id::ark' 
-            AND (ps.setting_value = ? OR ps.setting_value LIKE CONCAT('%', ?))
+            AND ps.setting_value = ?
             LIMIT 1
         ");
-        $stmt->execute([$suffix, $suffix]);
+        $stmt->execute([$suffix]);
         
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $result = $row;
@@ -595,16 +596,36 @@ try {
                 FROM issue_settings is2
                 JOIN issues i ON is2.issue_id = i.issue_id
                 WHERE is2.setting_name = 'pub-id::ark' 
-                AND (is2.setting_value = ? OR is2.setting_value LIKE CONCAT('%', ?))
+                AND is2.setting_value = ?
                 LIMIT 1
             ");
-            $stmt->execute([$suffix, $suffix]);
+            $stmt->execute([$suffix]);
             
             if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $result = $row;
                 $objectType = 'issue';
                 break;
             }
+        }
+    }
+    
+    // ========== ADDITIONAL SECURITY: Validate prefix ==========
+    // Check if the found ARK matches the expected prefix format
+    if ($result) {
+        // Get the full ARK to verify prefix matches
+        $stmt = $pdo->prepare("
+            SELECT setting_value FROM " . ($objectType === 'publication' ? 'publication_settings' : 'issue_settings') . "
+            WHERE " . ($objectType === 'publication' ? 'publication_id' : 'issue_id') . " = ?
+            AND setting_name = 'pub-id::ark'
+            LIMIT 1
+        ");
+        $stmt->execute([$result[$objectType === 'publication' ? 'publication_id' : 'issue_id']]);
+        $fullArk = $stmt->fetchColumn();
+        
+        // If the ARK exists but doesn't match the expected pattern, treat as not found
+        if ($fullArk && !preg_match('/^ark:\d+[A-Za-z0-9\/\-_]+$/', $fullArk)) {
+            $result = null;
+            $objectType = null;
         }
     }
     
