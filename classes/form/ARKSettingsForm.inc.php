@@ -31,6 +31,14 @@ class ARKSettingsForm extends Form {
         $correctTarget = $baseUrl . '/plugins/pubIds/ark/resolver.php?ark=${value}';
         $templateMgr->assign('arkTargetHint', $correctTarget);
         
+        // Add real data for display
+        $contextId = $this->_getContextId();
+        $plugin = $this->_getPlugin();
+        
+        $templateMgr->assign('arkPrefix', $plugin->getSetting($contextId, 'arkPrefix'));
+        $templateMgr->assign('arkCount', $plugin->getTotalArksCount($contextId));
+        $templateMgr->assign('pluginVersion', $plugin->getPluginVersion()); // Usando o método
+        
         return parent::fetch($request, $template, $display);
     }
 

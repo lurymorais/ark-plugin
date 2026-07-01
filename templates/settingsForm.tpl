@@ -126,10 +126,10 @@
                     <p style="margin: 5px 0;">
                         <strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.help"}</strong>
                     </p>
-                    <ul style="margin: 5px 0 5px 20px; padding: 0;">
-                        <li>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"}</li>
-                        <li>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"}</li>
-                        <li>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"}</li>
+                    <ul style="margin: 5px 0 5px 20px; padding: 0; list-style: disc;">
+                        <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"}</strong>: {$arkPrefix|escape}</li>
+                        <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"}</strong>: {$arkCount|escape}</li>
+                        <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"}</strong>: {$pluginVersion|escape}</li>
                     </ul>
                     <p style="margin: 5px 0;">
                         <a href="https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md" target="_blank">

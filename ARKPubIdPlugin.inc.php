@@ -26,9 +26,21 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     private const VALIDATION_SERVER_URL = 'https://revistacarnaubais.com.br/ark-telemetry/validate';
     private const STATISTICS_COLLECT_URL = 'https://revistacarnaubais.com.br/ark-telemetry/collect';
     
-    // Plugin version
-    private const PLUGIN_VERSION = '3.1.0.0';
-    
+    /**
+     * Get plugin version from version.xml
+     * 
+     * @return string Plugin version
+     */
+    public function getPluginVersion()
+    {
+        $versionFile = $this->getPluginPath() . '/version.xml';
+        if (file_exists($versionFile)) {
+            $xml = simplexml_load_file($versionFile);
+            return (string)$xml->release;
+        }
+        return '3.1.0.0'; // Fallback
+    }
+
     public function register($category, $path, $mainContextId = null)
     {
         if (self::$registered) {
