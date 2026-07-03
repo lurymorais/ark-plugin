@@ -32,6 +32,7 @@
 - Suporte a **metadados ERC** para artigos e edições
 - Pronto para registro NAAN (n2t.net)
 - **Resolvedor inteligente** que detecta se o ARK é de artigo ou edição
+- **Verificação de propriedade do NAAN** via n2t.net para recuperar acesso
 
 ### Instalação
 
@@ -49,6 +50,7 @@
 | Prefixo ARK | Seu prefixo NAAN (ex.: `ark:12345`) |
 | Prefixo Personalizado | 2-6 letras maiúsculas (ex.: `SIGLA`) |
 | URL do Resolvedor | `https://n2t.net/` (ou seu próprio resolvedor) |
+| Compartilhamento de dados | Básico (apenas dados técnicos) ou Completo (compartilha dados da revista) |
 
 ### Exemplo de Configuração
 
@@ -57,6 +59,7 @@
 - **Prefixo ARK:** `ark:12345`
 - **Prefixo Personalizado:** `SIGLA`
 - **URL do Resolvedor:** `https://n2t.net/`
+- **Compartilhamento de dados:** Básico
 
 **ARK resultante para artigo:** `https://n2t.net/ark:12345/SIGLA1234-ABCD`
 
@@ -170,6 +173,9 @@ Recarregue a página (F5) e acesse diretamente a aba para gerar ARK.
 #### Metadados ERC retornam data incorreta?
 A data de implementação do ARK pode ser configurada nas opções do plugin. Certifique-se de que o campo "Data de Implementação" está preenchido corretamente no formato AAAAMMDD.
 
+#### Recebi a mensagem "Este NAAN já está em uso" após reinstalar o plugin?
+Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Verificar Minha Propriedade" para restaurar seu acesso automaticamente. A verificação é feita via n2t.net e compara o domínio registrado no seu NAAN.
+
 ### Desinstalar
 
 1. Desative o plugin em **Configurações > Website > Plugins**
@@ -198,6 +204,7 @@ A data de implementação do ARK pode ser configurada nas opções do plugin. Ce
 - Soporte de **metadatos ERC** para artículos y ediciones
 - Listo para registro NAAN (n2t.net)
 - **Resolvedor inteligente** que detecta si el ARK es de artículo o edición
+- **Verificación de propiedad del NAAN** vía n2t.net para recuperar acceso
 
 ### Instalación
 
@@ -215,6 +222,7 @@ A data de implementação do ARK pode ser configurada nas opções do plugin. Ce
 | Prefijo ARK | Su prefijo NAAN (ej.: `ark:12345`) |
 | Prefijo Personalizado | 2-6 letras mayúsculas (ej.: `SIGLA`) |
 | URL del Resolvedor | `https://n2t.net/` (o su propio resolvedor) |
+| Compartir datos | Básico (solo datos técnicos) o Completo (comparte datos de la revista) |
 
 ### Ejemplo de Configuración
 
@@ -223,6 +231,7 @@ A data de implementação do ARK pode ser configurada nas opções do plugin. Ce
 - **Prefijo ARK:** `ark:12345`
 - **Prefijo Personalizado:** `SIGLA`
 - **URL del Resolvedor:** `https://n2t.net/`
+- **Compartir datos:** Básico
 
 **ARK resultante para artículo:** `https://n2t.net/ark:12345/SIGLA1234-ABCD`
 
@@ -336,6 +345,9 @@ Recargue la página (F5) y acceda directamente a la pestaña para generar el ARK
 #### ¿Los metadatos ERC devuelven fecha incorrecta?
 La fecha de implementación del ARK se puede configurar en las opciones del plugin. Asegúrese de que el campo "Fecha de Implementación" esté correctamente completado en el formato AAAAMMDD.
 
+#### ¿Recibí el mensaje "Este NAAN ya está en uso" después de reinstalar el plugin?
+Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en "Verificar Mi Propiedad" para restaurar su acceso automáticamente. La verificación se realiza vía n2t.net y compara el dominio registrado en su NAAN.
+
 ### Desinstalar
 
 1. Desactive el plugin en **Configuraciones > Sitio > Plugins**
@@ -364,6 +376,7 @@ La fecha de implementación del ARK se puede configurar en las opciones del plug
 - **ERC metadata support** for articles and issues
 - Ready for NAAN registration (n2t.net)
 - **Smart resolver** that detects whether the ARK belongs to an article or issue
+- **NAAN Ownership verification** via n2t.net to recover access
 
 ### Installation
 
@@ -381,6 +394,7 @@ La fecha de implementación del ARK se puede configurar en las opciones del plug
 | ARK Prefix | Your NAAN prefix (e.g., `ark:12345`) |
 | Custom Prefix | 2-6 uppercase letters (e.g., `PREFIX`) |
 | Resolver URL | `https://n2t.net/` (or your own resolver) |
+| Data sharing | Basic (technical data only) or Complete (shares journal data) |
 
 ### Configuration Example
 
@@ -389,6 +403,7 @@ La fecha de implementación del ARK se puede configurar en las opciones del plug
 - **ARK Prefix:** `ark:12345`
 - **Custom Prefix:** `PREFIX`
 - **Resolver URL:** `https://n2t.net/`
+- **Data sharing:** Basic
 
 **Resulting ARK for article:** `https://n2t.net/ark:12345/PREFIX1234-ABCD`
 
@@ -501,6 +516,9 @@ Refresh the page (F5) and directly access the tab to generate the ARK.
 
 #### Does ERC metadata return the wrong date?
 The ARK implementation date can be configured in the plugin options. Make sure the "Implementation Date" field is correctly filled in YYYYMMDD format.
+
+#### Did I receive the message "This NAAN is already in use" after reinstalling the plugin?
+Use the **Security Area** in the plugin settings. Click "Verify My Ownership" to restore your access automatically. Verification is done via n2t.net and compares the domain registered in your NAAN.
 
 ### Uninstallation
 

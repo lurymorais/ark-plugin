@@ -2,6 +2,12 @@
     Require all denied
 </FilesMatch>
 
+# Bloquear acesso a todos os arquivos PHP
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+
+# Permitir arquivos essenciais
 <Files "resolver.php">
     Require all granted
 </Files>

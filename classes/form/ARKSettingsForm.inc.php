@@ -106,7 +106,7 @@ class ARKSettingsForm extends Form {
         
         $arkImplementationDate = DB::table('journal_settings')
             ->where('journal_id', $contextId)
-            ->where('setting_name', 'arkImplementationDate')
+            ->where('setting_name', 'telemetryLevel')
             ->where('locale', '')
             ->value('setting_value');
         
@@ -139,6 +139,8 @@ class ARKSettingsForm extends Form {
         } else {
             $this->setData('arkResolver', '');
         }
+        
+        $this->setData('lastRecoveryAttempt', $plugin->getSetting($contextId, 'lastRecoveryAttempt'));
     }
 
     public function readInputData() {
@@ -153,6 +155,27 @@ class ARKSettingsForm extends Form {
             'arkResolver',
             'telemetryEnabled'
         ]);
+    }
+
+    public function handleTokenRecovery($request)
+    {
+        $plugin = $this->_getPlugin();
+        $contextId = $this->_getContextId();
+        
+        $lastAttempt = $plugin->getSetting($contextId, 'lastRecoveryAttempt');
+        if ($lastAttempt && (time() - $lastAttempt) < 3600) {
+            $timeRemaining = 3600 - (time() - $lastAttempt);
+            $minutes = ceil($timeRemaining / 60);
+            return [
+                'success' => false,
+                'message' => __('plugins.pubIds.ark.recovery.rateLimit', ['minutes' => $minutes])
+            ];
+        }
+        
+        $plugin->updateSetting($contextId, 'lastRecoveryAttempt', time());
+        $result = $plugin->requestTokenRecovery($contextId);
+        
+        return $result;
     }
 
     public function execute(...$functionArgs) {
@@ -187,6 +210,15 @@ class ARKSettingsForm extends Form {
         $resolverType = $this->getData('resolverType');
         $arkResolver = $this->getData('arkResolver');
         $arkImplementationDate = $this->getData('arkImplementationDate');
+
+        $token = $plugin->getPluginToken($contextId);
+        $adminSecret = $plugin->getSetting($contextId, 'ark_admin_secret');
+        if (empty($adminSecret)) {
+            $adminSecret = bin2hex(random_bytes(32));
+            $plugin->updateSetting($contextId, 'ark_admin_secret', $adminSecret);
+        }
+        
+        $apiEndpoint = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-api/telemetry';
         
         // ========== TELEMETRY: OPT-OUT ==========
         $telemetryEnabled = $this->getData('telemetryEnabled');
@@ -210,6 +242,12 @@ class ARKSettingsForm extends Form {
         }
         
         try {
+            // Salvar no journal_settings
+            DB::table('journal_settings')->updateOrInsert(
+                ['journal_id' => $contextId, 'setting_name' => 'arkPrefix', 'locale' => ''],
+                ['setting_value' => $naan]
+            );
+            
             DB::table('journal_settings')->updateOrInsert(
                 ['journal_id' => $contextId, 'setting_name' => 'arkPrefix', 'locale' => ''],
                 ['setting_value' => $naan]

@@ -438,7 +438,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
         <h1>ARK Resolver</h1>
         
         <div class="language-section language-pt">
-            <div class="language-label">PORTUGUÊS</div>
+            <div class="language-label">PORTUGUES</div>
             <h2>' . htmlspecialchars($titlePt) . '</h2>
             <p>' . str_replace('<strong>', '<span class="identifier">', str_replace('</strong>', '</span>', htmlspecialchars($messagePt))) . '</p>';
     
@@ -447,7 +447,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
     }
     
     echo '
-            <p><a href="' . htmlspecialchars($siteUrl) . '">Voltar para a página inicial</a></p>
+            <p><a href="' . htmlspecialchars($siteUrl) . '">Voltar para a pagina inicial</a></p>
         </div>
         
         <div class="language-section language-en">
@@ -482,7 +482,7 @@ if (empty($_GET['ark']) && empty($_GET['id'])) {
     showErrorPage(
         400,
         'Missing Parameter',
-        'Parâmetro Ausente',
+        'Parametro Ausente',
         'No ARK identifier was provided.',
         'Nenhum identificador ARK foi fornecido.',
         'Expected usage: resolver.php?ark=CRL1234-ABCD',
@@ -639,7 +639,7 @@ try {
         showErrorPage(
             404,
             'ARK Not Found',
-            'ARK Não Encontrado',
+            'ARK Nao Encontrado',
             'The identifier was not found in our database.',
             'O identificador não foi encontrado em nossa base de dados.',
             'You tried: ' . htmlspecialchars($cleanedInput),
@@ -656,9 +656,9 @@ try {
         showErrorPage(
             500,
             'Journal Error',
-            'Erro no Periódico',
+            'Erro no Periodico',
             'Could not identify the journal associated with this ARK.',
-            'Não foi possível identificar o periódico associado a este ARK.',
+            'Nao foi possivel identificar o periodico associado a este ARK.',
             'Contact the system administrator.',
             'Entre em contato com o administrador do sistema.'
         );
@@ -732,7 +732,7 @@ try {
         'Database Error',
         'Erro no Banco de Dados',
         'Could not connect to the database.',
-        'Não foi possível conectar ao banco de dados.',
+        'Nao foi possivel conectar ao banco de dados.',
         'Error: ' . $e->getMessage(),
         'Erro: ' . $e->getMessage()
     );

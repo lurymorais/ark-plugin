@@ -173,6 +173,34 @@ public function register($category, $path, $mainContextId = null)
         
         return $result;
     }
+    
+    /**
+     * Install plugin - generate token and register scheduled task
+     */
+    public function install($category, $path)
+    {
+        $success = parent::install($category, $path);
+        
+        if ($success) {
+            // Generate and store plugin token
+            $this->initializePluginToken();
+        }
+        
+        return $success;
+    }
+
+    /**
+     * Handle telemetry data request (pull) - Accepts requests ON or AFTER scheduled time
+     * 
+     * @param int $code HTTP status code
+     * @param array $data Response data
+     */
+    private function sendApiResponse(int $code, array $data): void
+    {
+        http_response_code($code);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
 
     /**
      * Send aggregated statistics to server (PUSH model, monthly)
@@ -1054,6 +1082,13 @@ public function injectIssueArkField($hookName, $args)
         $templateMgr->addJavaScript(
             'ark-field-js',
             $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/FieldArk.js?v=1.005',
+            ['contexts' => 'backend']
+        );
+        
+        // Include the FieldArk.js script
+        $templateMgr->addJavaScript(
+            'ark-field-js',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/FieldArk.js',
             ['contexts' => 'backend']
         );
         
