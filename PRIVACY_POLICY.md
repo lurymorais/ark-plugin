@@ -84,9 +84,30 @@ Example output (public dashboard):
 
 | Data Type | Retention Period | Deletion |
 |-----------|------------------|----------|
-| NAAN + ARK count + Version | 24 months | Automatic deletion after 24 months |
-| Validation logs | 12 months | Automatic deletion after 12 months |
-| Rate limit records | 24 hours | Automatic deletion after 24 hours |
+| Statistics | Permanent | Manual (on request) |
+| Validation logs | 24 months | Automatic (daily cron) |
+| Rate limit records | 24 hours | Automatic (daily cron) |
+| Validation tokens | 5 minutes | Automatic (expiration + daily cron) |
+
+### 4.1. Statistics Data (Permanent)
+
+Statistics data (NAAN, ARK count, plugin version) is kept permanently to maintain accurate cumulative counts of ARKs generated across the OJS ecosystem. This data does not contain any personal identifiable information.
+
+### 4.2. Automatic Cleanup
+
+The following data is automatically deleted by the daily maintenance script:
+- Validation logs: Deleted after 24 months
+- Rate limit records: Deleted after 24 hours
+- Expired validation tokens: Deleted when expired
+
+### 4.3. Requesting Deletion
+
+You can request deletion of your journal's statistics data:
+
+1. Disable telemetry: Go to Settings -> ARK Plugin -> Uncheck "Send anonymous statistics"
+2. Contact us: Email m.luryhortencio@gmail.com with your NAAN
+
+Response time: Within 30 days (as required by GDPR/LGPD)
 
 ### 4.1. Requesting Deletion
 
