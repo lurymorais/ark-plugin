@@ -171,9 +171,11 @@ class ARKSettingsForm extends Form {
         // ========== NAAN VALIDATION ==========
         $domain = preg_replace('#^https?://#', '', rtrim($request->getBaseUrl(), '/'));
         $validation = $plugin->validateNaanRemotely($naan, $domain);
-        
+
         if (!$validation['valid']) {
-            $this->addError('arkPrefix', $validation['message']);
+            // Use 'message' if exists, otherwise use 'error' or 'details'
+            $errorMessage = $validation['message'] ?? $validation['error'] ?? $validation['details'] ?? 'NAAN validation failed';
+            $this->addError('arkPrefix', $errorMessage);
             return false;
         }
 

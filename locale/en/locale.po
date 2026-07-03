@@ -213,8 +213,50 @@ msgstr "Plugin version"
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
 msgstr "Privacy Policy"
 
+msgid "plugins.pubIds.ark.validation.rateLimit"
+msgstr "Too many validation attempts. You are temporarily blocked."
+
 msgid "plugins.pubIds.ark.validation.domainMismatch"
 msgstr "This NAAN does not belong to your domain!"
 
+msgid "plugins.pubIds.ark.validation.notFound"
+msgstr "NAAN not found in ARK Alliance registry. Please verify the NAAN is correct."
+
+msgid "plugins.pubIds.ark.validation.missingFields"
+msgstr "Missing required fields: NAAN and domain are required."
+
+msgid "plugins.pubIds.ark.validation.invalidFormat"
+msgstr "Invalid NAAN format. Use only numbers (e.g., 16081)."
+
+msgid "plugins.pubIds.ark.validation.invalidDomain"
+msgstr "Invalid domain format. Please verify the domain is correct."
+
+msgid "plugins.pubIds.ark.validation.methodNotAllowed"
+msgstr "Request method not allowed."
+
 msgid "plugins.pubIds.ark.validation.error.generic"
 msgstr "Error validating NAAN. Please try again."
+
+msgid "plugins.pubIds.ark.validation.minutesRemaining"
+msgstr "minutes remaining"
+
+msgid "plugins.pubIds.ark.validation.tryAgainAfter"
+msgstr "Try again after:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "n2t.net Configuration Required"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "For your ARKs to resolve correctly, you need to configure your NAAN target on n2t.net with the URL below. This URL must be provided in the NAAN registration or update form:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "If you don't have a NAAN yet, request one at:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "or use the"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "request form"

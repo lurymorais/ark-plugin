@@ -213,8 +213,50 @@ msgstr "Версія плагіна"
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
 msgstr "Політика конфіденційності"
 
+msgid "plugins.pubIds.ark.validation.rateLimit"
+msgstr "Забагато спроб перевірки. Ви тимчасово заблоковані."
+
 msgid "plugins.pubIds.ark.validation.domainMismatch"
 msgstr "Цей NAAN не належить вашому домену!"
 
+msgid "plugins.pubIds.ark.validation.notFound"
+msgstr "NAAN не знайдено в реєстрі ARK Alliance. Перевірте правильність NAAN."
+
+msgid "plugins.pubIds.ark.validation.missingFields"
+msgstr "Відсутні обов'язкові поля: NAAN та домен є обов'язковими."
+
+msgid "plugins.pubIds.ark.validation.invalidFormat"
+msgstr "Невірний формат NAAN. Використовуйте лише цифри (напр: 16081)."
+
+msgid "plugins.pubIds.ark.validation.invalidDomain"
+msgstr "Невірний формат домену. Перевірте правильність домену."
+
+msgid "plugins.pubIds.ark.validation.methodNotAllowed"
+msgstr "Метод запиту не дозволено."
+
 msgid "plugins.pubIds.ark.validation.error.generic"
 msgstr "Помилка перевірки NAAN. Спробуйте ще раз."
+
+msgid "plugins.pubIds.ark.validation.minutesRemaining"
+msgstr "хвилин залишилося"
+
+msgid "plugins.pubIds.ark.validation.tryAgainAfter"
+msgstr "Спробуйте ще раз після:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "Необхідна конфігурація на n2t.net"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "Щоб ваші ARK правильно розпізнавалися, потрібно налаштувати target вашого NAAN на n2t.net за допомогою URL нижче. Цю URL потрібно вказати у формі реєстрації або оновлення NAAN:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "Якщо у вас ще немає NAAN, подайте заявку на:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "або скористайтеся"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "формою заявки"

@@ -5,6 +5,10 @@
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *}
 
+{* ========== TRANSLATIONS FOR JAVASCRIPT ========== *}
+{assign var="validationDomainMismatch" value="plugins.pubIds.ark.validation.domainMismatch"|translate}
+{assign var="validationGenericError" value="plugins.pubIds.ark.validation.error.generic"|translate}
+
 <div id="description">{translate key="plugins.pubIds.ark.manager.settings.description"}</div>
 
 <script src="{$baseUrl}/plugins/pubIds/ark/js/ARKSettingsFormHandler.js"></script>
@@ -47,6 +51,29 @@
         {fbvFormSection}
             <p class="pkp_help">{translate key="plugins.pubIds.ark.manager.settings.arkPrefix.description"}</p>
             {fbvElement type="text" id="arkPrefix" name="arkPrefix" value=$arkPrefix required="true" label="plugins.pubIds.ark.manager.settings.arkPrefix" maxlength="40" size=$fbvStyles.size.MEDIUM}
+            
+            {* ========== NAAN TARGET CONFIGURATION WARNING ========== *}
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 15px; margin: 15px 0 0 0; border-radius: 4px;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 13px; color: #856404;">
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.title"}
+                </p>
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404;">
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.description"}
+                </p>
+                <div style="background: #fff; padding: 8px 10px; border-radius: 4px; font-family: monospace; font-size: 12px; word-break: break-all; border: 1px solid #e0e0e0;">
+                    {$baseUrl}/plugins/pubIds/ark/resolver.php?ark={literal}${value}{/literal}
+                </div>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #856404;">
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.help"}
+                    <a href="https://arks.org/" target="_blank" style="color: #006798; text-decoration: underline;">
+                        {translate key="plugins.pubIds.ark.manager.settings.naanTarget.link"}
+                    </a>
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.or"}
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSf_847hNXtLGikR-XeDy1uT1AKd24DpHnt5UQh2i8ORRu7u-w/viewform" target="_blank" style="color: #006798; text-decoration: underline;">
+                        {translate key="plugins.pubIds.ark.manager.settings.naanTarget.form"}
+                    </a>
+                </p>
+            </div>
         {/fbvFormSection}
     {/fbvFormArea}
 
@@ -145,7 +172,6 @@
 
     <script>
     // Ensure telemetryEnabled value is sent in the form
-    // The checkbox value will be sent automatically via form submission
     $(document).ready(function() {
         $('form#arkSettingsForm').on('submit', function() {
             var checked = $('#telemetryEnabled').is(':checked');
@@ -341,41 +367,128 @@
             setupListeners();
         }
     })();
+    </script>
 
-// NAAN validation before submitting the form
-$(document).ready(function() {
-    var validationError = '{translate key="plugins.pubIds.ark.validation.domainMismatch"}';
-    var genericError = '{translate key="plugins.pubIds.ark.validation.error.generic"}';
+    {/literal}
+
+    {* ========== NAAN VALIDATION (outside literal) ========== *}
+    {assign var="validationRateLimit" value="plugins.pubIds.ark.validation.rateLimit"|translate}
+    {assign var="validationDomainMismatch" value="plugins.pubIds.ark.validation.domainMismatch"|translate}
+    {assign var="validationNotFound" value="plugins.pubIds.ark.validation.notFound"|translate}
+    {assign var="validationMissingFields" value="plugins.pubIds.ark.validation.missingFields"|translate}
+    {assign var="validationInvalidFormat" value="plugins.pubIds.ark.validation.invalidFormat"|translate}
+    {assign var="validationInvalidDomain" value="plugins.pubIds.ark.validation.invalidDomain"|translate}
+    {assign var="validationMethodNotAllowed" value="plugins.pubIds.ark.validation.methodNotAllowed"|translate}
+    {assign var="validationGenericError" value="plugins.pubIds.ark.validation.error.generic"|translate}
+    {assign var="validationMinutesRemaining" value="plugins.pubIds.ark.validation.minutesRemaining"|translate}
+    {assign var="validationTryAgainAfter" value="plugins.pubIds.ark.validation.tryAgainAfter"|translate}
     
-    $('#arkSettingsForm').on('submit', function(e) {
-        var naan = $('input[name="arkPrefix"]').val();
+    <script>
+    // NAAN validation before submitting the form
+    $(document).ready(function() {
+        // Translations from Smarty (processed server-side)
+        var translations = {
+            rateLimit: "{$validationRateLimit|escape:"javascript"}",
+            domainMismatch: "{$validationDomainMismatch|escape:"javascript"}",
+            notFound: "{$validationNotFound|escape:"javascript"}",
+            missingFields: "{$validationMissingFields|escape:"javascript"}",
+            invalidFormat: "{$validationInvalidFormat|escape:"javascript"}",
+            invalidDomain: "{$validationInvalidDomain|escape:"javascript"}",
+            methodNotAllowed: "{$validationMethodNotAllowed|escape:"javascript"}",
+            genericError: "{$validationGenericError|escape:"javascript"}",
+            minutesRemaining: "{$validationMinutesRemaining|escape:"javascript"}",
+            tryAgainAfter: "{$validationTryAgainAfter|escape:"javascript"}"
+        };
+                
+        function translateServerError(response) {
+            var error = response.error || '';
+            
+            // Map server errors to translations
+            var errorMap = {
+                'Too many validation attempts': translations.rateLimit,
+                'NAAN not found on n2t.net registry': translations.notFound,
+                'NAAN metadata incomplete': translations.notFound,
+                'NAAN belongs to different domain': translations.domainMismatch,
+                'Missing naan or domain': translations.missingFields,
+                'Invalid NAAN format': translations.invalidFormat,
+                'Invalid domain format': translations.invalidDomain,
+                'Method not allowed': translations.methodNotAllowed
+            };
+            
+            // Return translated message if found, otherwise generic error
+            return errorMap[error] || response.message || error || translations.genericError;
+        }
         
-        $.ajax({
-            url: 'https://revistacarnaubais.com.br/ark-telemetry/validate.php',
-            type: 'POST',
-            data: JSON.stringify({ naan: naan, domain: window.location.hostname }),
-            contentType: 'application/json',
-            dataType: 'json',
-            async: false,
-            success: function(response) {
-                if (response.valid !== true) {
-                    alert(response.message || validationError);
+        $('#arkSettingsForm').on('submit', function(e) {
+            var naan = $('input[name="arkPrefix"]').val();
+            var $submitBtn = $(this).find('button[type="submit"]');
+            
+            // Disable button to prevent multiple submissions
+            $submitBtn.prop('disabled', true).text('Validating...');
+            
+            $.ajax({
+                url: 'https://revistacarnaubais.com.br/ark-telemetry/validate.php',
+                type: 'POST',
+                data: JSON.stringify({ naan: naan, domain: window.location.hostname }),
+                contentType: 'application/json',
+                dataType: 'json',
+                timeout: 15000,
+                success: function(response) {
+                    $submitBtn.prop('disabled', false).text('Save');
+                    
+                    if (response.valid === true) {
+                        // Valid NAAN - allow form submission
+                        return true;
+                    }
+                    
+                    // Translate server error message
+                    var userMessage = translateServerError(response);
+                    
+                    // Check if it's a rate limit error to add time info
+                    if (response.error === 'Too many validation attempts') {
+                        var waitMinutes = response.wait_minutes || 0;
+                        var waitSeconds = response.wait_seconds || 0;
+                        var now = new Date();
+                        var endTime = new Date(now.getTime() + (waitSeconds * 1000));
+                        
+                        // Build message with translations
+                        var message = userMessage + '\n\n';
+                        message += waitMinutes + ' ' + translations.minutesRemaining + '\n';
+                        message += translations.tryAgainAfter + ' ' + endTime.toLocaleTimeString();
+                        
+                        alert(message);
+                    } else {
+                        alert(userMessage);
+                    }
+                    
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     return false;
+                },
+                error: function(xhr, status) {
+                    $submitBtn.prop('disabled', false).text('Save');
+                    
+                    if (status === 'timeout') {
+                        alert('Validation server timeout. Please try again.');
+                    } else if (xhr.status === 429) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            var waitSeconds = response.wait_seconds || 60;
+                            var endTime = new Date(Date.now() + (waitSeconds * 1000));
+                            alert('Too many attempts. Try again after ' + endTime.toLocaleTimeString());
+                        } catch(e) {
+                            alert(translations.genericError);
+                        }
+                    } else {
+                        alert(translations.genericError);
+                    }
+                    e.preventDefault();
+                    return false;
                 }
-            },
-            error: function() {
-                alert(genericError);
-                e.preventDefault();
-                return false;
-            }
+            });
         });
     });
-});
-</script>
-
-    {/literal}
+    </script>
 
     {fbvFormArea id="arkPreviewArea" title="plugins.pubIds.ark.manager.settings.preview"}
         <div id="arkPreviewBox" style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; border-left: 4px solid #d00a6c;">

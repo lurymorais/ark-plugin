@@ -213,8 +213,50 @@ msgstr "Versão do plugin"
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
 msgstr "Política de Privacidade"
 
+msgid "plugins.pubIds.ark.validation.rateLimit"
+msgstr "Muitas tentativas de validação. Você está temporariamente bloqueado."
+
 msgid "plugins.pubIds.ark.validation.domainMismatch"
 msgstr "Este NAAN não pertence ao seu domínio!"
 
+msgid "plugins.pubIds.ark.validation.notFound"
+msgstr "NAAN não encontrado no registro da ARK Alliance. Verifique se o NAAN está correto."
+
+msgid "plugins.pubIds.ark.validation.missingFields"
+msgstr "Campos obrigatórios não preenchidos: NAAN e domínio são necessários."
+
+msgid "plugins.pubIds.ark.validation.invalidFormat"
+msgstr "Formato de NAAN inválido. Use apenas números (ex: 16081)."
+
+msgid "plugins.pubIds.ark.validation.invalidDomain"
+msgstr "Formato de domínio inválido. Verifique se o domínio está correto."
+
+msgid "plugins.pubIds.ark.validation.methodNotAllowed"
+msgstr "Método de requisição não permitido."
+
 msgid "plugins.pubIds.ark.validation.error.generic"
 msgstr "Erro ao validar NAAN. Tente novamente."
+
+msgid "plugins.pubIds.ark.validation.minutesRemaining"
+msgstr "minutos restantes"
+
+msgid "plugins.pubIds.ark.validation.tryAgainAfter"
+msgstr "Tente novamente após:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "Configuração necessária no n2t.net"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "Para que seus ARKs sejam resolvidos corretamente, você precisa configurar o target do seu NAAN no n2t.net com a URL abaixo. Esta URL deve ser informada no formulário de registro ou atualização do NAAN:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "Se você ainda não possui um NAAN, solicite um em:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "ou use o"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "formulário de solicitação"

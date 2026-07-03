@@ -213,8 +213,50 @@ msgstr "Versión del plugin"
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
 msgstr "Política de Privacidad"
 
+msgid "plugins.pubIds.ark.validation.error.generic"
+msgstr "Error al validar NAAN. Intente nuevamente."
+
+msgid "plugins.pubIds.ark.validation.rateLimit"
+msgstr "Demasiados intentos de validación. Estás temporalmente bloqueado."
+
 msgid "plugins.pubIds.ark.validation.domainMismatch"
 msgstr "¡Este NAAN no pertenece a su dominio!"
 
-msgid "plugins.pubIds.ark.validation.error.generic"
-msgstr "Error al validar NAAN. Intente nuevamente."
+msgid "plugins.pubIds.ark.validation.notFound"
+msgstr "NAAN no encontrado en el registro de ARK Alliance. Verifica que el NAAN sea correcto."
+
+msgid "plugins.pubIds.ark.validation.missingFields"
+msgstr "Campos obligatorios no completados: NAAN y dominio son requeridos."
+
+msgid "plugins.pubIds.ark.validation.invalidFormat"
+msgstr "Formato de NAAN inválido. Use solo números (ej: 16081)."
+
+msgid "plugins.pubIds.ark.validation.invalidDomain"
+msgstr "Formato de dominio inválido. Verifica que el dominio sea correcto."
+
+msgid "plugins.pubIds.ark.validation.methodNotAllowed"
+msgstr "Método de solicitud no permitido."
+
+msgid "plugins.pubIds.ark.validation.minutesRemaining"
+msgstr "minutos restantes"
+
+msgid "plugins.pubIds.ark.validation.tryAgainAfter"
+msgstr "Intente nuevamente después de:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "Configuración requerida en n2t.net"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "Para que tus ARKs se resuelvan correctamente, debes configurar el target de tu NAAN en n2t.net con la URL siguiente. Esta URL debe proporcionarse en el formulario de registro o actualización del NAAN:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "Si aún no tienes un NAAN, solicita uno en:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "o usa el"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "formulario de solicitud"
