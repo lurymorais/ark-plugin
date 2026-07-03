@@ -8,6 +8,7 @@
 
 (function($) {
     var saveUrl = null;
+    var checkUrl = null;
     
     function generateArkSuffix(customPrefix) {
         if (!customPrefix) customPrefix = 'CRL';
@@ -32,13 +33,26 @@
         return suffix;
     }
     
+    function getPublicationId() {
+        var $input = $('input[name="publicationId"]');
+        if ($input.length) return $input.val();
+        
+        var match = window.location.href.match(/\/publication\/(\d+)/);
+        if (match) return match[1];
+        
+        match = window.location.href.match(/publicationId=(\d+)/);
+        if (match) return match[1];
+        
+        return null;
+    }
+    
     function checkDuplicate(arkValue, publicationId, callback) {
-        if (!saveUrl) {
+        if (!checkUrl) {
             callback(false);
             return;
         }
         
-        fetch(saveUrl + '?check_article=1&publicationId=' + publicationId + '&ark=' + encodeURIComponent(arkValue))
+        fetch(checkUrl + '?check_article=1&publicationId=' + publicationId + '&ark=' + encodeURIComponent(arkValue))
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 callback(data.duplicate === true);
@@ -83,11 +97,29 @@
         }
         
         saveUrl = window.arkPluginConfig ? window.arkPluginConfig.saveUrl : '/plugins/pubIds/ark/save_ajax.php';
+        checkUrl = window.arkPluginConfig ? window.arkPluginConfig.checkUrl : '/plugins/pubIds/ark/save_ajax.php';
         
         var checkInterval = setInterval(function() {
             var $input = $('input[name="pub-id::ark"]');
             
             if ($input.length > 0) {
+                // Fill existing ARK if available
+                if (!$input.val()) {
+                    var publicationId = getPublicationId();
+                    if (publicationId) {
+                        fetch(checkUrl + '?check_article=1&publicationId=' + publicationId + '&ark=')
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                if (data.ark && !data.duplicate) {
+                                    $input.val(data.ark);
+                                    $input.trigger('input');
+                                    $input.trigger('change');
+                                }
+                            })
+                            .catch(function() {});
+                    }
+                }
+                
                 if ($input.next('.ark-generate-btn').length === 0) {
                     var generateLabel = 'Gerar ARK';
                     if (window.arkPluginConfig && window.arkPluginConfig.generateLabel) {
@@ -151,8 +183,21 @@
                         var fullArk = prefix + '/' + suffix;
                         
                         $input.val(fullArk);
+                        
+                        // Trigger multiple events to ensure OJS detects the change
+                        $input.trigger('focus');
                         $input.trigger('input');
                         $input.trigger('change');
+                        $input.trigger('blur');
+                        
+                        // Native events for frameworks
+                        var evt = new Event('input', { bubbles: true });
+                        $input[0].dispatchEvent(evt);
+                        
+                        var evt2 = new Event('change', { bubbles: true });
+                        $input[0].dispatchEvent(evt2);
+                        
+                        $input.trigger('keyup');
                         
                         $btn.css('opacity', '0.7');
                         setTimeout(function() { $btn.css('opacity', '1'); }, 200);

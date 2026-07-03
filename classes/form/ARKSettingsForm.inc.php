@@ -31,13 +31,12 @@ class ARKSettingsForm extends Form {
         $correctTarget = $baseUrl . '/plugins/pubIds/ark/resolver.php?ark=${value}';
         $templateMgr->assign('arkTargetHint', $correctTarget);
         
-        // Add real data for display
         $contextId = $this->_getContextId();
         $plugin = $this->_getPlugin();
         
         $templateMgr->assign('arkPrefix', $plugin->getSetting($contextId, 'arkPrefix'));
         $templateMgr->assign('arkCount', $plugin->getTotalArksCount($contextId));
-        $templateMgr->assign('pluginVersion', $plugin->getPluginVersion()); // Usando o método
+        $templateMgr->assign('pluginVersion', $plugin->getPluginVersion());
         
         return parent::fetch($request, $template, $display);
     }
@@ -111,8 +110,6 @@ class ARKSettingsForm extends Form {
             ->where('locale', '')
             ->value('setting_value');
         
-        // Check if telemetry is enabled (opt-in, default disabled)
-        // Default: ENABLED (opt-out)
         $telemetryEnabled = DB::table('journal_settings')
             ->where('journal_id', $contextId)
             ->where('setting_name', 'telemetryEnabled')
@@ -172,7 +169,6 @@ class ARKSettingsForm extends Form {
         }
         
         // ========== NAAN VALIDATION ==========
-        // Validate NAAN remotely (server-side)
         $domain = preg_replace('#^https?://#', '', rtrim($request->getBaseUrl(), '/'));
         $validation = $plugin->validateNaanRemotely($naan, $domain);
         
@@ -189,13 +185,29 @@ class ARKSettingsForm extends Form {
         $resolverType = $this->getData('resolverType');
         $arkResolver = $this->getData('arkResolver');
         $arkImplementationDate = $this->getData('arkImplementationDate');
+        
+        // ========== TELEMETRY: OPT-OUT ==========
         $telemetryEnabled = $this->getData('telemetryEnabled');
+        
+        // If checkbox was not sent in POST (unchecked)
         if ($telemetryEnabled === null) {
-            $telemetryEnabled = '1'; // Enabled by default
+            // Check if a value already exists in the database
+            $existingValue = DB::table('journal_settings')
+                ->where('journal_id', $contextId)
+                ->where('setting_name', 'telemetryEnabled')
+                ->where('locale', '')
+                ->value('setting_value');
+            
+            // If never saved before (first time), default to enabled
+            // If already saved, user unchecked it
+            if ($existingValue === null) {
+                $telemetryEnabled = '1'; // First time: enabled by default
+            } else {
+                $telemetryEnabled = '0'; // User unchecked it
+            }
         }
         
         try {
-            // Save to journal_settings
             DB::table('journal_settings')->updateOrInsert(
                 ['journal_id' => $contextId, 'setting_name' => 'arkPrefix', 'locale' => ''],
                 ['setting_value' => $naan]
@@ -243,7 +255,7 @@ class ARKSettingsForm extends Form {
                 );
             }
             
-            // ========== SEND STATISTICS (OPT-IN) ==========
+            // ========== SEND STATISTICS ==========
             if ($telemetryEnabled === '1') {
                 $plugin->sendStatistics($contextId);
             }

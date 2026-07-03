@@ -212,3 +212,9 @@ msgstr "Plugin version"
 
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
 msgstr "Privacy Policy"
+
+msgid "plugins.pubIds.ark.validation.domainMismatch"
+msgstr "This NAAN does not belong to your domain!"
+
+msgid "plugins.pubIds.ark.validation.error.generic"
+msgstr "Error validating NAAN. Please try again."

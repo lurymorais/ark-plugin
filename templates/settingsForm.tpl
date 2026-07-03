@@ -344,28 +344,29 @@
 
 // NAAN validation before submitting the form
 $(document).ready(function() {
-
+    var validationError = '{translate key="plugins.pubIds.ark.validation.domainMismatch"}';
+    var genericError = '{translate key="plugins.pubIds.ark.validation.error.generic"}';
+    
     $('#arkSettingsForm').on('submit', function(e) {
         var naan = $('input[name="arkPrefix"]').val();
         
-        // Make AJAX request to validate NAAN before sending
         $.ajax({
-            url: 'https://revistacarnaubais.com.br/ark-telemetry/validate',
+            url: 'https://revistacarnaubais.com.br/ark-telemetry/validate.php',
             type: 'POST',
             data: JSON.stringify({ naan: naan, domain: window.location.hostname }),
             contentType: 'application/json',
             dataType: 'json',
-            async: false, // Wait for response
+            async: false,
             success: function(response) {
                 if (response.valid !== true) {
-                    alert(response.message || 'Este NAAN não pertence ao seu domínio!');
+                    alert(response.message || validationError);
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     return false;
                 }
             },
             error: function() {
-                alert('Erro ao validar NAAN. Tente novamente.');
+                alert(genericError);
                 e.preventDefault();
                 return false;
             }

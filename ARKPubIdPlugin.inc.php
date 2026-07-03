@@ -23,8 +23,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     private static $registered = false;
     
     // Validation server endpoint (only for NAAN validation)
-    private const VALIDATION_SERVER_URL = 'https://revistacarnaubais.com.br/ark-telemetry/validate';
-    private const STATISTICS_COLLECT_URL = 'https://revistacarnaubais.com.br/ark-telemetry/collect';
+    private const VALIDATION_SERVER_URL = 'https://revistacarnaubais.com.br/ark-telemetry/validate.php';
+    private const STATISTICS_COLLECT_URL = 'https://revistacarnaubais.com.br/ark-telemetry/collect.php';
     
     /**
      * Get plugin version from version.xml
@@ -41,53 +41,69 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         return '3.1.0.0'; // Fallback
     }
 
-    public function register($category, $path, $mainContextId = null)
-    {
-        if (self::$registered) {
-            return true;
-        }
-        
-        $success = parent::register($category, $path, $mainContextId);
-        
-        if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
-            return $success;
-        }
-
-        if ($success && $this->getEnabled($mainContextId)) {
-            
-            // Hook for API endpoints
-            \HookRegistry::register('LoadHandler', function($hookName, $args) {
-                $page = $args[0];
-                $op = $args[1];
-                return false;
-            });
-
-            \HookRegistry::register('Publication::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
-            \HookRegistry::register('Publication::getProperties::fullProperties', [$this, 'modifyObjectProperties']);
-            \HookRegistry::register('Publication::getProperties::values', [$this, 'modifyArticlePropertyValues']);
-            \HookRegistry::register('Publication::validate', [$this, 'validatePublicationArk']);
-            \HookRegistry::register('Form::config::before', [$this, 'addPublicationFormFields']);
-            \HookRegistry::register('TemplateManager::display', [$this, 'loadArkFieldComponent']);
-            
-            \HookRegistry::register('Publication::add', [$this, 'onPublicationAdd']);
-            \HookRegistry::register('Publication::edit', [$this, 'onPublicationEdit']);
-            \HookRegistry::register('Form::execute', [$this, 'onFormExecute']);
-            
-            \HookRegistry::register('TemplateManager::display', [$this, 'injectIssueArkField']);
-            \HookRegistry::register('IssueDAO::insertIssue', [$this, 'onIssueInsert']);
-            \HookRegistry::register('IssueDAO::updateIssue', [$this, 'onIssueUpdate']);
-            \HookRegistry::register('Form::execute', [$this, 'issueFormExecute']);
-            
-            \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnFrontend']);
-            \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnArchive']);
-
-            \HookRegistry::register('TemplateManager::display', [$this, 'loadArticleStyles']);
-        }
-        
-        self::$registered = true;
-        return $success;
+public function register($category, $path, $mainContextId = null)
+{
+    if (self::$registered) {
+        return true;
     }
     
+    $success = parent::register($category, $path, $mainContextId);
+    
+    if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
+        return $success;
+    }
+
+    if ($success && $this->getEnabled($mainContextId)) {
+        
+        // ========== REGISTER AJAX ROUTE ==========
+        \HookRegistry::register('LoadHandler', function($hookName, $args) {
+            $page = $args[0];
+            $op = $args[1];
+            $source = $args[2];
+            
+            if ($page === 'ark-ajax') {
+                require_once($this->getPluginPath() . '/classes/handler/ARKSaveHandler.inc.php');
+                $handler = new ARKSaveHandler();
+                $handler->setPlugin($this);
+                
+                $request = Application::get()->getRequest();
+                
+                if ($op === 'save-ark') {
+                    $handler->saveArk($args, $request);
+                } elseif ($op === 'check-ark') {
+                    $handler->checkArk($args, $request);
+                } elseif ($op === 'check-article-ark') {
+                    $handler->checkArticleArk($args, $request);
+                }
+                
+                return true;
+            }
+            return false;
+        });
+        \HookRegistry::register('Publication::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
+        \HookRegistry::register('Publication::getProperties::fullProperties', [$this, 'modifyObjectProperties']);
+        \HookRegistry::register('Publication::getProperties::values', [$this, 'modifyArticlePropertyValues']);
+        \HookRegistry::register('Publication::validate', [$this, 'validatePublicationArk']);
+        \HookRegistry::register('Form::config::before', [$this, 'addPublicationFormFields']);
+        \HookRegistry::register('TemplateManager::display', [$this, 'loadArkFieldComponent']);
+        
+        \HookRegistry::register('Publication::add', [$this, 'onPublicationAdd']);
+        \HookRegistry::register('Publication::edit', [$this, 'onPublicationEdit']);
+        \HookRegistry::register('Form::execute', [$this, 'onFormExecute']);
+        
+        \HookRegistry::register('TemplateManager::display', [$this, 'injectIssueArkField']);
+        \HookRegistry::register('IssueDAO::insertIssue', [$this, 'onIssueInsert']);
+        \HookRegistry::register('IssueDAO::updateIssue', [$this, 'onIssueUpdate']);
+        \HookRegistry::register('Form::execute', [$this, 'issueFormExecute']);
+        
+        \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnFrontend']);
+        \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnArchive']);
+        \HookRegistry::register('TemplateManager::display', [$this, 'loadArticleStyles']);
+    }
+    
+    self::$registered = true;
+    return $success;
+}
     /**
      * Install plugin
      */
@@ -105,7 +121,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
      * @param string $domain The domain to validate against
      * @return array ['valid' => bool, 'message' => string]
      */
-    private function validateNaanRemotely($naan, $domain)
+    public function validateNaanRemotely($naan, $domain)
     {
         $naanClean = preg_replace('/^ark:/', '', $naan);
         $naanClean = preg_replace('/\/$/', '', $naanClean);
@@ -131,7 +147,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($ch, CURLOPT_TIMEOUT, 15);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . self::PLUGIN_VERSION);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . $this->getPluginVersion());
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -187,7 +203,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         $payload = [
             'naan' => $naan,
             'arks_count' => $this->getTotalArksCount($contextId),
-            'plugin_version' => self::PLUGIN_VERSION
+            'plugin_version' => $this->getPluginVersion()
         ];
         
         $ch = curl_init();
@@ -198,7 +214,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . self::PLUGIN_VERSION);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . $this->getPluginVersion());
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -375,38 +391,41 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     
     // ==================== ISSUE FORM INJECTION (BACKEND) ====================
     
-    public function injectIssueArkField($hookName, $args)
-    {
-        $templateMgr = $args[0];
-        $request = Application::get()->getRequest();
-        
-        $context = $request->getContext();
-        if (!$context) return;
-        
-        $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
-        if (!$enabled) return;
-        
-        $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
-        $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
-        if (empty($customPrefix)) $customPrefix = 'ISSUE';
-        
-        $saveUrl = $request->getBaseUrl() . '/plugins/pubIds/ark/save_ajax.php';
-        
-        $confirmReplaceMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmReplace', ['%s']));
-        $confirmNewMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmNew'));
-        $generateButtonText = addslashes(__('plugins.pubIds.ark.editor.generateNewArk'));
-        $duplicateArkError = addslashes(__('plugins.pubIds.ark.editor.duplicateArkError'));
-        $saveSuccessMsg = addslashes(__('plugins.pubIds.ark.editor.saveSuccess'));
-        $networkErrorMsg = addslashes(__('plugins.pubIds.ark.editor.networkError'));
-        $genericErrorMsg = addslashes(__('plugins.pubIds.ark.editor.genericError'));
-        $savingText = addslashes(__('common.saving'));
+public function injectIssueArkField($hookName, $args)
+{
+    $templateMgr = $args[0];
+    $request = Application::get()->getRequest();
+    
+    $context = $request->getContext();
+    if (!$context) return;
+    
+    $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
+    if (!$enabled) return;
+    
+    $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
+    $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
+    if (empty($customPrefix)) $customPrefix = 'ISSUE';
+    
+    $baseUrl = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-ajax';
+    $saveUrl = $baseUrl . '/save-ark';
+    $checkUrl = $baseUrl . '/check-ark';
+    $checkArticleUrl = $baseUrl . '/check-article-ark';
+    
+    $confirmReplaceMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmReplace', ['%s']));
+    $confirmNewMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmNew'));
+    $generateButtonText = addslashes(__('plugins.pubIds.ark.editor.generateNewArk'));
+    $duplicateArkError = addslashes(__('plugins.pubIds.ark.editor.duplicateArkError'));
+    $saveSuccessMsg = addslashes(__('plugins.pubIds.ark.editor.saveSuccess'));
+    $networkErrorMsg = addslashes(__('plugins.pubIds.ark.editor.networkError'));
+    $genericErrorMsg = addslashes(__('plugins.pubIds.ark.editor.genericError'));
+    $savingText = addslashes(__('common.saving'));
 
-        // JavaScript code for issue ARK field injection
-        $jsCode = '
+    $jsCode = '
 (function() {
     var prefix = "' . addslashes($prefix) . '";
     var customPrefix = "' . addslashes($customPrefix) . '";
     var saveUrl = "' . $saveUrl . '";
+    var checkUrl = "' . $checkUrl . '";
     var currentIssueId = null;
     var alreadyFilled = false;
     
@@ -467,7 +486,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     }
     
     function checkExistingArk(issueId, callback) {
-        fetch(saveUrl + "?check=1&issueId=" + issueId)
+        fetch(checkUrl + "?check=1&issueId=" + issueId)
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 callback(data.exists ? data.ark : null);
@@ -533,6 +552,9 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             if (data.status) {
                 alreadyFilled = true;
                 showNotification(saveSuccessMsg, "success");
+                setTimeout(function() {
+                    location.reload();
+                }, 1500);
             } else {
                 if (data.error_code === "DUPLICATE_ARK") {
                     showNotification(duplicateArkError, "error");
@@ -642,10 +664,9 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     });
 })();
 ';
-        
-        $templateMgr->addJavaScript('ark-issue-field', $jsCode, ['contexts' => 'backend', 'inline' => true]);
-    }
     
+    $templateMgr->addJavaScript('ark-issue-field', $jsCode, ['contexts' => 'backend', 'inline' => true]);
+}
     // ==================== PUBLICATION FORM METHODS ====================
     
     public function onFormExecute($hookName, $form) {
@@ -1025,12 +1046,14 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
         $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
         
-        $saveUrl = $request->getBaseUrl() . '/plugins/pubIds/ark/save_ajax.php';
+        $baseUrl = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-ajax';
+        $saveUrl = $baseUrl . '/save-ark';
+        $checkUrl = $baseUrl . '/check-article-ark';
         
         // Include the FieldArk.js script
         $templateMgr->addJavaScript(
             'ark-field-js',
-            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/FieldArk.js',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/FieldArk.js?v=1.005',
             ['contexts' => 'backend']
         );
         
@@ -1040,7 +1063,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
                 prefix: "' . $prefix . '", 
                 customPrefix: "' . ($customPrefix ?: 'CRL') . '",
                 generateLabel: "' . __('plugins.pubIds.ark.editor.generateArk') . '",
-                saveUrl: "' . $saveUrl . '"
+                saveUrl: "' . $saveUrl . '",
+                checkUrl: "' . $checkUrl . '"
             };',
             ['contexts' => 'backend', 'inline' => true]
         );

@@ -1,13 +1,7 @@
-# ============================================
-# ARK PLUGIN - PROTEÇÃO SIMPLIFICADA
-# ============================================
-
-# Bloquear acesso a todos os arquivos PHP
 <FilesMatch "\.php$">
     Require all denied
 </FilesMatch>
 
-# Permitir arquivos essenciais
 <Files "resolver.php">
     Require all granted
 </Files>
@@ -20,7 +14,6 @@
     Require all granted
 </Files>
 
-# Permitir arquivos estáticos
 <FilesMatch "\.(css|js)$">
     Require all granted
 </FilesMatch>
