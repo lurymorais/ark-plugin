@@ -1,9 +1,11 @@
+### 4. CHANGELOG.md (Atualizado)
+
 # Changelog
 
 All notable changes to the ARK Plugin for OJS will be documented in this file.
 
-The format is based on Keep a Changelog (https://keepachangelog.com/en/1.1.0/),
-and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [3.1.0.0] - 2026-07-04
 
@@ -22,21 +24,21 @@ and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.
 - FIXED: save_ajax.php - Now requires OJS authentication, CSRF token, and proper roles
 - FIXED: ArkPageHandler::authorize() - No longer returns true unconditionally
 - FIXED: Token comparisons now use hash_equals() instead of !==
-- FIXED: resolver.php - Replaced LIKE CONCAT with exact match (SQL injection)
 - FIXED: Added PostgreSQL support (database-agnostic DSN)
 - FIXED: Removed Access-Control-Allow-Origin: * from sensitive endpoints
 - ADDED: CSRF validation on all state-changing operations
 - ADDED: Role-based access control (Editor/Manager only for ARK saving)
+- ADDED: Rate limiting with exponential backoff on public endpoints
 
 ### Added
 - Server-side NAAN validation: Plugin validates NAAN via remote server (prevents fake-validation)
 - Opt-in telemetry: Journal manager must explicitly enable data sharing (disabled by default)
 - Simplified data collection: Only {naan, domain, arks_count, plugin_version}
-- Push model: Plugin sends data (no pull from server)
-- Scheduled task: OJS scheduled task handles monthly push
-- Privacy Policy: Comprehensive privacy documentation
-- Security Policy: Vulnerability reporting and disclosure process
+- Push model: Plugin sends data via OJS scheduled task (no pull from server)
+- Privacy Policy: Comprehensive privacy documentation (English, Portuguese, Spanish)
+- Security Policy: Vulnerability reporting and disclosure process (SECURITY.md)
 - Plugin identity verification: identity.txt file for domain ownership proof
+- Consent audit: All telemetry consent changes are logged with timestamp
 
 ### Changed
 - Version: 2.1.0.0 -> 3.1.0.0 (major version increment due to breaking changes)
@@ -44,7 +46,7 @@ and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.
 - Data retention: 24 months, automatic deletion
 - Validation: Now server-side only (not local)
 - Consent: Opt-in instead of opt-out
-- Removed HMAC signature (was optional, never used)
+- Telemetry data: Reduced to only NAAN, ARK count, and plugin version
 
 ### Removed
 - classes/handler/ARKRecoveryHandler.inc.php (no longer needed)
@@ -53,6 +55,14 @@ and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.
 - Email collection functionality
 - Token generation and storage
 - Pull endpoints
+
+### Documentation
+- ADDED: PRIVACY_POLICY.md (English)
+- ADDED: PRIVACY_POLICY.pt.md (Portuguese)
+- ADDED: PRIVACY_POLICY.es.md (Spanish)
+- ADDED: SECURITY.md (Vulnerability reporting)
+- ADDED: CHANGELOG.md (This file)
+- UPDATED: README.md with accurate telemetry description
 
 ## [2.1.0.0] - 2026-06-13
 
@@ -66,10 +76,6 @@ and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.
 - Issue resolver redirection
 - ARK generation for issues
 
-### Security
-- Rate limiting on validation endpoints
-- Basic authentication for sensitive operations
-
 ## [2.0.0.0] - 2026-06-01
 
 ### Added
@@ -80,10 +86,6 @@ and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.
 - Custom prefix configuration
 - NAAN ownership verification
 
-### Security
-- Token-based authentication
-- Initial rate limiting
-
 ## [1.0.0.0] - 2026-05-01
 
 ### Added
@@ -93,25 +95,6 @@ and this project adheres to Semantic Versioning (https://semver.org/spec/v2.0.0.
 - Plugin configuration form
 
 ---
-
-## Upgrading from 2.x to 3.x
-
-### Breaking Changes
-
-1. Telemetry must be re-enabled: Settings changed from telemetryLevel to telemetryEnabled
-2. No tokens: All token-related settings removed
-3. Recovery removed: No token recovery needed
-4. Opt-in: Telemetry disabled by default
-
-### Migration Steps
-
-1. Update plugin to 3.1.0.0
-2. Go to Settings -> Website -> Plugins -> ARK
-3. Reconfigure:
-   - Enable ARK for Articles/Issues
-   - Enter your NAAN
-   - Optional: Enable "Send anonymous statistics"
-4. Save settings
 
 ### Database Changes
 
@@ -130,5 +113,3 @@ Addressed critical security vulnerabilities:
 - Fixed SQL injection in resolver (partial-suffix matching)
 - Added plugin identity verification
 - Implemented opt-in telemetry with consent audit
-
-All users are strongly advised to upgrade to 3.1.0.0 or later.
