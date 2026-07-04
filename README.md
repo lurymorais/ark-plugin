@@ -15,6 +15,7 @@
 </a>
 
 
+
 <a name="portugues"></a>
 ## 🇧🇷 Português
 
@@ -69,25 +70,46 @@
 
 > Ao fim da configuração, você verá um pré-visualizador.
 
-### Compartilhamento de Dados (Opt-out)
+### Compartilhamento de Dados
 
-Por padrão, o plugin envia dados anônimos de uso mensalmente para ajudar a melhorar o serviço. Você pode desabilitar isso a qualquer momento nas configurações do plugin.
+O plugin recolhe dados de publicação para caso de bugs na versão usada. O plugin oferece duas opções de compartilhamento de dados para ajudar na melhoria do serviço:
 
-**Dados enviados mensalmente:**
-- Identificador NAAN (público)
-- Quantidade de ARKs gerados
-- Versão do plugin
+| Nível | Dados compartilhados |
+|-------|---------------------|
+| **Básico** | Apenas identificador NAAN, quantidade de ARKs gerados, versão do plugin e URL do site |
+| **Completo** | Todos os dados do nível básico, mais o nome da revista, país, e-mail e idioma principal |
 
-**Nenhum dado pessoal é coletado**
+> Seus dados são protegidos em conformidade com a **LGPD (Lei Geral de Proteção de Dados - Brasil)** e o **GDPR (Regulamento Geral de Proteção de Dados - União Europeia)**. Não recolhemos nenhum outro dado além destes nem usaremos seus dados para outros serviços.
 
-> Seus dados são protegidos em conformidade com a **LGPD (Lei Geral de Proteção de Dados - Brasil)** e o **GDPR (Regulamento Geral de Proteção de Dados - União Europeia)**.
+O modo completo permite que sua revista apareça nas estatísticas públicas do ecossistema. Disponível em [Estatísticas do plugin ARK](https://revistacarnaubais.com.br/ark-telemetry/stats.php?lang=pt_BR)
 
-**Como desabilitar:**
-1. Acesse **Configurações > Website > Plugins > ARK**
-2. Desmarque a opção **"Enviar estatísticas anônimas"**
-3. Clique em Salvar
+<img width="auto" height="auto" alt="página de estatísticas" src="https://github-production-user-asset-6210df.s3.amazonaws.com/243876433/600558996-8914db21-15a0-480b-a3dc-ddc4d7dc9d9c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260531T033706Z&X-Amz-Expires=300&X-Amz-Signature=cfc7827dc0425a8ac6b4c4605e8f2093ea7a30d4e79e09a6264ab7407ce1a28a&X-Amz-SignedHeaders=host&response-content-type=image%2Fpng" />
 
-**Política de Privacidade:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
+### Como Funciona a Telemetria (Modelo Pull)
+
+O plugin utiliza um **sistema de telemetria baseado em pull** onde o servidor central coleta dados das revistas de forma mensal programada:
+
+1. Quando você salva as configurações do plugin, sua revista se registra no servidor central
+2. O servidor atribui sua revista a um dia específico do mês (1-30) para coleta de dados
+3. Nesse dia, o servidor puxa automaticamente os dados de telemetria da sua revista
+4. Nenhum cron job ou tarefa agendada é necessária no seu servidor!
+
+**Benefícios para gestores de revistas:**
+- Configuração zero além das configurações do plugin
+- Sem impacto no desempenho do seu servidor
+- Seus dados ajudam a melhorar o ecossistema do plugin
+
+### Verificação de Propriedade (Área de Segurança)
+
+Se você reinstalar o plugin ou migrar de servidor e receber a mensagem de que seu NAAN já está em uso, utilize a **Área de Segurança** nas configurações do plugin:
+
+1. Clique no botão **"Verificar Minha Propriedade"**
+2. O sistema consulta os metadados do seu NAAN no n2t.net
+3. Compara o domínio registrado com o domínio atual do seu site
+4. Se forem iguais, seu acesso é restaurado automaticamente
+5. Se forem diferentes, você precisará atualizar o cadastro do seu NAAN na ARK Alliance
+
+> Esta verificação só pode ser feita uma vez por hora, por segurança.
 
 ### Uso
 
@@ -185,6 +207,7 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 
 [Licença e créditos](#licenca)
 
+
 ---
 
 <a name="espanol"></a>
@@ -241,25 +264,46 @@ Utilize a **Área de Segurança** nas configurações do plugin. Clique em "Veri
 
 > Al finalizar la configuración, podrá ver una vista previa de ejemplo de sus recursos.
 
-### Compartir Datos (Opt-out)
+### Compartir Datos
 
-Por defecto, el plugin envía datos anónimos de uso mensualmente para ayudar a mejorar el servicio. Puede deshabilitar esto en cualquier momento en la configuración del plugin.
+El plugin recopila datos de publicación para casos de errores en la versión utilizada. El plugin ofrece dos opciones de intercambio de datos para ayudar a mejorar el servicio:
 
-**Datos enviados mensualmente:**
-- Identificador NAAN (público)
-- Cantidad de ARKs generados
-- Versión del plugin
+| Nivel | Datos compartidos |
+|-------|---------------------|
+| **Básico** | Solo identificador NAAN, cantidad de ARKs generados, versión del plugin y URL del sitio |
+| **Completo** | Todos los datos del nivel básico, más el nombre de la revista, país, correo electrónico e idioma principal |
 
-**No se recopilan datos personales**
+> Sus datos están protegidos en cumplimiento con la **LGPD (Ley General de Protección de Datos - Brasil)** y el **RGPD (Reglamento General de Protección de Datos - Unión Europea)**. No recopilamos ningún otro dato además de estos ni usaremos sus datos para otros servicios.
 
-> Sus datos están protegidos en cumplimiento con la **LGPD (Ley General de Protección de Datos - Brasil)** y el **RGPD (Reglamento General de Protección de Datos - Unión Europea)**.
+El modo completo permite que su revista aparezca en las estadísticas públicas del ecosistema. Disponible en [Estadísticas del plugin ARK](https://revistacarnaubais.com.br/ark-telemetry/stats.php?lang=es)
 
-**Cómo deshabilitar:**
-1. Vaya a **Configuraciones > Sitio > Plugins > ARK**
-2. Desmarque la opción **"Enviar estadísticas anónimas"**
-3. Haga clic en Guardar
+<img width="auto" height="auto" alt="usage stats page" src="https://github-production-user-asset-6210df.s3.amazonaws.com/243876433/600558996-8914db21-15a0-480b-a3dc-ddc4d7dc9d9c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260531T033706Z&X-Amz-Expires=300&X-Amz-Signature=cfc7827dc0425a8ac6b4c4605e8f2093ea7a30d4e79e09a6264ab7407ce1a28a&X-Amz-SignedHeaders=host&response-content-type=image%2Fpng" />
 
-**Política de Privacidad:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
+### Cómo Funciona la Telemetría (Modelo Pull)
+
+El plugin utiliza un **sistema de telemetría basado en pull** donde el servidor central recopila datos de las revistas de forma mensual programada:
+
+1. Cuando guarda la configuración del plugin, su revista se registra en el servidor central
+2. El servidor asigna su revista a un día específico del mes (1-30) para la recolección de datos
+3. Ese día, el servidor extrae automáticamente los datos de telemetría de su revista
+4. ¡No necesita crons ni tareas programadas en su servidor!
+
+**Beneficios para los gestores de revistas:**
+- Configuración cero más allá de los ajustes del plugin
+- Sin impacto en el rendimiento de su servidor
+- Sus datos ayudan a mejorar el ecosistema del plugin
+
+### Verificación de Propiedad (Área de Seguridad)
+
+Si reinstala el plugin o migra de servidor y recibe el mensaje de que su NAAN ya está en uso, utilice el **Área de Seguridad** en la configuración del plugin:
+
+1. Haga clic en el botón **"Verificar Mi Propiedad"**
+2. El sistema consulta los metadatos de su NAAN en n2t.net
+3. Compara el dominio registrado con el dominio actual de su sitio
+4. Si son iguales, su acceso se restaura automáticamente
+5. Si son diferentes, deberá actualizar el registro de su NAAN en ARK Alliance
+
+> Esta verificación solo se puede realizar una vez por hora, por seguridad.
 
 ### Uso
 
@@ -357,6 +401,7 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 
 [Licencia y créditos](#licenca)
 
+
 ---
 
 <a name="english"></a>
@@ -413,25 +458,46 @@ Utilice el **Área de Seguridad** en la configuración del plugin. Haga clic en 
 
 > At the end of the configuration, you will be able to see an example preview for your resources.
 
-### Data Sharing (Opt-out)
+### Data Sharing
 
-By default, the plugin sends anonymous usage data monthly to help improve the service. You can disable this at any time in the plugin settings.
+The plugin collects publication data for bug tracking purposes regarding the version used. The plugin offers two data sharing options to help improve the service:
 
-**Data sent monthly:**
-- NAAN identifier (public)
-- Number of ARKs generated
-- Plugin version
+| Level | Data shared |
+|-------|-------------|
+| **Basic** | Only NAAN identifier, number of ARKs generated, plugin version and site URL |
+| **Complete** | All Basic level data, plus journal name, country, email and primary language |
 
-**No personal data is collected**
+> Your data is protected in compliance with **LGPD (Brazilian General Data Protection Law)** and **GDPR (General Data Protection Regulation - European Union)**. We do not collect any other data beyond these nor will we use your data for other services.
 
-> Your data is protected in compliance with **LGPD (Brazilian General Data Protection Law)** and **GDPR (General Data Protection Regulation - European Union)**.
+Complete mode allows your journal to appear in public ecosystem statistics. Available at [ARK Plugin Statistics](https://revistacarnaubais.com.br/ark-telemetry/stats.php?lang=en)
 
-**How to disable:**
-1. Go to **Settings > Website > Plugins > ARK**
-2. Uncheck **"Send anonymous statistics"**
-3. Click Save
+<img width="auto" height="auto" alt="usage stats page" src="https://github-production-user-asset-6210df.s3.amazonaws.com/243876433/600558996-8914db21-15a0-480b-a3dc-ddc4d7dc9d9c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260531%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260531T033706Z&X-Amz-Expires=300&X-Amz-Signature=cfc7827dc0425a8ac6b4c4605e8f2093ea7a30d4e79e09a6264ab7407ce1a28a&X-Amz-SignedHeaders=host&response-content-type=image%2Fpng" />
 
-**Privacy Policy:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
+### How Telemetry Works (Pull Model)
+
+The plugin uses a **pull-based telemetry system** where the central server collects data from journals on a scheduled monthly basis:
+
+1. When you save the plugin settings, your journal registers with the central server
+2. The server assigns your journal to a specific day of the month (1-30) for data collection
+3. On that day, the server automatically pulls telemetry data from your journal
+4. No cron jobs or scheduled tasks are needed on your server!
+
+**Benefits for journal managers:**
+- Zero configuration required beyond plugin settings
+- No impact on your server's performance
+- Your data helps improve the plugin ecosystem
+
+### Ownership Verification (Security Area)
+
+If you reinstall the plugin or migrate servers and receive a message that your NAAN is already in use, use the **Security Area** in the plugin settings:
+
+1. Click the **"Verify My Ownership"** button
+2. The system queries your NAAN metadata on n2t.net
+3. Compares the registered domain with your current site domain
+4. If they match, your access is restored automatically
+5. If they differ, you need to update your NAAN registration with ARK Alliance
+
+> This verification can only be performed once per hour for security reasons.
 
 ### Usage
 

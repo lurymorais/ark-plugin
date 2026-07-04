@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ARK Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 10:00-0300\n"
-"PO-Revision-Date: 2026-07-01 10:00-0300\n"
+"POT-Creation-Date: 2026-07-03 10:00-0300\n"
+"PO-Revision-Date: 2026-07-03 10:00-0300\n"
 "Last-Translator: Lury Morais\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
@@ -90,15 +90,6 @@ msgstr "Vista previa"
 msgid "plugins.pubIds.ark.manager.settings.previewLabel"
 msgstr "Ejemplo de ARK que se generará:"
 
-msgid "plugins.pubIds.ark.manager.settings.arkReassign"
-msgstr "Reasignar ARKs"
-
-msgid "plugins.pubIds.ark.manager.settings.arkReassign.description"
-msgstr "Haga clic para eliminar todos los ARKs existentes y reasignar con las nuevas configuraciones."
-
-msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
-msgstr "¿Está seguro? Todos los ARKs existentes serán eliminados permanentemente."
-
 msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
 msgstr "Fecha de Implementación del ARK"
 
@@ -119,6 +110,36 @@ msgstr "Ayude a mejorar el plugin compartiendo datos anónimos de uso."
 
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.help"
 msgstr "Datos enviados: NAAN, cantidad de ARKs, versión del plugin. No se recopilan datos personales. Más información en la Política de Privacidad."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
+msgstr "Identificador NAAN (público)"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
+msgstr "Cantidad de ARKs generados"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
+msgstr "Versión del plugin"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
+msgstr "Política de Privacidad"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "Configuración requerida en n2t.net"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "Para que tus ARKs se resuelvan correctamente, debes configurar el target de tu NAAN en n2t.net con la URL siguiente. Esta URL debe proporcionarse en el formulario de registro o actualización del NAAN:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "Si aún no tienes un NAAN, solicita uno en:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "o usa el"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "formulario de solicitud"
 
 msgid "plugins.pubIds.ark.editor.ark"
 msgstr "ARK"
@@ -195,27 +216,6 @@ msgstr "Servidor de validación temporalmente no disponible. Intente nuevamente 
 msgid "plugins.pubIds.ark.validation.invalidResponse"
 msgstr "Respuesta inválida del servidor de validación. Intente nuevamente."
 
-msgid "plugins.pubIds.ark.resolver.title"
-msgstr "Resolvedor ARK"
-
-msgid "plugins.pubIds.ark.resolver.loading"
-msgstr "Resolviendo ARK..."
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
-msgstr "Identificador NAAN (público)"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
-msgstr "Cantidad de ARKs generados"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
-msgstr "Versión del plugin"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
-msgstr "Política de Privacidad"
-
-msgid "plugins.pubIds.ark.validation.error.generic"
-msgstr "Error al validar NAAN. Intente nuevamente."
-
 msgid "plugins.pubIds.ark.validation.rateLimit"
 msgstr "Demasiados intentos de validación. Estás temporalmente bloqueado."
 
@@ -237,26 +237,11 @@ msgstr "Formato de dominio inválido. Verifica que el dominio sea correcto."
 msgid "plugins.pubIds.ark.validation.methodNotAllowed"
 msgstr "Método de solicitud no permitido."
 
+msgid "plugins.pubIds.ark.validation.error.generic"
+msgstr "Error al validar NAAN. Intente nuevamente."
+
 msgid "plugins.pubIds.ark.validation.minutesRemaining"
 msgstr "minutos restantes"
 
 msgid "plugins.pubIds.ark.validation.tryAgainAfter"
 msgstr "Intente nuevamente después de:"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
-msgstr "Configuración requerida en n2t.net"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
-msgstr "Para que tus ARKs se resuelvan correctamente, debes configurar el target de tu NAAN en n2t.net con la URL siguiente. Esta URL debe proporcionarse en el formulario de registro o actualización del NAAN:"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
-msgstr "Si aún no tienes un NAAN, solicita uno en:"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
-msgstr "ARK Alliance"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
-msgstr "o usa el"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
-msgstr "formulario de solicitud"

@@ -38,84 +38,124 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             $xml = simplexml_load_file($versionFile);
             return (string)$xml->release;
         }
-        return '3.1.0.0'; // Fallback
+        return '3.1.0.0';
     }
 
-public function register($category, $path, $mainContextId = null)
-{
-    if (self::$registered) {
-        return true;
-    }
-    
-    $success = parent::register($category, $path, $mainContextId);
-    
-    if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
+    public function register($category, $path, $mainContextId = null)
+    {
+        if (self::$registered) {
+            return true;
+        }
+        
+        $success = parent::register($category, $path, $mainContextId);
+        
+        if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
+            return $success;
+        }
+
+        if ($success && $this->getEnabled($mainContextId)) {
+            
+            // Create identity file for plugin verification
+            $this->ensureIdentityFile();
+            
+            // Register AJAX route
+            \HookRegistry::register('LoadHandler', function($hookName, $args) {
+                $page = $args[0];
+                $op = $args[1];
+                $source = $args[2];
+                
+                if ($page === 'ark-ajax') {
+                    require_once($this->getPluginPath() . '/classes/handler/ARKSaveHandler.inc.php');
+                    $handler = new ARKSaveHandler();
+                    $handler->setPlugin($this);
+                    
+                    $request = Application::get()->getRequest();
+                    
+                    if ($op === 'save-ark') {
+                        $handler->saveArk($args, $request);
+                    } elseif ($op === 'check-ark') {
+                        $handler->checkArk($args, $request);
+                    } elseif ($op === 'check-article-ark') {
+                        $handler->checkArticleArk($args, $request);
+                    }
+                    
+                    return true;
+                }
+                return false;
+            });
+            
+            \HookRegistry::register('Publication::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
+            \HookRegistry::register('Publication::getProperties::fullProperties', [$this, 'modifyObjectProperties']);
+            \HookRegistry::register('Publication::getProperties::values', [$this, 'modifyArticlePropertyValues']);
+            \HookRegistry::register('Publication::validate', [$this, 'validatePublicationArk']);
+            \HookRegistry::register('Form::config::before', [$this, 'addPublicationFormFields']);
+            \HookRegistry::register('TemplateManager::display', [$this, 'loadArkFieldComponent']);
+            
+            \HookRegistry::register('Publication::add', [$this, 'onPublicationAdd']);
+            \HookRegistry::register('Publication::edit', [$this, 'onPublicationEdit']);
+            \HookRegistry::register('Form::execute', [$this, 'onFormExecute']);
+            
+            \HookRegistry::register('TemplateManager::display', [$this, 'injectIssueArkField']);
+            \HookRegistry::register('IssueDAO::insertIssue', [$this, 'onIssueInsert']);
+            \HookRegistry::register('IssueDAO::updateIssue', [$this, 'onIssueUpdate']);
+            \HookRegistry::register('Form::execute', [$this, 'issueFormExecute']);
+            
+            \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnFrontend']);
+            \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnArchive']);
+            \HookRegistry::register('TemplateManager::display', [$this, 'loadArticleStyles']);
+        }
+        
+        self::$registered = true;
         return $success;
     }
 
-    if ($success && $this->getEnabled($mainContextId)) {
-        
-        // ========== REGISTER AJAX ROUTE ==========
-        \HookRegistry::register('LoadHandler', function($hookName, $args) {
-            $page = $args[0];
-            $op = $args[1];
-            $source = $args[2];
-            
-            if ($page === 'ark-ajax') {
-                require_once($this->getPluginPath() . '/classes/handler/ARKSaveHandler.inc.php');
-                $handler = new ARKSaveHandler();
-                $handler->setPlugin($this);
-                
-                $request = Application::get()->getRequest();
-                
-                if ($op === 'save-ark') {
-                    $handler->saveArk($args, $request);
-                } elseif ($op === 'check-ark') {
-                    $handler->checkArk($args, $request);
-                } elseif ($op === 'check-article-ark') {
-                    $handler->checkArticleArk($args, $request);
-                }
-                
-                return true;
-            }
-            return false;
-        });
-        \HookRegistry::register('Publication::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
-        \HookRegistry::register('Publication::getProperties::fullProperties', [$this, 'modifyObjectProperties']);
-        \HookRegistry::register('Publication::getProperties::values', [$this, 'modifyArticlePropertyValues']);
-        \HookRegistry::register('Publication::validate', [$this, 'validatePublicationArk']);
-        \HookRegistry::register('Form::config::before', [$this, 'addPublicationFormFields']);
-        \HookRegistry::register('TemplateManager::display', [$this, 'loadArkFieldComponent']);
-        
-        \HookRegistry::register('Publication::add', [$this, 'onPublicationAdd']);
-        \HookRegistry::register('Publication::edit', [$this, 'onPublicationEdit']);
-        \HookRegistry::register('Form::execute', [$this, 'onFormExecute']);
-        
-        \HookRegistry::register('TemplateManager::display', [$this, 'injectIssueArkField']);
-        \HookRegistry::register('IssueDAO::insertIssue', [$this, 'onIssueInsert']);
-        \HookRegistry::register('IssueDAO::updateIssue', [$this, 'onIssueUpdate']);
-        \HookRegistry::register('Form::execute', [$this, 'issueFormExecute']);
-        
-        \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnFrontend']);
-        \HookRegistry::register('TemplateManager::display', [$this, 'displayArkOnArchive']);
-        \HookRegistry::register('TemplateManager::display', [$this, 'loadArticleStyles']);
-    }
-    
-    self::$registered = true;
-    return $success;
-}
     /**
      * Install plugin
      */
     public function install($category, $path)
     {
         $success = parent::install($category, $path);
+        
+        if ($success) {
+            $this->ensureIdentityFile();
+        }
+        
         return $success;
     }
 
     /**
+     * Ensure identity file exists for plugin verification
+     */
+    private function ensureIdentityFile()
+    {
+        $identityFile = $this->getPluginPath() . '/identity.txt';
+        
+        if (!file_exists($identityFile)) {
+            $token = bin2hex(random_bytes(16));
+            file_put_contents($identityFile, $token);
+            chmod($identityFile, 0644);
+            error_log("[ARK] Identity file created: identity.txt");
+        }
+    }
+
+    /**
+     * Get the identity token from the file
+     * 
+     * @return string|null The identity token or null if file doesn't exist
+     */
+    public function getIdentityToken()
+    {
+        $identityFile = $this->getPluginPath() . '/identity.txt';
+        
+        if (file_exists($identityFile)) {
+            return trim(file_get_contents($identityFile));
+        }
+        
+        return null;
+    }
+
+    /**
      * Validate NAAN with remote server (secure, server-side validation)
-     * The plugin does NOT validate locally - this prevents fake-validation attacks
      * 
      * @param string $naan The NAAN to validate
      * @param string $domain The domain to validate against
@@ -173,37 +213,10 @@ public function register($category, $path, $mainContextId = null)
         
         return $result;
     }
-    
-    /**
-     * Install plugin - generate token and register scheduled task
-     */
-    public function install($category, $path)
-    {
-        $success = parent::install($category, $path);
-        
-        if ($success) {
-            // Generate and store plugin token
-            $this->initializePluginToken();
-        }
-        
-        return $success;
-    }
-
-    /**
-     * Handle telemetry data request (pull) - Accepts requests ON or AFTER scheduled time
-     * 
-     * @param int $code HTTP status code
-     * @param array $data Response data
-     */
-    private function sendApiResponse(int $code, array $data): void
-    {
-        http_response_code($code);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-    }
 
     /**
      * Send aggregated statistics to server (PUSH model, monthly)
+     * Only sends if telemetry is explicitly enabled by the journal manager.
      * 
      * @param int $contextId Journal ID
      * @return bool
@@ -228,12 +241,31 @@ public function register($category, $path, $mainContextId = null)
             return false;
         }
         
+        // Ensure identity file exists
+        $this->ensureIdentityFile();
+        
+        // Get domain
+        $domain = preg_replace('#^https?://#', '', rtrim($context->getData('url'), '/'));
+        
+        // Get validation token
+        $validation = $this->validateNaanRemotely($naan, $domain);
+
+        if (!$validation['valid'] || empty($validation['token'])) {
+            error_log("[ARK Plugin] Failed to get validation token for {$naan}");
+            return false;
+        }
+
+        $token = $validation['token'];
+
+        // Only send minimal data: NAAN, ARK count, plugin version
         $payload = [
             'naan' => $naan,
+            'domain' => $domain,
             'arks_count' => $this->getTotalArksCount($contextId),
-            'plugin_version' => $this->getPluginVersion()
+            'plugin_version' => $this->getPluginVersion(),
+            'token' => $token
         ];
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, self::STATISTICS_COLLECT_URL);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -246,6 +278,7 @@ public function register($category, $path, $mainContextId = null)
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
         
         if ($httpCode === 202) {
@@ -253,10 +286,10 @@ public function register($category, $path, $mainContextId = null)
             return true;
         }
         
-        error_log("[ARK Plugin] Failed to send statistics: HTTP {$httpCode}");
+        error_log("[ARK Plugin] Failed to send statistics: HTTP {$httpCode} - " . $curlError);
         return false;
     }
-    
+
     /**
      * Get total ARKs count for a context
      */
@@ -419,36 +452,36 @@ public function register($category, $path, $mainContextId = null)
     
     // ==================== ISSUE FORM INJECTION (BACKEND) ====================
     
-public function injectIssueArkField($hookName, $args)
-{
-    $templateMgr = $args[0];
-    $request = Application::get()->getRequest();
-    
-    $context = $request->getContext();
-    if (!$context) return;
-    
-    $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
-    if (!$enabled) return;
-    
-    $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
-    $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
-    if (empty($customPrefix)) $customPrefix = 'ISSUE';
-    
-    $baseUrl = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-ajax';
-    $saveUrl = $baseUrl . '/save-ark';
-    $checkUrl = $baseUrl . '/check-ark';
-    $checkArticleUrl = $baseUrl . '/check-article-ark';
-    
-    $confirmReplaceMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmReplace', ['%s']));
-    $confirmNewMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmNew'));
-    $generateButtonText = addslashes(__('plugins.pubIds.ark.editor.generateNewArk'));
-    $duplicateArkError = addslashes(__('plugins.pubIds.ark.editor.duplicateArkError'));
-    $saveSuccessMsg = addslashes(__('plugins.pubIds.ark.editor.saveSuccess'));
-    $networkErrorMsg = addslashes(__('plugins.pubIds.ark.editor.networkError'));
-    $genericErrorMsg = addslashes(__('plugins.pubIds.ark.editor.genericError'));
-    $savingText = addslashes(__('common.saving'));
+    public function injectIssueArkField($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $request = Application::get()->getRequest();
+        
+        $context = $request->getContext();
+        if (!$context) return;
+        
+        $enabled = $this->getSetting($context->getId(), 'enableIssueARK');
+        if (!$enabled) return;
+        
+        $prefix = rtrim($this->getSetting($context->getId(), 'arkPrefix'), '/');
+        $customPrefix = $this->getSetting($context->getId(), 'arkCustomPrefix');
+        if (empty($customPrefix)) $customPrefix = 'ISSUE';
+        
+        $baseUrl = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-ajax';
+        $saveUrl = $baseUrl . '/save-ark';
+        $checkUrl = $baseUrl . '/check-ark';
+        $checkArticleUrl = $baseUrl . '/check-article-ark';
+        
+        $confirmReplaceMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmReplace', ['%s']));
+        $confirmNewMsg = addslashes(__('plugins.pubIds.ark.editor.generateNewArk.confirmNew'));
+        $generateButtonText = addslashes(__('plugins.pubIds.ark.editor.generateNewArk'));
+        $duplicateArkError = addslashes(__('plugins.pubIds.ark.editor.duplicateArkError'));
+        $saveSuccessMsg = addslashes(__('plugins.pubIds.ark.editor.saveSuccess'));
+        $networkErrorMsg = addslashes(__('plugins.pubIds.ark.editor.networkError'));
+        $genericErrorMsg = addslashes(__('plugins.pubIds.ark.editor.genericError'));
+        $savingText = addslashes(__('common.saving'));
 
-    $jsCode = '
+        $jsCode = '
 (function() {
     var prefix = "' . addslashes($prefix) . '";
     var customPrefix = "' . addslashes($customPrefix) . '";
@@ -692,9 +725,10 @@ public function injectIssueArkField($hookName, $args)
     });
 })();
 ';
-    
-    $templateMgr->addJavaScript('ark-issue-field', $jsCode, ['contexts' => 'backend', 'inline' => true]);
-}
+        
+        $templateMgr->addJavaScript('ark-issue-field', $jsCode, ['contexts' => 'backend', 'inline' => true]);
+    }
+
     // ==================== PUBLICATION FORM METHODS ====================
     
     public function onFormExecute($hookName, $form) {
@@ -1085,13 +1119,6 @@ public function injectIssueArkField($hookName, $args)
             ['contexts' => 'backend']
         );
         
-        // Include the FieldArk.js script
-        $templateMgr->addJavaScript(
-            'ark-field-js',
-            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/FieldArk.js',
-            ['contexts' => 'backend']
-        );
-        
         $templateMgr->addJavaScript(
             'ark-field-injector-vars',
             'window.arkPluginConfig = { 
@@ -1103,7 +1130,6 @@ public function injectIssueArkField($hookName, $args)
             };',
             ['contexts' => 'backend', 'inline' => true]
         );
-
     }
 
     /**
@@ -1242,17 +1268,19 @@ public function injectIssueArkField($hookName, $args)
      * @return mixed Setting value or null if not set
      */
     public function getSetting($contextId, $name) {
-        // For arkPrefix and ark_token, read directly from database (bypass cache)
         if ($name === 'arkPrefix') {
-            $result = DB::table('journal_settings')
-                ->where('journal_id', $contextId)
-                ->where('setting_name', $name)
-                ->where('locale', '')
-                ->value('setting_value');
-            return $result;
+            try {
+                $result = DB::table('journal_settings')
+                    ->where('journal_id', $contextId)
+                    ->where('setting_name', $name)
+                    ->where('locale', '')
+                    ->value('setting_value');
+                return $result;
+            } catch (Exception $e) {
+                return parent::getSetting($contextId, $name);
+            }
         }
 
-        // For other settings, use parent method
         return parent::getSetting($contextId, $name);
     }
     

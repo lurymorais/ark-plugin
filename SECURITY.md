@@ -23,20 +23,40 @@ Why this is secure:
 - Prevents fake-validation of NAANs
 - Uses rate limiting with exponential backoff
 
+### Plugin Identity Verification
+
+The plugin creates a file `identity.txt` in its folder to verify it is actually installed:
+
+- Created automatically during installation
+- Contains a random token
+- Server verifies the file exists before accepting statistics
+- Prevents external actors from sending data on behalf of the journal
+
 ### Data Collection (Opt-in)
 
 If enabled by the journal manager, the plugin sends:
 
 {
   "naan": "ark:16081",
+  "domain": "revistacarnaubais.com.br",
   "arks_count": 1250,
-  "plugin_version": "3.1.0"
+  "plugin_version": "3.1.0.0"
 }
 
 - No personal data: No emails, names, or identifiable information
 - No credentials: No tokens, secrets, or persistent auth
 - Push model: Journal controls when data is sent (monthly via scheduled task)
 - Opt-in: Disabled by default, journal must explicitly enable
+- Token-based: Temporary tokens (expire in 5 minutes) for each transmission
+
+### Consent Tracking (LGPD/GDPR)
+
+All consent changes are audited:
+
+- When a journal manager enables/disables telemetry
+- Timestamp of the change
+- Previous and new values
+- Stored in `ark_validations` table
 
 ### Security Controls
 
@@ -49,6 +69,7 @@ If enabled by the journal manager, the plugin sends:
 | Timing Attacks | hash_equals() for all credential comparisons |
 | PostgreSQL Support | Database-agnostic queries |
 | SSL/TLS | All external communication encrypted |
+| Identity Verification | File-based (identity.txt) |
 
 ## Reporting a Vulnerability
 
@@ -81,17 +102,20 @@ Instead, send an email to:
 
 1. Review permissions: Only grant Manager/Editor roles to trusted users
 2. Update regularly: Keep the plugin updated to the latest version
+3. Review telemetry consent: Check if data sharing is enabled as desired
 
 ### Server Administrators
 
 1. Check logs: Monitor for failed validation attempts
 2. Database backup: Regular backups of issue_settings and publication_settings
+3. Verify identity.txt: Ensure the plugin's identity file is present and accessible
 
 ## Security Features Summary
 
 | Feature | Status |
 |---------|--------|
 | NAAN Server-side Validation | ✅ Implemented |
+| Plugin Identity Verification | ✅ Implemented |
 | Rate Limiting | ✅ Implemented |
 | CSRF Protection | ✅ Implemented |
 | OJS Authentication | ✅ Implemented |
@@ -102,6 +126,7 @@ Instead, send an email to:
 | SSL/TLS Encryption | ✅ Implemented |
 | Data Minimization | ✅ Implemented |
 | Opt-in Telemetry | ✅ Implemented |
+| Consent Audit | ✅ Implemented |
 | Privacy Policy | ✅ Available |
 
 ## Third-Party Dependencies
@@ -120,5 +145,5 @@ Security vulnerabilities will be disclosed:
 2. Fix release: Patch released within the timeline above
 3. Public disclosure: After fix is released and widely adopted
 
-Last Updated: 2026-07-01
+Last Updated: 2026-07-04
 Version: 3.1.0.0

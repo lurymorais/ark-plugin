@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ARK Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 10:00-0300\n"
-"PO-Revision-Date: 2026-07-01 10:00-0300\n"
+"POT-Creation-Date: 2026-07-03 10:00-0300\n"
+"PO-Revision-Date: 2026-07-03 10:00-0300\n"
 "Last-Translator: Lury Morais\n"
 "Language-Team: English\n"
 "Language: en\n"
@@ -90,15 +90,6 @@ msgstr "Preview"
 msgid "plugins.pubIds.ark.manager.settings.previewLabel"
 msgstr "Example ARK that will be generated:"
 
-msgid "plugins.pubIds.ark.manager.settings.arkReassign"
-msgstr "Reassign ARKs"
-
-msgid "plugins.pubIds.ark.manager.settings.arkReassign.description"
-msgstr "Click to remove all existing ARKs and reassign with new settings."
-
-msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
-msgstr "Are you sure? All existing ARKs will be permanently removed."
-
 msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
 msgstr "ARK Implementation Date"
 
@@ -119,6 +110,36 @@ msgstr "Help improve the plugin by sharing anonymous usage data."
 
 msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.help"
 msgstr "Data sent: NAAN, ARK count, plugin version. No personal data is collected. Learn more in the Privacy Policy."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
+msgstr "NAAN identifier (public)"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
+msgstr "Number of ARKs generated"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
+msgstr "Plugin version"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
+msgstr "Privacy Policy"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "n2t.net Configuration Required"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "For your ARKs to resolve correctly, you need to configure your NAAN target on n2t.net with the URL below. This URL must be provided in the NAAN registration or update form:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "If you don't have a NAAN yet, request one at:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "or use the"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "request form"
 
 msgid "plugins.pubIds.ark.editor.ark"
 msgstr "ARK"
@@ -195,24 +216,6 @@ msgstr "Validation server is temporarily unavailable. Please try again later."
 msgid "plugins.pubIds.ark.validation.invalidResponse"
 msgstr "Invalid response from validation server. Please try again."
 
-msgid "plugins.pubIds.ark.resolver.title"
-msgstr "ARK Resolver"
-
-msgid "plugins.pubIds.ark.resolver.loading"
-msgstr "Resolving ARK..."
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
-msgstr "NAAN identifier (public)"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
-msgstr "Number of ARKs generated"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
-msgstr "Plugin version"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
-msgstr "Privacy Policy"
-
 msgid "plugins.pubIds.ark.validation.rateLimit"
 msgstr "Too many validation attempts. You are temporarily blocked."
 
@@ -242,21 +245,3 @@ msgstr "minutes remaining"
 
 msgid "plugins.pubIds.ark.validation.tryAgainAfter"
 msgstr "Try again after:"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
-msgstr "n2t.net Configuration Required"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
-msgstr "For your ARKs to resolve correctly, you need to configure your NAAN target on n2t.net with the URL below. This URL must be provided in the NAAN registration or update form:"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
-msgstr "If you don't have a NAAN yet, request one at:"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
-msgstr "ARK Alliance"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
-msgstr "or use the"
-
-msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
-msgstr "request form"

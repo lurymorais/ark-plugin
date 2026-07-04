@@ -26,23 +26,52 @@ class ARKSettingsForm extends Form {
 
     public function fetch($request, $template = null, $display = false)
     {
+        $contextId = $this->_getContextId();
+        $plugin = $this->_getPlugin();
+        
         $templateMgr = TemplateManager::getManager($request);
         $baseUrl = $request->getBaseUrl();
         $correctTarget = $baseUrl . '/plugins/pubIds/ark/resolver.php?ark=${value}';
         $templateMgr->assign('arkTargetHint', $correctTarget);
         
-        $contextId = $this->_getContextId();
-        $plugin = $this->_getPlugin();
+        // Get all settings
+        $arkPrefix = $plugin->getSetting($contextId, 'arkPrefix');
+        $enablePublicationARK = $plugin->getSetting($contextId, 'enablePublicationARK');
+        $enableIssueARK = $plugin->getSetting($contextId, 'enableIssueARK');
+        $arkSuffix = $plugin->getSetting($contextId, 'arkSuffix');
+        $arkCustomPrefix = $plugin->getSetting($contextId, 'arkCustomPrefix');
+        $arkImplementationDate = $plugin->getSetting($contextId, 'arkImplementationDate');
+        $telemetryEnabled = $plugin->getSetting($contextId, 'telemetryEnabled');
+        $resolverType = $plugin->getSetting($contextId, 'resolverType');
+        $arkResolver = $plugin->getSetting($contextId, 'arkResolver');
         
-        $templateMgr->assign('arkPrefix', $plugin->getSetting($contextId, 'arkPrefix'));
-        $templateMgr->assign('arkCount', $plugin->getTotalArksCount($contextId));
-        $templateMgr->assign('pluginVersion', $plugin->getPluginVersion());
+        // Assign to template
+        $templateMgr->assign('arkPrefix', $arkPrefix);
+        $templateMgr->assign('enablePublicationARK', $enablePublicationARK);
+        $templateMgr->assign('enableIssueARK', $enableIssueARK);
+        $templateMgr->assign('arkSuffix', $arkSuffix);
+        $templateMgr->assign('arkCustomPrefix', $arkCustomPrefix);
+        $templateMgr->assign('arkImplementationDate', $arkImplementationDate);
+        $templateMgr->assign('telemetryEnabled', $telemetryEnabled);
+        $templateMgr->assign('resolverType', $resolverType ?? 'n2t');
+        $templateMgr->assign('arkResolver', $arkResolver ?? '');
+        
+        // Get count and version
+        $arkCount = $plugin->getTotalArksCount($contextId);
+        $pluginVersion = $plugin->getPluginVersion();
+        $templateMgr->assign('arkCount', $arkCount);
+        $templateMgr->assign('pluginVersion', $pluginVersion);
         
         return parent::fetch($request, $template, $display);
     }
 
-    public function _getContextId() { return $this->_contextId; }
-    public function _getPlugin() { return $this->_plugin; }
+    public function _getContextId() { 
+        return $this->_contextId; 
+    }
+    
+    public function _getPlugin() { 
+        return $this->_plugin; 
+    }
 
     function __construct($plugin, $contextId) {
         $this->_contextId = $contextId;
@@ -98,40 +127,41 @@ class ARKSettingsForm extends Form {
         $contextId = $this->_getContextId();
         $plugin = $this->_getPlugin();
         
-        $arkPrefix = DB::table('journal_settings')
-            ->where('journal_id', $contextId)
-            ->where('setting_name', 'arkPrefix')
-            ->where('locale', '')
-            ->value('setting_value');
+        // Default values
+        $defaultEnablePublication = '1';
+        $defaultEnableIssue = '1';
+        $defaultResolverType = 'n2t';
+        $defaultTelemetryEnabled = '1';
         
-        $arkImplementationDate = DB::table('journal_settings')
-            ->where('journal_id', $contextId)
-            ->where('setting_name', 'telemetryLevel')
-            ->where('locale', '')
-            ->value('setting_value');
-        
-        $telemetryEnabled = DB::table('journal_settings')
-            ->where('journal_id', $contextId)
-            ->where('setting_name', 'telemetryEnabled')
-            ->where('locale', '')
-            ->value('setting_value');
-        
-        if ($telemetryEnabled === null) {
-            $telemetryEnabled = '1';
+        // Read from database, use defaults if not exists
+        $enablePublicationARK = $plugin->getSetting($contextId, 'enablePublicationARK');
+        if ($enablePublicationARK === null) {
+            $enablePublicationARK = $defaultEnablePublication;
         }
         
-        $this->setData('enablePublicationARK', $plugin->getSetting($contextId, 'enablePublicationARK'));
-        $this->setData('enableIssueARK', $plugin->getSetting($contextId, 'enableIssueARK'));
-        $this->setData('arkPrefix', $arkPrefix);
-        $this->setData('arkSuffix', $plugin->getSetting($contextId, 'arkSuffix'));
-        $this->setData('arkCustomPrefix', $plugin->getSetting($contextId, 'arkCustomPrefix'));
-        $this->setData('arkImplementationDate', $arkImplementationDate);
-        $this->setData('telemetryEnabled', $telemetryEnabled);
-            
+        $enableIssueARK = $plugin->getSetting($contextId, 'enableIssueARK');
+        if ($enableIssueARK === null) {
+            $enableIssueARK = $defaultEnableIssue;
+        }
+        
+        $telemetryEnabled = $plugin->getSetting($contextId, 'telemetryEnabled');
+        if ($telemetryEnabled === null) {
+            $telemetryEnabled = $defaultTelemetryEnabled;
+        }
+        
         $resolverType = $plugin->getSetting($contextId, 'resolverType');
         if (empty($resolverType)) {
-            $resolverType = 'n2t';
+            $resolverType = $defaultResolverType;
         }
+        
+        // Set form data
+        $this->setData('enablePublicationARK', $enablePublicationARK);
+        $this->setData('enableIssueARK', $enableIssueARK);
+        $this->setData('arkPrefix', $plugin->getSetting($contextId, 'arkPrefix'));
+        $this->setData('arkSuffix', $plugin->getSetting($contextId, 'arkSuffix'));
+        $this->setData('arkCustomPrefix', $plugin->getSetting($contextId, 'arkCustomPrefix'));
+        $this->setData('arkImplementationDate', $plugin->getSetting($contextId, 'arkImplementationDate'));
+        $this->setData('telemetryEnabled', $telemetryEnabled);
         $this->setData('resolverType', $resolverType);
         
         if ($resolverType === 'custom') {
@@ -139,8 +169,6 @@ class ARKSettingsForm extends Form {
         } else {
             $this->setData('arkResolver', '');
         }
-        
-        $this->setData('lastRecoveryAttempt', $plugin->getSetting($contextId, 'lastRecoveryAttempt'));
     }
 
     public function readInputData() {
@@ -155,27 +183,6 @@ class ARKSettingsForm extends Form {
             'arkResolver',
             'telemetryEnabled'
         ]);
-    }
-
-    public function handleTokenRecovery($request)
-    {
-        $plugin = $this->_getPlugin();
-        $contextId = $this->_getContextId();
-        
-        $lastAttempt = $plugin->getSetting($contextId, 'lastRecoveryAttempt');
-        if ($lastAttempt && (time() - $lastAttempt) < 3600) {
-            $timeRemaining = 3600 - (time() - $lastAttempt);
-            $minutes = ceil($timeRemaining / 60);
-            return [
-                'success' => false,
-                'message' => __('plugins.pubIds.ark.recovery.rateLimit', ['minutes' => $minutes])
-            ];
-        }
-        
-        $plugin->updateSetting($contextId, 'lastRecoveryAttempt', time());
-        $result = $plugin->requestTokenRecovery($contextId);
-        
-        return $result;
     }
 
     public function execute(...$functionArgs) {
@@ -193,12 +200,17 @@ class ARKSettingsForm extends Form {
         
         // ========== NAAN VALIDATION ==========
         $domain = preg_replace('#^https?://#', '', rtrim($request->getBaseUrl(), '/'));
-        $validation = $plugin->validateNaanRemotely($naan, $domain);
-
-        if (!$validation['valid']) {
-            // Use 'message' if exists, otherwise use 'error' or 'details'
-            $errorMessage = $validation['message'] ?? $validation['error'] ?? $validation['details'] ?? 'NAAN validation failed';
-            $this->addError('arkPrefix', $errorMessage);
+        
+        try {
+            $validation = $plugin->validateNaanRemotely($naan, $domain);
+            
+            if (!$validation['valid']) {
+                $errorMessage = $validation['message'] ?? $validation['error'] ?? $validation['details'] ?? 'NAAN validation failed';
+                $this->addError('arkPrefix', $errorMessage);
+                return false;
+            }
+        } catch (Exception $e) {
+            $this->addError('arkPrefix', 'Validation error: ' . $e->getMessage());
             return false;
         }
 
@@ -211,88 +223,83 @@ class ARKSettingsForm extends Form {
         $arkResolver = $this->getData('arkResolver');
         $arkImplementationDate = $this->getData('arkImplementationDate');
 
-        $token = $plugin->getPluginToken($contextId);
-        $adminSecret = $plugin->getSetting($contextId, 'ark_admin_secret');
-        if (empty($adminSecret)) {
-            $adminSecret = bin2hex(random_bytes(32));
-            $plugin->updateSetting($contextId, 'ark_admin_secret', $adminSecret);
-        }
-        
-        $apiEndpoint = $request->getBaseUrl() . '/index.php/' . $context->getPath() . '/ark-api/telemetry';
-        
         // ========== TELEMETRY: OPT-OUT ==========
         $telemetryEnabled = $this->getData('telemetryEnabled');
         
-        // If checkbox was not sent in POST (unchecked)
         if ($telemetryEnabled === null) {
-            // Check if a value already exists in the database
             $existingValue = DB::table('journal_settings')
                 ->where('journal_id', $contextId)
                 ->where('setting_name', 'telemetryEnabled')
                 ->where('locale', '')
                 ->value('setting_value');
             
-            // If never saved before (first time), default to enabled
-            // If already saved, user unchecked it
             if ($existingValue === null) {
-                $telemetryEnabled = '1'; // First time: enabled by default
+                $telemetryEnabled = '1';
             } else {
-                $telemetryEnabled = '0'; // User unchecked it
+                $telemetryEnabled = '0';
             }
+        }
+
+        // ========== RECORD CONSENT CHANGE (LGPD/GDPR Compliance) ==========
+        $newTelemetryEnabled = $this->getData('telemetryEnabled') ? '1' : '0';
+        $oldTelemetryEnabled = $plugin->getSetting($contextId, 'telemetryEnabled');
+
+        if ($newTelemetryEnabled !== $oldTelemetryEnabled) {
+            $action = $newTelemetryEnabled === '1' ? 'enabled' : 'disabled';
+            
+            try {
+                $request = Application::get()->getRequest();
+                $domain = preg_replace('#^https?://#', '', rtrim($request->getBaseUrl(), '/'));
+                $message = "Consent changed from '{$oldTelemetryEnabled}' to '{$newTelemetryEnabled}'";
+                
+                $stmt = DB::connection()->getPdo()->prepare("
+                    INSERT INTO ark_validations (
+                        naan, 
+                        domain, 
+                        status, 
+                        message,
+                        consent_action,
+                        consent_previous_value,
+                        consent_changed_at
+                    ) VALUES (?, ?, 'consent_change', ?, ?, ?, NOW())
+                ");
+                
+                $stmt->execute([
+                    $naan,
+                    $domain,
+                    $message,
+                    $action,
+                    $oldTelemetryEnabled ?: 'not_set'
+                ]);
+                
+                error_log("[ARK] Consent {$action} for NAAN: {$naan}");
+                
+            } catch (Exception $e) {
+                // Don't interrupt flow, just log
+                error_log("[ARK] Failed to log consent change: " . $e->getMessage());
+            }
+        }
+
+        // ========== SEND STATISTICS ==========
+        if ($telemetryEnabled === '1') {
+            $plugin->sendStatistics($contextId);
+        } else {
+            error_log("[ARK] Telemetry disabled for NAAN: {$naan}");
         }
         
         try {
-            // Salvar no journal_settings
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'arkPrefix', 'locale' => ''],
-                ['setting_value' => $naan]
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'arkPrefix', 'locale' => ''],
-                ['setting_value' => $naan]
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'enablePublicationARK', 'locale' => ''],
-                ['setting_value' => $enablePublication ? '1' : '0']
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'enableIssueARK', 'locale' => ''],
-                ['setting_value' => $enableIssue ? '1' : '0']
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'arkSuffix', 'locale' => ''],
-                ['setting_value' => $arkSuffix]
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'arkCustomPrefix', 'locale' => ''],
-                ['setting_value' => $arkCustomPrefix]
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'resolverType', 'locale' => ''],
-                ['setting_value' => $resolverType]
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'arkImplementationDate', 'locale' => ''],
-                ['setting_value' => $arkImplementationDate]
-            );
-            
-            DB::table('journal_settings')->updateOrInsert(
-                ['journal_id' => $contextId, 'setting_name' => 'telemetryEnabled', 'locale' => ''],
-                ['setting_value' => $telemetryEnabled ? '1' : '0']
-            );
+            // Save using official plugin method (plugin_settings)
+            $plugin->updateSetting($contextId, 'arkPrefix', $naan, 'string');
+            $plugin->updateSetting($contextId, 'enablePublicationARK', $enablePublication ? '1' : '0', 'bool');
+            $plugin->updateSetting($contextId, 'enableIssueARK', $enableIssue ? '1' : '0', 'bool');
+            $plugin->updateSetting($contextId, 'arkSuffix', $arkSuffix, 'string');
+            $plugin->updateSetting($contextId, 'arkCustomPrefix', $arkCustomPrefix, 'string');
+            $plugin->updateSetting($contextId, 'resolverType', $resolverType, 'string');
+            $plugin->updateSetting($contextId, 'arkImplementationDate', $arkImplementationDate, 'string');
+            $plugin->updateSetting($contextId, 'telemetryEnabled', $telemetryEnabled ? '1' : '0', 'bool');
             
             if ($resolverType === 'custom') {
-                DB::table('journal_settings')->updateOrInsert(
-                    ['journal_id' => $contextId, 'setting_name' => 'arkResolver', 'locale' => ''],
-                    ['setting_value' => $arkResolver]
-                );
+                $plugin->updateSetting($contextId, 'arkResolver', $arkResolver, 'string');
             }
             
             // ========== SEND STATISTICS ==========
