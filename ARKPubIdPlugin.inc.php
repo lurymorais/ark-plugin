@@ -118,9 +118,85 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         
         if ($success) {
             $this->ensureIdentityFile();
+            $this->registerPluginKey();
+
         }
         
         return $success;
+    }
+
+    /**
+     * Check if key already exists
+     * Generate private key
+     * Save in OJS database
+     * Register with server
+     */
+    private function registerPluginKey()
+    {
+        $existingKey = $this->getSetting(0, 'plugin_private_key');
+        if (!empty($existingKey)) {
+            return $existingKey;
+        }
+        
+        $privateKey = bin2hex(random_bytes(32));
+        
+        $this->updateSetting(0, 'plugin_private_key', $privateKey, 'string');
+        
+        $this->sendPrivateKeyToServer($privateKey);
+        
+        return $privateKey;
+    }
+
+    private function sendPrivateKeyToServer($privateKey)
+    {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        
+        if (!$context) {
+            return false;
+        }
+        
+        $naan = $this->getSetting($context->getId(), 'arkPrefix');
+        $domain = preg_replace('#^https?://#', '', rtrim($context->getData('url'), '/'));
+        
+        if (empty($naan) || empty($domain)) {
+            return false;
+        }
+        
+        $payload = [
+            'action' => 'register',
+            'naan' => $naan,
+            'domain' => $domain,
+            'private_key' => $privateKey,
+            'plugin_version' => $this->getPluginVersion()
+        ];
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, self::STATISTICS_COLLECT_URL);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . $this->getPluginVersion());
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 200) {
+            error_log("[ARK] Private key registered successfully");
+            return true;
+        }
+        
+        error_log("[ARK] Failed to register private key: HTTP {$httpCode}");
+        return false;
+    }
+
+    public function getPluginPrivateKey()
+    {
+        return $this->getSetting(0, 'plugin_private_key');
     }
 
     /**
@@ -257,13 +333,22 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
 
         $token = $validation['token'];
 
+        // Get private key
+        $privateKey = $this->getPluginPrivateKey();
+        if (empty($privateKey)) {
+            error_log("[ARK Plugin] No private key found for {$naan}");
+            return false;
+        }
+
         // Only send minimal data: NAAN, ARK count, plugin version
         $payload = [
             'naan' => $naan,
             'domain' => $domain,
             'arks_count' => $this->getTotalArksCount($contextId),
             'plugin_version' => $this->getPluginVersion(),
-            'token' => $token
+            'token' => $token,
+            'private_key' => $privateKey
+
         ];
 
         $ch = curl_init();
