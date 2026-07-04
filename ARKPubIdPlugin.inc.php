@@ -57,6 +57,10 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             
             // Create identity file for plugin verification
             $this->ensureIdentityFile();
+
+            // Generate and register private key if needed
+            $this->registerPluginKey();
+
             
             // Register AJAX route
             \HookRegistry::register('LoadHandler', function($hookName, $args) {
@@ -131,24 +135,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
      * Save in OJS database
      * Register with server
      */
-    private function registerPluginKey()
-    {
-        $existingKey = $this->getSetting(0, 'plugin_private_key');
-        if (!empty($existingKey)) {
-            return $existingKey;
-        }
-        
-        $privateKey = bin2hex(random_bytes(32));
-        
-        $this->updateSetting(0, 'plugin_private_key', $privateKey, 'string');
-        
-        $this->sendPrivateKeyToServer($privateKey);
-        
-        return $privateKey;
-    }
-
-    private function sendPrivateKeyToServer($privateKey)
-    {
+    public function registerPluginKey()
+    {        
         $request = Application::get()->getRequest();
         $context = $request->getContext();
         
@@ -156,12 +144,22 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             return false;
         }
         
-        $naan = $this->getSetting($context->getId(), 'arkPrefix');
-        $domain = preg_replace('#^https?://#', '', rtrim($context->getData('url'), '/'));
+        $contextId = $context->getId();
+        $naan = $this->getSetting($contextId, 'arkPrefix');
         
-        if (empty($naan) || empty($domain)) {
+        if (empty($naan)) {
             return false;
         }
+          
+        $privateKey = $this->getPluginPrivateKey();
+        
+        if (empty($privateKey)) {
+            $privateKey = bin2hex(random_bytes(32));
+            $this->updateSetting($contextId, 'plugin_private_key', $privateKey, 'string');
+        } else {
+        }
+        
+        $domain = preg_replace('#^https?://#', '', rtrim($request->getBaseUrl(), '/'));
         
         $payload = [
             'action' => 'register',
@@ -170,30 +168,36 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             'private_key' => $privateKey,
             'plugin_version' => $this->getPluginVersion()
         ];
-        
+                
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, self::STATISTICS_COLLECT_URL);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, 'ARK-Plugin/' . $this->getPluginVersion());
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
         
         if ($httpCode === 200) {
-            error_log("[ARK] Private key registered successfully");
-            return true;
+            $result = json_decode($response, true);
+            if ($result && $result['status'] === 'registered') {
+                error_log("[ARK] Plugin registered successfully for {$naan}");
+                return true;
+            } else {
+                error_log("[ARK] Registration failed: " . ($result['error'] ?? 'Unknown error'));
+                return false;
+            }
         }
         
-        error_log("[ARK] Failed to register private key: HTTP {$httpCode}");
+        error_log("[ARK] Registration failed: HTTP {$httpCode}");
         return false;
     }
-
     public function getPluginPrivateKey()
     {
         return $this->getSetting(0, 'plugin_private_key');
@@ -202,13 +206,12 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     /**
      * Ensure identity file exists for plugin verification
      */
-    private function ensureIdentityFile()
+    public function ensureIdentityFile()
     {
         $identityFile = $this->getPluginPath() . '/identity.txt';
         
         if (!file_exists($identityFile)) {
-            $token = bin2hex(random_bytes(16));
-            file_put_contents($identityFile, $token);
+            file_put_contents($identityFile, '');
             chmod($identityFile, 0644);
             error_log("[ARK] Identity file created: identity.txt");
         }
@@ -243,10 +246,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         $naanClean = preg_replace('/\/$/', '', $naanClean);
         
         if (empty($naanClean)) {
-            return [
-                'valid' => false, 
-                'message' => __('plugins.pubIds.ark.validation.invalidNaan')
-            ];
+            return ['valid' => false, 'message' => 'Invalid NAAN'];
         }
         
         $payload = [
@@ -272,19 +272,13 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         
         if ($httpCode !== 200 || empty($response)) {
             error_log("[ARK Plugin] Validation server error: HTTP {$httpCode} - " . $curlError);
-            return [
-                'valid' => false,
-                'message' => __('plugins.pubIds.ark.validation.serverUnavailable')
-            ];
+            return ['valid' => false, 'message' => 'Validation server unavailable'];
         }
         
         $result = json_decode($response, true);
         
         if (!isset($result['valid'])) {
-            return [
-                'valid' => false,
-                'message' => __('plugins.pubIds.ark.validation.invalidResponse')
-            ];
+            return ['valid' => false, 'message' => 'Invalid response from validation server'];
         }
         
         return $result;
@@ -292,7 +286,6 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
 
     /**
      * Send aggregated statistics to server (PUSH model, monthly)
-     * Only sends if telemetry is explicitly enabled by the journal manager.
      * 
      * @param int $contextId Journal ID
      * @return bool
@@ -308,7 +301,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         
         // Check if telemetry is enabled (opt-in)
         $telemetryEnabled = $this->getSetting($contextId, 'telemetryEnabled');
-        if ($telemetryEnabled !== '1') {
+        
+        if ((string)$telemetryEnabled !== '1') {
             return false;
         }
         
@@ -320,14 +314,29 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         // Ensure identity file exists
         $this->ensureIdentityFile();
         
-        // Get domain
         $domain = preg_replace('#^https?://#', '', rtrim($context->getData('url'), '/'));
+        
+        if (empty($domain)) {
+            $domain = preg_replace('#^https?://#', '', rtrim($_SERVER['HTTP_HOST'] ?? '', '/'));
+        }
+        
+        if (empty($domain)) {
+            $domain = Config::getVar('general', 'base_url');
+            if (!empty($domain)) {
+                $domain = preg_replace('#^https?://#', '', rtrim($domain, '/'));
+            }
+        }
+        
+        if (empty($domain)) {
+            error_log("[ARK Plugin] Could not determine domain for {$naan}");
+            return false;
+        }
         
         // Get validation token
         $validation = $this->validateNaanRemotely($naan, $domain);
 
         if (!$validation['valid'] || empty($validation['token'])) {
-            error_log("[ARK Plugin] Failed to get validation token for {$naan}");
+            error_log("[ARK Plugin] Failed to get validation token for {$naan}: " . ($validation['message'] ?? $validation['error'] ?? 'Unknown error'));
             return false;
         }
 
@@ -348,7 +357,6 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             'plugin_version' => $this->getPluginVersion(),
             'token' => $token,
             'private_key' => $privateKey
-
         ];
 
         $ch = curl_init();
@@ -366,12 +374,15 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         $curlError = curl_error($ch);
         curl_close($ch);
         
-        if ($httpCode === 202) {
+        if ($httpCode === 202 || $httpCode === 200) {
             error_log("[ARK Plugin] Statistics sent successfully for {$naan}");
             return true;
         }
         
-        error_log("[ARK Plugin] Failed to send statistics: HTTP {$httpCode} - " . $curlError);
+        error_log("[ARK Plugin] Failed to send statistics for {$naan}: HTTP {$httpCode}");
+        if (!empty($curlError)) {
+            error_log("[ARK Plugin] cURL error: {$curlError}");
+        }
         return false;
     }
 
