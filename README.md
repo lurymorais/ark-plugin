@@ -1,6 +1,9 @@
 <a name="top"></a>
 
 # 🌐 ARK Plugin for OJS 3.5.x
+
+[![AI-DECLARATION: copilot](https://img.shields.io/badge/䷼%20AI--DECLARATION-copilot-fee2e2?labelColor=fee2e2)](https://ai-declaration.md)
+
 > **Escolha seu idioma / Elija su idioma / Choose your language :**  
 > [🇧🇷 Português](#portugues) | [🇪🇸 Español](#espanol) | [🇺🇸🇪 English](#english)
 
