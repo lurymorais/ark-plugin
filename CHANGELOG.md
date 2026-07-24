@@ -1,11 +1,20 @@
-### 4. CHANGELOG.md (Atualizado)
-
 # Changelog
 
 All notable changes to the ARK Plugin for OJS will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [3.1.1.0] - 2026-07-24
+
+### Fixed
+- **CRITICAL FIX: 500 error when publishing issues**
+- **FIXED: Plugin registration logic** - Fixed context handling for multi-journal support
+- **FIXED: Repeated registration attempts** - Plugin now checks `plugin_registered` status before attempting registration
+- **FIXED: Private key management** - Each journal maintains its own private key and registration state
+
+### Added
+- **ADDED: `templates/empty.tpl`** - to prevent OJS from loading a non-existent template in the publish issue modal
 
 ## [3.1.0.0] - 2026-07-04
 
