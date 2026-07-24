@@ -99,9 +99,9 @@ Data is stored on a secure server in Brazil (revistacarnaubais.com.br).
 - Encryption: SSL/TLS for all data transmission
 - Access Control: Only the data controller (Lury Morais) has access
 - Rate Limiting: Prevents abuse/brute force
-- No API Keys: No permanent credentials stored
-- No Tokens: No persistent authentication tokens
-
+- Private Key: Each plugin installation generates a unique private key stored securely in the OJS database. This key is used to authenticate telemetry submissions and is never shared publicly.
+- No Tokens: No persistent authentication tokens (only temporary 5-minute tokens for validation)
+- 
 ### Data Protection
 
 - No personal data: By design, no PII is collected
