@@ -159,7 +159,7 @@
                         <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"}</strong>: {$pluginVersion|escape}</li>
                     </ul>
                     <p style="margin: 5px 0;">
-                        <a href="https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md" target="_blank">
+                        <a href="https://github.com/lurymorais/ark-plugin/blob/main/PRIVACY_POLICY.md" target="_blank">
                             {translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"}
                         </a>
                     </p>

@@ -38,7 +38,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             $xml = simplexml_load_file($versionFile);
             return (string)$xml->release;
         }
-        return '3.1.0.0';
+        return '3.1.1.0';
     }
 
     public function register($category, $path, $mainContextId = null)

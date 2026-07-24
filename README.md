@@ -90,7 +90,7 @@ O plugin envia estatísticas anônimas de uso por padrão para ajudar a melhorar
 
 **Dashboard Público:** https://revistacarnaubais.com.br/ark-telemetry/stats.php
 
-**Política de Privacidade:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
+**Política de Privacidade:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/main/PRIVACY_POLICY.md)
 
 ### Verificação de Identidade e Segurança
 
@@ -292,7 +292,7 @@ El plugin envía estadísticas anónimas de uso por defecto para ayudar a mejora
 
 **Dashboard Público:** https://revistacarnaubais.com.br/ark-telemetry/stats.php
 
-**Política de Privacidad:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
+**Política de Privacidad:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/main/PRIVACY_POLICY.md)
 
 ### Verificación de Identidad y Seguridad
 
@@ -494,7 +494,7 @@ The plugin sends anonymous usage statistics by default to help improve the servi
 
 **Public Dashboard:** https://revistacarnaubais.com.br/ark-telemetry/stats.php
 
-**Privacy Policy:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/v3.1.0.0/PRIVACY_POLICY.md)
+**Privacy Policy:** [PRIVACY_POLICY.md](https://github.com/lurymorais/ark-plugin/blob/main/PRIVACY_POLICY.md)
 
 ### Identity and Security Verification
 
