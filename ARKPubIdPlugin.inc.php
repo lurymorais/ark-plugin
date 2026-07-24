@@ -58,9 +58,15 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             // Create identity file for plugin verification
             $this->ensureIdentityFile();
 
-            // Generate and register private key if needed
-            $this->registerPluginKey();
-
+            // Check if already registered before attempting
+            $request = Application::get()->getRequest();
+            $context = $request->getContext();
+            $contextId = $context ? $context->getId() : 0;
+            
+            // Only register if never registered before
+            if (!$this->isPluginRegistered($contextId)) {
+                $this->registerPluginKey();
+            }
             
             // Register AJAX route
             \HookRegistry::register('LoadHandler', function($hookName, $args) {
@@ -123,40 +129,94 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         if ($success) {
             $this->ensureIdentityFile();
             $this->registerPluginKey();
-
         }
         
         return $success;
     }
 
     /**
-     * Check if key already exists
-     * Generate private key
-     * Save in OJS database
-     * Register with server
+     * Check if plugin is already registered with the central server
+     * 
+     * @param int|null $contextId Journal ID (null = use current context)
+     * @return bool True if already registered
+     */
+    private function isPluginRegistered($contextId = null)
+    {
+        if ($contextId === null) {
+            $request = Application::get()->getRequest();
+            $context = $request->getContext();
+            if (!$context) {
+                error_log("[ARK] No context found for registration check");
+                return false;
+            }
+            $contextId = $context->getId();
+        }
+        
+        $registered = parent::getSetting($contextId, 'plugin_registered');
+        return $registered === '1';
+    }
+
+    /**
+     * Mark plugin as registered with the central server
+     * 
+     * @param int|null $contextId Journal ID (null = use current context)
+     * @return void
+     */
+    private function setPluginRegistered($contextId = null)
+    {
+        if ($contextId === null) {
+            $request = Application::get()->getRequest();
+            $context = $request->getContext();
+            if (!$context) {
+                error_log("[ARK] No context found to set registered");
+                return;
+            }
+            $contextId = $context->getId();
+        }
+        
+        parent::updateSetting($contextId, 'plugin_registered', '1', 'string');
+        error_log("[ARK] Set plugin_registered = 1 for context {$contextId}");
+    }
+
+    /**
+     * Register plugin key with central server
+     * 
+     * @return bool True on success
      */
     public function registerPluginKey()
-    {        
+    {
         $request = Application::get()->getRequest();
         $context = $request->getContext();
         
         if (!$context) {
+            error_log("[ARK] No context found, cannot register");
             return false;
         }
         
         $contextId = $context->getId();
-        $naan = $this->getSetting($contextId, 'arkPrefix');
         
-        if (empty($naan)) {
+        if (!$contextId) {
+            error_log("[ARK] No context ID found, cannot register");
             return false;
         }
-          
-        $privateKey = $this->getPluginPrivateKey();
+        
+        if ($this->isPluginRegistered($contextId)) {
+            error_log("[ARK] Already registered for context {$contextId}");
+            return true;
+        }
+        
+        $naan = $this->getSetting($contextId, 'arkPrefix');
+        if (empty($naan)) {
+            error_log("[ARK] No NAAN found for context {$contextId}");
+            return false;
+        }
+        
+        $privateKey = $this->getSetting($contextId, 'plugin_private_key');
         
         if (empty($privateKey)) {
             $privateKey = bin2hex(random_bytes(32));
             $this->updateSetting($contextId, 'plugin_private_key', $privateKey, 'string');
-        } else {
+            error_log("[ARK] Generated new private key for context {$contextId}");
         }
         
         $domain = preg_replace('#^https?://#', '', rtrim($request->getBaseUrl(), '/'));
@@ -168,7 +228,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
             'private_key' => $privateKey,
             'plugin_version' => $this->getPluginVersion()
         ];
-                
+        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, self::STATISTICS_COLLECT_URL);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -187,7 +247,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         if ($httpCode === 200) {
             $result = json_decode($response, true);
             if ($result && $result['status'] === 'registered') {
-                error_log("[ARK] Plugin registered successfully for {$naan}");
+                $this->setPluginRegistered($contextId);
+                error_log("[ARK] Plugin registered successfully for {$naan} (context {$contextId})");
                 return true;
             } else {
                 error_log("[ARK] Registration failed: " . ($result['error'] ?? 'Unknown error'));
@@ -196,11 +257,36 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
         }
         
         error_log("[ARK] Registration failed: HTTP {$httpCode}");
+        if (!empty($curlError)) {
+            error_log("[ARK] cURL error: {$curlError}");
+        }
         return false;
     }
+
+    /**
+     * Get the private key from the correct context
+     * 
+     * @return string|null
+     */
     public function getPluginPrivateKey()
     {
-        return $this->getSetting(0, 'plugin_private_key');
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        
+        if (!$context) {
+            error_log("[ARK] No context found, cannot get private key");
+            return null;
+        }
+        
+        $contextId = $context->getId();
+        $privateKey = $this->getSetting($contextId, 'plugin_private_key');
+        
+        if (empty($privateKey)) {
+            error_log("[ARK] No private key found for context {$contextId}");
+            return null;
+        }
+        
+        return $privateKey;
     }
 
     /**
@@ -342,8 +428,8 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
 
         $token = $validation['token'];
 
-        // Get private key
-        $privateKey = $this->getPluginPrivateKey();
+        // Get private key from correct context
+        $privateKey = $this->getSetting($contextId, 'plugin_private_key');
         if (empty($privateKey)) {
             error_log("[ARK Plugin] No private key found for {$naan}");
             return false;
@@ -1103,7 +1189,7 @@ class ARKPubIdPlugin extends PKPPubIdPlugin
     }
     
     public function addJavaScript($request, $templateMgr) { }
-    public function getPubIdAssignFile() { return $this->getTemplateResource('arkAssign.tpl'); }
+    public function getPubIdAssignFile() { return $this->getTemplateResource('empty.tpl'); }
     
     public function instantiateSettingsForm($contextId) {
         require_once($this->getPluginPath() . '/classes/form/ARKSettingsForm.inc.php');
