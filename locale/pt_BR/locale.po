@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ARK Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-29 10:00-0300\n"
-"PO-Revision-Date: 2026-05-29 10:00-0300\n"
+"POT-Creation-Date: 2026-07-03 10:00-0300\n"
+"PO-Revision-Date: 2026-07-03 10:00-0300\n"
 "Last-Translator: Lury Morais\n"
 "Language-Team: Portuguese (Brazil)\n"
 "Language: pt_BR\n"
@@ -37,10 +37,10 @@ msgid "plugins.pubIds.ark.manager.settings.enableIssueARK"
 msgstr "Edições"
 
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix"
-msgstr "Prefixo ARK"
+msgstr "Prefixo ARK (NAAN)"
 
 msgid "plugins.pubIds.ark.manager.settings.arkPrefix.description"
-msgstr "Prefixo fixo do ARK (ex: ark:12345)."
+msgstr "Seu prefixo NAAN (ex: ark:12345). Este deve ser registrado na ARK Alliance."
 
 msgid "plugins.pubIds.ark.manager.settings.form.arkPrefixPattern"
 msgstr "O prefixo deve conter 2-40 caracteres (letras, números, :, _)."
@@ -90,15 +90,6 @@ msgstr "Pré-visualização"
 msgid "plugins.pubIds.ark.manager.settings.previewLabel"
 msgstr "Exemplo de ARK que será gerado:"
 
-msgid "plugins.pubIds.ark.manager.settings.arkReassign"
-msgstr "Reatribuir ARKs"
-
-msgid "plugins.pubIds.ark.manager.settings.arkReassign.description"
-msgstr "Clique para remover todos os ARKs existentes e reatribuir com as novas configurações."
-
-msgid "plugins.pubIds.ark.manager.settings.arkReassign.confirm"
-msgstr "Tem certeza? Todos os ARKs existentes serão permanentemente removidos."
-
 msgid "plugins.pubIds.ark.manager.settings.arkImplementationDate"
 msgstr "Data de Implementação do ARK"
 
@@ -110,6 +101,45 @@ msgstr "Se este for o seu primeiro uso do ARK, insira a data que recebeu seu NAA
 
 msgid "plugins.pubIds.ark.manager.settings.form.arkImplementationDatePattern"
 msgstr "A data deve estar no formato AAAAMMDD (ano, mês, dia) com 8 dígitos."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled"
+msgstr "Enviar estatísticas anônimas"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.description"
+msgstr "Ajude a melhorar o plugin compartilhando dados anônimos de uso."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.help"
+msgstr "Dados enviados: NAAN, quantidade de ARKs, versão do plugin. Nenhum dado pessoal é coletado. Saiba mais na Política de Privacidade."
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"
+msgstr "Identificador NAAN (público)"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"
+msgstr "Quantidade de ARKs gerados"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"
+msgstr "Versão do plugin"
+
+msgid "plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"
+msgstr "Política de Privacidade"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.title"
+msgstr "Configuração necessária no n2t.net"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.description"
+msgstr "Para que seus ARKs sejam resolvidos corretamente, você precisa configurar o target do seu NAAN no n2t.net com a URL abaixo. Esta URL deve ser informada no formulário de registro ou atualização do NAAN:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.help"
+msgstr "Se você ainda não possui um NAAN, solicite um em:"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.link"
+msgstr "ARK Alliance"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.or"
+msgstr "ou use o"
+
+msgid "plugins.pubIds.ark.manager.settings.naanTarget.form"
+msgstr "formulário de solicitação"
 
 msgid "plugins.pubIds.ark.editor.ark"
 msgstr "ARK"
@@ -171,158 +201,47 @@ msgstr "Sufixo aleatório"
 msgid "common.saving"
 msgstr "Salvando..."
 
-msgid "plugins.pubIds.ark.validation.naanAlreadyUsed"
-msgstr "Este identificador NAAN já está sendo usado por outra revista. Se você é o proprietário legítimo, clique no botão abaixo para verificar sua propriedade. Caso contrário, entre em contato pelo e-mail m.luryhortencio@gmail.com"
-
-msgid "plugins.pubIds.ark.recovery.title"
-msgstr "Verificação de Propriedade"
-
-msgid "plugins.pubIds.ark.recovery.instructions"
-msgstr "Para confirmar que você é o proprietário deste NAAN, clique no botão abaixo. O sistema verificará automaticamente se o domínio cadastrado no NAAN corresponde ao seu site atual."
-
-msgid "plugins.pubIds.ark.recovery.button"
-msgstr "Verificar Propriedade"
-
-msgid "plugins.pubIds.ark.recovery.failed"
-msgstr "Não foi possível verificar sua propriedade. Certifique-se de que seu NAAN está registrado corretamente."
-
-msgid "plugins.pubIds.ark.recovery.rateLimit"
-msgstr "Aguarde {$minutes} minutos antes de tentar novamente."
-
-msgid "plugins.pubIds.ark.settings.telemetryLevel"
-msgstr "Compartilhamento de dados"
-
-msgid "plugins.pubIds.ark.settings.telemetryLevel.restricted"
-msgstr "Básico (apenas dados técnicos)"
-
-msgid "plugins.pubIds.ark.settings.telemetryLevel.public"
-msgstr "Completo (compartilha dados da revista)"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryLevel.description"
-msgstr "Escolha o que deseja compartilhar para nos ajudar a melhorar o plugin:"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryLevel.restricted.description"
-msgstr "Compartilha apenas identificador NAAN, quantidade de ARKs, versão do plugin e URL do site"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryLevel.public.description"
-msgstr "Compartilha nome da revista, país, e-mail e idioma, além dos dados básicos"
-
-msgid "plugins.pubIds.ark.manager.settings.telemetryInfo"
-msgstr "Compartilhar esses dados nos ajuda a evitar fraudes e melhorar o serviço. Seus dados são protegidos conforme a LGPD."
-
-msgid "plugins.pubIds.ark.manager.settings.publicInfo.title"
-msgstr "Modo Completo Ativado"
-
-msgid "plugins.pubIds.ark.manager.settings.publicInfo.description"
-msgstr "O nome da sua revista e a quantidade de ARKs gerados aparecerão nas estatísticas públicas do ecossistema."
-
-msgid "plugins.pubIds.ark.manager.settings.publicInfo.dataSent"
-msgstr "Dados públicos: Nome da revista e quantidade de ARKs. Seus dados de contato são usados apenas internamente."
-
-msgid "plugins.pubIds.ark.recovery.title"
-msgstr "Área de Segurança"
-
-msgid "plugins.pubIds.ark.recovery.securityArea"
-msgstr "Área de Segurança"
-
-msgid "plugins.pubIds.ark.recovery.securityNote"
-msgstr "Esta área é usada APENAS se você recebeu a mensagem de que seu NAAN já está em uso. Aqui você pode comprovar que é o proprietário legítimo."
-
-msgid "plugins.pubIds.ark.recovery.button"
-msgstr "Verificar Minha Propriedade"
-
-msgid "plugins.pubIds.ark.recovery.howItWorks"
-msgstr "Como a verificação funciona:"
-
-msgid "plugins.pubIds.ark.recovery.step1"
-msgstr "Verificamos o endereço (domínio) cadastrado no seu NAAN"
-
-msgid "plugins.pubIds.ark.recovery.step2"
-msgstr "Comparamos com o endereço atual do seu site"
-
-msgid "plugins.pubIds.ark.recovery.step3"
-msgstr "Se forem iguais, seu acesso é liberado automaticamente"
-
-msgid "plugins.pubIds.ark.recovery.step4"
-msgstr "Se forem diferentes, você precisará atualizar o cadastro do seu NAAN"
-
-msgid "plugins.pubIds.ark.recovery.targetHintLabel"
-msgstr "Endereço correto para cadastrar no NAAN:"
-
-msgid "plugins.pubIds.ark.recovery.failed"
-msgstr "Não foi possível verificar sua propriedade. Verifique se seu NAAN está registrado corretamente."
-
-msgid "plugins.pubIds.ark.recovery.success"
-msgstr "Propriedade confirmada! Seu acesso foi restaurado com sucesso."
-
-msgid "plugins.pubIds.ark.recovery.domainMismatch"
-msgstr "O endereço registrado para este NAAN é diferente do seu site atual. Para corrigir, acesse o site da ARK Alliance e atualize seu cadastro para o endereço mostrado abaixo."
-
-msgid "plugins.pubIds.ark.recovery.metadataFailed"
-msgstr "Não foi possível verificar os metadados do seu NAAN. Verifique se ele está registrado corretamente."
-
-msgid "plugins.pubIds.ark.recovery.rateLimit"
-msgstr "⏱Aguarde {$minutes} minutos antes de tentar novamente."
-
-msgid "plugins.pubIds.ark.recovery.noNaan"
-msgstr "Nenhum NAAN configurado. Configure o prefixo ARK primeiro."
-
-msgid "plugins.pubIds.ark.recovery.error.pluginNotFound"
-msgstr "Erro interno: Plugin ARK não encontrado. Entre em contato com o administrador do sistema."
-
-msgid "plugins.pubIds.ark.recovery.error.noContext"
-msgstr "Erro interno: Contexto da revista não encontrado. Entre em contato com o administrador do sistema."
-
-msgid "plugins.pubIds.ark.recovery.error.network"
-msgstr "Erro de rede: Não foi possível conectar ao servidor n2t.net. Detalhe: {$error}. Verifique sua conexão com a internet."
-
-msgid "plugins.pubIds.ark.recovery.error.naanNotFound"
-msgstr "NAAN '{$naan}' não encontrado no sistema n2t.net. Verifique se ele foi registrado corretamente na ARK Alliance."
-
-msgid "plugins.pubIds.ark.recovery.error.httpError"
-msgstr "Servidor n2t.net retornou erro HTTP {$code}. Tente novamente mais tarde."
-
-msgid "plugins.pubIds.ark.recovery.error.emptyResponse"
-msgstr "Resposta vazia do servidor n2t.net. Tente novamente mais tarde."
-
-msgid "plugins.pubIds.ark.recovery.error.invalidJson"
-msgstr "Resposta inválida do servidor n2t.net. O formato dos dados não é reconhecido."
-
-msgid "plugins.pubIds.ark.recovery.error.missingWhere"
-msgstr "Metadados do NAAN incompletos. O campo 'where' (endereço do site) não foi encontrado."
-
-msgid "plugins.pubIds.ark.recovery.noNaan"
-msgstr "Nenhum NAAN configurado. Primeiro, configure o prefixo ARK nas configurações do plugin."
-
-msgid "plugins.pubIds.ark.recovery.rateLimit"
-msgstr "⏱Você já tentou verificar recentemente. Aguarde {$minutes} minutos antes de tentar novamente."
-
-msgid "plugins.pubIds.ark.recovery.success"
-msgstr "Propriedade confirmada! Seu acesso foi restaurado com sucesso para o NAAN {$naan}."
-
-msgid "plugins.pubIds.ark.recovery.domainMismatch"
-msgstr "O endereço registrado para este NAAN é '{$registered}', mas seu site atual é '{$current}'.\n\nPara corrigir, acesse o formulário da ARK Alliance e atualize seu NAAN para:\n{$target}\n\nApós atualizar, clique novamente em 'Verificar Propriedade'."
-
-msgid "plugins.pubIds.ark.validation.naanNotFound"
-msgstr "O NAAN {$naan} não está registrado na ARK Alliance. Registre-se em: https://forms.gle/2a8HQUNJRAcvq5UGA"
-
-msgid "plugins.pubIds.ark.validation.domainMismatch"
-msgstr "O domínio registrado para este NAAN é '{$registered}', mas seu site é '{$current}'. Para usar este NAAN, atualize seu cadastro na ARK Alliance."
-
-msgid "plugins.pubIds.ark.validation.telemetryFailed"
-msgstr "Não foi possível completar a validação. Tente novamente mais tarde."
-
-msgid "plugins.pubIds.ark.recovery.waitMessage"
-msgstr "Aguarde {$minutes} minutos antes de tentar novamente."
-
 msgid "plugins.pubIds.ark.validation.invalidNaan"
 msgstr "Formato de NAAN inválido. Use 'ark:12345' ou apenas o número."
 
 msgid "plugins.pubIds.ark.validation.naanNotFound"
-msgstr "O NAAN '{$naan}' não foi encontrado no registro da ARK Alliance. Registre-o em: https://forms.gle/2a8HQUNJRAcvq5UGA"
+msgstr "O NAAN '{$naan}' não está registrado na ARK Alliance. Registre-se em: https://forms.gle/2a8HQUNJRAcvq5UGA"
 
 msgid "plugins.pubIds.ark.validation.domainMismatch"
 msgstr "Este NAAN pertence ao domínio '{$registered}', mas seu site está em '{$current}'. Para usar este NAAN, atualize seu cadastro na ARK Alliance."
 
-msgid "plugins.pubIds.ark.validation.telemetryFailed"
-msgstr "Falha na comunicação com o servidor de telemetria. Tente novamente mais tarde."
+msgid "plugins.pubIds.ark.validation.serverUnavailable"
+msgstr "Servidor de validação temporariamente indisponível. Tente novamente mais tarde."
+
+msgid "plugins.pubIds.ark.validation.invalidResponse"
+msgstr "Resposta inválida do servidor de validação. Tente novamente."
+
+msgid "plugins.pubIds.ark.validation.rateLimit"
+msgstr "Muitas tentativas de validação. Você está temporariamente bloqueado."
+
+msgid "plugins.pubIds.ark.validation.domainMismatch"
+msgstr "Este NAAN não pertence ao seu domínio!"
+
+msgid "plugins.pubIds.ark.validation.notFound"
+msgstr "NAAN não encontrado no registro da ARK Alliance. Verifique se o NAAN está correto."
+
+msgid "plugins.pubIds.ark.validation.missingFields"
+msgstr "Campos obrigatórios não preenchidos: NAAN e domínio são necessários."
+
+msgid "plugins.pubIds.ark.validation.invalidFormat"
+msgstr "Formato de NAAN inválido. Use apenas números (ex: 16081)."
+
+msgid "plugins.pubIds.ark.validation.invalidDomain"
+msgstr "Formato de domínio inválido. Verifique se o domínio está correto."
+
+msgid "plugins.pubIds.ark.validation.methodNotAllowed"
+msgstr "Método de requisição não permitido."
+
+msgid "plugins.pubIds.ark.validation.error.generic"
+msgstr "Erro ao validar NAAN. Tente novamente."
+
+msgid "plugins.pubIds.ark.validation.minutesRemaining"
+msgstr "minutos restantes"
+
+msgid "plugins.pubIds.ark.validation.tryAgainAfter"
+msgstr "Tente novamente após:"

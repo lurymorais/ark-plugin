@@ -262,10 +262,10 @@ function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUr
     }
     $metadata['base_ark_url'] = 'https://n2t.net/ark:' . $naan . '/';
     
-    // Get ARK implementation date from journal settings (fixed date)
+    // Get ARK implementation date from plugin settings (fixed date)
     $stmt = $pdo->prepare("
-        SELECT setting_value FROM journal_settings
-        WHERE journal_id = ? AND setting_name = 'arkImplementationDate' AND (locale = '' OR locale IS NULL)
+        SELECT setting_value FROM plugin_settings
+        WHERE plugin_name = 'arkpubidplugin' AND context_id = ? AND setting_name = 'arkImplementationDate'
         LIMIT 1
     ");
     $stmt->execute([$contextId]);
@@ -438,7 +438,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
         <h1>ARK Resolver</h1>
         
         <div class="language-section language-pt">
-            <div class="language-label">PORTUGUES</div>
+            <div class="language-label">PORTUGUÊS</div>
             <h2>' . htmlspecialchars($titlePt) . '</h2>
             <p>' . str_replace('<strong>', '<span class="identifier">', str_replace('</strong>', '</span>', htmlspecialchars($messagePt))) . '</p>';
     
@@ -447,7 +447,7 @@ function showErrorPage($statusCode, $titleEn, $titlePt, $messageEn, $messagePt, 
     }
     
     echo '
-            <p><a href="' . htmlspecialchars($siteUrl) . '">Voltar para a pagina inicial</a></p>
+            <p><a href="' . htmlspecialchars($siteUrl) . '">Voltar para a página inicial</a></p>
         </div>
         
         <div class="language-section language-en">
@@ -482,54 +482,45 @@ if (empty($_GET['ark']) && empty($_GET['id'])) {
     showErrorPage(
         400,
         'Missing Parameter',
-        'Parametro Ausente',
+        'Parâmetro Ausente',
         'No ARK identifier was provided.',
         'Nenhum identificador ARK foi fornecido.',
-        'Expected usage: resolver.php?ark=CRL1234-ABCD or resolver.php?ark=CRL1234ABCD',
-        'Uso esperado: resolver.php?ark=CRL1234-ABCD ou resolver.php?ark=CRL1234ABCD'
+        'Expected usage: resolver.php?ark=CRL1234-ABCD',
+        'Uso esperado: resolver.php?ark=CRL1234-ABCD'
     );
 }
 
-$arkSuffix = $_GET['ark'] ?? $_GET['id'];
-$originalInput = $arkSuffix;
+$arkInput = $_GET['ark'] ?? $_GET['id'];
+$originalInput = $arkInput;
 
 // Detect inflection (function called without arguments)
 $inflection = getInflection();
 
 // Remove inflection suffixes from ARK value
+$arkSuffix = $arkInput;
 $arkSuffix = preg_replace('/\?info$/', '', $arkSuffix);
 $arkSuffix = preg_replace('/\.info$/', '', $arkSuffix);
 $arkSuffix = preg_replace('/\?\?$/', '', $arkSuffix);
 $arkSuffix = preg_replace('/\?$/', '', $arkSuffix);
 
-$originalInput = $arkSuffix;
+// Save the cleaned version for display
+$cleanedInput = $arkSuffix;
 
-// Clean ARK suffix (remove ark: prefix and shoulder)
+// ========== CLEAN THE SUFFIX ==========
+// Remove ark: prefix and NAAN if someone passed the full ARK directly
 $arkSuffix = preg_replace('/^ark:[0-9]+\//', '', $arkSuffix);
 $arkSuffix = preg_replace('/^[A-Z]+\//', '', $arkSuffix);
 
-// Length validation
-if (strlen($arkSuffix) < 4) {
+// Validate suffix format (letters, numbers, hyphens, underscores)
+if (!preg_match('/^[A-Za-z0-9\-_]{4,50}$/', $arkSuffix)) {
     showErrorPage(
         400,
         'Invalid ARK Format',
-        'Formato de ARK Invalido',
-        'The provided identifier is too short.',
-        'O identificador fornecido e muito curto.',
-        'You tried: ' . htmlspecialchars($originalInput) . '. Minimum length is 4 characters.',
-        'Voce tentou: ' . htmlspecialchars($originalInput) . '. O tamanho minimo e 4 caracteres.'
-    );
-}
-
-if (strlen($arkSuffix) > 50) {
-    showErrorPage(
-        400,
-        'Invalid ARK Format',
-        'Formato de ARK Invalido',
-        'The provided identifier is too long.',
-        'O identificador fornecido e muito longo.',
-        'You tried: ' . htmlspecialchars($originalInput) . '. Maximum length is 50 characters.',
-        'Voce tentou: ' . htmlspecialchars($originalInput) . '. O tamanho maximo e 50 caracteres.'
+        'Formato de ARK Inválido',
+        'The provided identifier does not match ARK format.',
+        'O identificador fornecido não corresponde ao formato ARK.',
+        'Expected format: CRL1234-ABCD. You tried: ' . htmlspecialchars($cleanedInput),
+        'Formato esperado: CRL1234-ABCD. Você tentou: ' . htmlspecialchars($cleanedInput)
     );
 }
 
@@ -556,17 +547,17 @@ try {
     $pdo = new PDO($dsn, $dbConfig['username'], $dbConfig['password']);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Try with and without hyphen (ARK NAAN format allows both)
+    $result = null;
+    $objectType = null; // 'publication' or 'issue'
+
+    // Try with and without hyphen (ARK format variations)
     $attempts = [$arkSuffix];
     if (strpos($arkSuffix, '-') === false && strlen($arkSuffix) >= 8) {
         $attempts[] = substr($arkSuffix, 0, -4) . '-' . substr($arkSuffix, -4);
     } elseif (strpos($arkSuffix, '-') !== false) {
         $attempts[] = str_replace('-', '', $arkSuffix);
     }
-    
-    $result = null;
-    $objectType = null; // 'publication' or 'issue'
-    
+
     // First, search in publications (articles)
     foreach ($attempts as $suffix) {
         $stmt = $pdo->prepare("
@@ -575,10 +566,10 @@ try {
             JOIN publications p ON ps.publication_id = p.publication_id
             JOIN submissions s ON p.submission_id = s.submission_id
             WHERE ps.setting_name = 'pub-id::ark' 
-            AND (ps.setting_value = ? OR ps.setting_value LIKE CONCAT('%', ?))
+            AND ps.setting_value LIKE CONCAT('%/', ?)
             LIMIT 1
         ");
-        $stmt->execute([$suffix, $suffix]);
+        $stmt->execute([$suffix]);
         
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $result = $row;
@@ -586,7 +577,7 @@ try {
             break;
         }
     }
-    
+
     // If not found in publications, search in issues
     if (!$result) {
         foreach ($attempts as $suffix) {
@@ -595,10 +586,10 @@ try {
                 FROM issue_settings is2
                 JOIN issues i ON is2.issue_id = i.issue_id
                 WHERE is2.setting_name = 'pub-id::ark' 
-                AND (is2.setting_value = ? OR is2.setting_value LIKE CONCAT('%', ?))
+                AND is2.setting_value LIKE CONCAT('%/', ?)
                 LIMIT 1
             ");
-            $stmt->execute([$suffix, $suffix]);
+            $stmt->execute([$suffix]);
             
             if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $result = $row;
@@ -608,15 +599,51 @@ try {
         }
     }
     
+    // ========== ADDITIONAL SECURITY: Verify the found ARK matches the expected NAAN ==========
+    if ($result) {
+        $stmt = $pdo->prepare("
+            SELECT setting_value FROM " . ($objectType === 'publication' ? 'publication_settings' : 'issue_settings') . "
+            WHERE " . ($objectType === 'publication' ? 'publication_id' : 'issue_id') . " = ?
+            AND setting_name = 'pub-id::ark'
+            LIMIT 1
+        ");
+        $stmt->execute([$result[$objectType === 'publication' ? 'publication_id' : 'issue_id']]);
+        $fullArkFromDb = $stmt->fetchColumn();
+        
+        // Extract NAAN from the found ARK
+        $foundNaan = '';
+        if (preg_match('/^ark:([0-9]+)\//', $fullArkFromDb, $matches)) {
+            $foundNaan = $matches[1];
+        }
+        
+        // Get the expected NAAN from the configured settings
+        $stmt = $pdo->prepare("
+            SELECT setting_value FROM journal_settings
+            WHERE journal_id = ? AND setting_name = 'arkPrefix'
+            AND locale = ''
+            LIMIT 1
+        ");
+        $stmt->execute([$result['context_id']]);
+        $expectedNaan = $stmt->fetchColumn();
+        $expectedNaan = preg_replace('/^ark:/', '', $expectedNaan);
+        $expectedNaan = preg_replace('/\/$/', '', $expectedNaan);
+        
+        // If the found NAAN doesn't match the expected NAAN, reject
+        if ($foundNaan !== $expectedNaan) {
+            $result = null;
+            $objectType = null;
+        }
+    }
+    
     if (!$result) {
         showErrorPage(
             404,
             'ARK Not Found',
-            'ARK Nao Encontrado',
+            'ARK Não Encontrado',
             'The identifier was not found in our database.',
-            'O identificador nao foi encontrado em nossa base de dados.',
-            'You tried: ' . htmlspecialchars($originalInput),
-            'Voce tentou: ' . htmlspecialchars($originalInput)
+            'O identificador não foi encontrado em nossa base de dados.',
+            'You tried: ' . htmlspecialchars($cleanedInput),
+            'Você tentou: ' . htmlspecialchars($cleanedInput)
         );
     }
     
@@ -629,9 +656,9 @@ try {
         showErrorPage(
             500,
             'Journal Error',
-            'Erro no Periodico',
+            'Erro no Periódico',
             'Could not identify the journal associated with this ARK.',
-            'Nao foi possivel identificar o periodico associado a este ARK.',
+            'Não foi possível identificar o periódico associado a este ARK.',
             'Contact the system administrator.',
             'Entre em contato com o administrador do sistema.'
         );
@@ -643,14 +670,14 @@ try {
     
     // Check if we need to return ERC metadata
     if ($inflection === 'brief' || $inflection === 'full') {
-        $fullArkResolverUrl = $siteBaseUrl . "/plugins/pubIds/ark/resolver.php?ark=" . urlencode($originalInput);
+        $fullArkResolverUrl = $siteBaseUrl . "/plugins/pubIds/ark/resolver.php?ark=" . urlencode($cleanedInput);
         
         if ($objectType === 'publication') {
             $metadata = getMetadataForERC(
                 $pdo, 
                 $result['publication_id'], 
                 $result['context_id'], 
-                $originalInput,
+                $arkSuffix,
                 $siteBaseUrl,
             );
         } else {
@@ -659,15 +686,15 @@ try {
                 $pdo, 
                 $result['issue_id'], 
                 $result['context_id'], 
-                $originalInput,
+                $arkSuffix,
                 $siteBaseUrl,
             );
         }
         
         if ($inflection === 'brief') {
-            outputBriefERC($metadata, $originalInput, $fullArkResolverUrl);
+            outputBriefERC($metadata, $arkSuffix, $fullArkResolverUrl);
         } else {
-            outputFullERC($metadata, $originalInput, $fullArkResolverUrl);
+            outputFullERC($metadata, $arkSuffix, $fullArkResolverUrl);
         }
         exit;
     }
@@ -705,7 +732,7 @@ try {
         'Database Error',
         'Erro no Banco de Dados',
         'Could not connect to the database.',
-        'Nao foi possivel conectar ao banco de dados.',
+        'Não foi possível conectar ao banco de dados.',
         'Error: ' . $e->getMessage(),
         'Erro: ' . $e->getMessage()
     );
@@ -845,8 +872,8 @@ function getMetadataForIssueERC($pdo, $issueId, $contextId, $arkSuffix, $baseUrl
     
     // SUPPORT_WHEN: Use implementation date from settings
     $stmt = $pdo->prepare("
-        SELECT setting_value FROM journal_settings
-        WHERE journal_id = ? AND setting_name = 'arkImplementationDate' AND (locale = '' OR locale IS NULL)
+        SELECT setting_value FROM plugin_settings
+        WHERE plugin_name = 'arkpubidplugin' AND context_id = ? AND setting_name = 'arkImplementationDate'
         LIMIT 1
     ");
     $stmt->execute([$contextId]);

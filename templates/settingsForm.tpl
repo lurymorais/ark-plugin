@@ -5,6 +5,10 @@
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *}
 
+{* ========== TRANSLATIONS FOR JAVASCRIPT ========== *}
+{assign var="validationDomainMismatch" value="plugins.pubIds.ark.validation.domainMismatch"|translate}
+{assign var="validationGenericError" value="plugins.pubIds.ark.validation.error.generic"|translate}
+
 <div id="description">{translate key="plugins.pubIds.ark.manager.settings.description"}</div>
 
 <script src="{$baseUrl}/plugins/pubIds/ark/js/ARKSettingsFormHandler.js"></script>
@@ -47,6 +51,29 @@
         {fbvFormSection}
             <p class="pkp_help">{translate key="plugins.pubIds.ark.manager.settings.arkPrefix.description"}</p>
             {fbvElement type="text" id="arkPrefix" name="arkPrefix" value=$arkPrefix required="true" label="plugins.pubIds.ark.manager.settings.arkPrefix" maxlength="40" size=$fbvStyles.size.MEDIUM}
+            
+            {* ========== NAAN TARGET CONFIGURATION WARNING ========== *}
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 15px; margin: 15px 0 0 0; border-radius: 4px;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 13px; color: #856404;">
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.title"}
+                </p>
+                <p style="margin: 0 0 8px 0; font-size: 12px; color: #856404;">
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.description"}
+                </p>
+                <div style="background: #fff; padding: 8px 10px; border-radius: 4px; font-family: monospace; font-size: 12px; word-break: break-all; border: 1px solid #e0e0e0;">
+                    {$baseUrl}/plugins/pubIds/ark/resolver.php?ark={literal}${value}{/literal}
+                </div>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #856404;">
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.help"}
+                    <a href="https://arks.org/" target="_blank" style="color: #006798; text-decoration: underline;">
+                        {translate key="plugins.pubIds.ark.manager.settings.naanTarget.link"}
+                    </a>
+                    {translate key="plugins.pubIds.ark.manager.settings.naanTarget.or"}
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSf_847hNXtLGikR-XeDy1uT1AKd24DpHnt5UQh2i8ORRu7u-w/viewform" target="_blank" style="color: #006798; text-decoration: underline;">
+                        {translate key="plugins.pubIds.ark.manager.settings.naanTarget.form"}
+                    </a>
+                </p>
+            </div>
         {/fbvFormSection}
     {/fbvFormArea}
 
@@ -112,70 +139,31 @@
         {/fbvFormSection}
     {/fbvFormArea}
 
-    {fbvFormArea id="telemetryArea" title="plugins.pubIds.ark.settings.telemetryLevel"}
+    {* ========== TELEMETRY (OPT-OUT) ========== *}
+    {fbvFormArea id="telemetryArea" title="plugins.pubIds.ark.manager.settings.telemetryEnabled"}
         {fbvFormSection}
-            <p class="pkp_help">{translate key="plugins.pubIds.ark.manager.settings.telemetryLevel.description"}</p>
-            
-            <div style="margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                <div style="margin-bottom: 10px;">
-                    <label style="font-weight: normal;">
-                        <input type="radio" name="telemetryLevel" value="restricted" {if $telemetryLevel != 'public'}checked="checked"{/if}>
-                        <span style="font-weight: bold;">{translate key="plugins.pubIds.ark.settings.telemetryLevel.restricted"}</span>
-                    </label>
-                    <div style="margin-left: 25px; font-size: 12px; color: #666;">
-                        {translate key="plugins.pubIds.ark.manager.settings.telemetryLevel.restricted.description"}
-                    </div>
-                </div>
-                
-                <div>
-                    <label style="font-weight: normal;">
-                        <input type="radio" name="telemetryLevel" value="public" {if $telemetryLevel == 'public'}checked="checked"{/if}>
-                        <span style="font-weight: bold;">{translate key="plugins.pubIds.ark.settings.telemetryLevel.public"}</span>
-                    </label>
-                    <div style="margin-left: 25px; font-size: 12px; color: #666;">
-                        {translate key="plugins.pubIds.ark.manager.settings.telemetryLevel.public.description"}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="pkp_helpers_alert pkp_helpers_alert--info" style="margin-top: 10px;">
-                {translate key="plugins.pubIds.ark.manager.settings.telemetryInfo"}
-            </div>
-        {/fbvFormSection}
-    {/fbvFormArea}
-
-    {fbvFormArea id="tokenRecoveryArea" title="plugins.pubIds.ark.recovery.title"}
-        {fbvFormSection}
-            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 20px; margin: 15px 0;">
-                <h4 style="color: #856404; margin-top: 0; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 20px;">🔒</span> 
-                    {translate key="plugins.pubIds.ark.recovery.securityArea"}
-                </h4>
-                
-                <p style="color: #856404; margin-bottom: 15px;">
-                    {translate key="plugins.pubIds.ark.recovery.securityNote"}
+            <div style="background: #e8f4f8; border-left: 4px solid #006798; padding: 15px; margin: 10px 0; border-radius: 4px;">
+                <p style="margin: 0 0 10px 0;">
+                    <strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.description"}</strong>
                 </p>
                 
-                <hr style="border-color: #ffeeba; margin: 15px 0;">
+                {fbvElement type="checkbox" label="plugins.pubIds.ark.manager.settings.telemetryEnabled" id="telemetryEnabled" name="telemetryEnabled" checked=$telemetryEnabled}
                 
-                <p><strong>{translate key="plugins.pubIds.ark.recovery.howItWorks"}</strong></p>
-                <ol style="margin: 10px 0 15px 20px; color: #333;">
-                    <li>{translate key="plugins.pubIds.ark.recovery.step1"}</li>
-                    <li>{translate key="plugins.pubIds.ark.recovery.step2"}</li>
-                    <li>{translate key="plugins.pubIds.ark.recovery.step3"}</li>
-                    <li>{translate key="plugins.pubIds.ark.recovery.step4"}</li>
-                </ol>
-                
-                <div style="background: #e8f4f8; border-left: 4px solid #006798; padding: 12px; margin: 15px 0; border-radius: 4px;">
-                    <p style="margin: 0; font-size: 13px;">
-                        <strong>{translate key="plugins.pubIds.ark.recovery.targetHintLabel"}</strong><br>
-                        <code style="word-break: break-all;">{$baseUrl}/plugins/pubIds/ark/resolver.php?ark={literal}${value}{/literal}</code>
+                <div style="margin-top: 10px; font-size: 13px; color: #555;">
+                    <p style="margin: 5px 0;">
+                        <strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.help"}</strong>
+                    </p>
+                    <ul style="margin: 5px 0 5px 20px; padding: 0; list-style: disc;">
+                        <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.naan"}</strong>: {$arkPrefix|escape}</li>
+                        <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.count"}</strong>: {$arkCount|escape}</li>
+                        <li><strong>{translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.data.version"}</strong>: {$pluginVersion|escape}</li>
+                    </ul>
+                    <p style="margin: 5px 0;">
+                        <a href="https://github.com/lurymorais/ark-plugin/blob/main/PRIVACY_POLICY.md" target="_blank">
+                            {translate key="plugins.pubIds.ark.manager.settings.telemetryEnabled.privacyLink"}
+                        </a>
                     </p>
                 </div>
-                
-                <button type="button" id="recoveryButton" class="pkp_button">
-                    {translate key="plugins.pubIds.ark.recovery.button"}
-                </button>
             </div>
         {/fbvFormSection}
     {/fbvFormArea}
@@ -183,75 +171,13 @@
     {literal}
 
     <script>
-    // Force telemetryLevel value to be sent in the form
+    // Ensure telemetryEnabled value is sent in the form
     $(document).ready(function() {
-        // Make sure the default value is sent
         $('form#arkSettingsForm').on('submit', function() {
-            var selectedLevel = $('input[name="telemetryLevel"]:checked').val();
-            if (!selectedLevel) {
-                $('input[name="telemetryLevel"][value="restricted"]').prop('checked', true);
-            }
+            var checked = $('#telemetryEnabled').is(':checked');
         });
     });
-    </script>
 
-    <script>
-        var lastRecoveryAttempt = 0;
-        var RECOVERY_COOLDOWN = 3600000;
-
-        $(document).ready(function() {
-            // Load timestamp of last server attempt
-            $.ajax({
-                url: 'https://revistacarnaubais.com.br/ark-telemetry/recovery.php?check=1',
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    if (data.lastAttempt && data.canAttempt === false) {
-                        var remaining = data.remainingMinutes;
-                        $('#recoveryButton').prop('disabled', true);
-                        $('#recoveryButton').text('Aguarde ' + remaining + ' minutos');
-                    }
-                }
-            });
-            
-            $('#recoveryButton').on('click', function() {
-                var $btn = $(this);
-                var now = Date.now();
-                
-                // Check local rate limit
-                if (lastRecoveryAttempt > 0 && (now - lastRecoveryAttempt) < RECOVERY_COOLDOWN) {
-                    var remaining = Math.ceil((RECOVERY_COOLDOWN - (now - lastRecoveryAttempt)) / 60000);
-                    alert('Aguarde ' + remaining + ' minutos antes de tentar novamente.');
-                    return;
-                }
-                
-                var originalText = $btn.text();
-                $btn.text('Verificando...').prop('disabled', true);
-                lastRecoveryAttempt = now;
-                
-                $.ajax({
-                    url: 'https://revistacarnaubais.com.br/ark-telemetry/recovery.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function(response) {
-                        $btn.text(originalText).prop('disabled', false);
-                        alert(response.content || response.message || 'Verificação concluída');
-                        
-                        if (response.status === true) {
-                            location.reload();
-                        }
-                    },
-                    error: function(xhr) {
-                        $btn.text(originalText).prop('disabled', false);
-                        var errorMsg = xhr.responseJSON?.content || 'Erro na verificação. Tente novamente.';
-                        alert(errorMsg);
-                    }
-                });
-            });
-        });
-    </script>
-
-    <script>
     (function() {
         var updateInterval = null;
         var ROTATION_INTERVAL = 5000;
@@ -443,91 +369,126 @@
     })();
     </script>
 
-    <script>
-        // Recovery button - with full diagnostics
-        $(document).ready(function() {
-            $('#recoveryButton').on('click', function() {
-                var $btn = $(this);
-                var originalText = $btn.text();
-                $btn.text('Verificando...').prop('disabled', true);
-                
-                var recoveryUrl = 'https://revistacarnaubais.com.br/ark-telemetry/recovery.php';
-                
-                $.ajax({
-                    url: recoveryUrl,
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function(response) {
-                        $btn.text(originalText).prop('disabled', false);
-                        
-                        // Display exact message returned by server
-                        var msg = response.content || response.message || 'Resposta sem mensagem';
-                        alert(msg);
-                        
-                        if (response.status === true) {
-                            location.reload();
-                        }
-                    },
-                    error: function(xhr) {
-                        $btn.text(originalText).prop('disabled', false);
-                        
-                        // Try to extract real error message
-                        var errorMsg = '';
-                        
-                        if (xhr.responseJSON) {
-                            errorMsg = xhr.responseJSON.content || xhr.responseJSON.message || JSON.stringify(xhr.responseJSON);
-                        } else if (xhr.responseText) {
-                            errorMsg = xhr.responseText.substring(0, 500);
-                        } else if (xhr.status === 0) {
-                            errorMsg = 'Não foi possível conectar ao servidor.';
-                        } else if (xhr.status === 404) {
-                            errorMsg = 'Endpoint não encontrado: ' + recoveryUrl;
-                        } else if (xhr.status === 500) {
-                            errorMsg = 'Erro interno no servidor.';
-                        } else {
-                            errorMsg = 'Erro HTTP ' + xhr.status + ': ' + xhr.statusText;
-                        }
-                        
-                        alert('Erro: ' + errorMsg);
-                    }
-                });
-            });
-        });
-    </script>
+    {/literal}
 
+    {* ========== NAAN VALIDATION (outside literal) ========== *}
+    {assign var="validationRateLimit" value="plugins.pubIds.ark.validation.rateLimit"|translate}
+    {assign var="validationDomainMismatch" value="plugins.pubIds.ark.validation.domainMismatch"|translate}
+    {assign var="validationNotFound" value="plugins.pubIds.ark.validation.notFound"|translate}
+    {assign var="validationMissingFields" value="plugins.pubIds.ark.validation.missingFields"|translate}
+    {assign var="validationInvalidFormat" value="plugins.pubIds.ark.validation.invalidFormat"|translate}
+    {assign var="validationInvalidDomain" value="plugins.pubIds.ark.validation.invalidDomain"|translate}
+    {assign var="validationMethodNotAllowed" value="plugins.pubIds.ark.validation.methodNotAllowed"|translate}
+    {assign var="validationGenericError" value="plugins.pubIds.ark.validation.error.generic"|translate}
+    {assign var="validationMinutesRemaining" value="plugins.pubIds.ark.validation.minutesRemaining"|translate}
+    {assign var="validationTryAgainAfter" value="plugins.pubIds.ark.validation.tryAgainAfter"|translate}
+    
     <script>
-// NAAN validation before submitting the form
-$(document).ready(function() {
-
-    $('#arkSettingsForm').on('submit', function(e) {
-        var naan = $('input[name="arkPrefix"]').val();
+    // NAAN validation before submitting the form
+    $(document).ready(function() {
+        // Translations from Smarty (processed server-side)
+        var translations = {
+            rateLimit: "{$validationRateLimit|escape:"javascript"}",
+            domainMismatch: "{$validationDomainMismatch|escape:"javascript"}",
+            notFound: "{$validationNotFound|escape:"javascript"}",
+            missingFields: "{$validationMissingFields|escape:"javascript"}",
+            invalidFormat: "{$validationInvalidFormat|escape:"javascript"}",
+            invalidDomain: "{$validationInvalidDomain|escape:"javascript"}",
+            methodNotAllowed: "{$validationMethodNotAllowed|escape:"javascript"}",
+            genericError: "{$validationGenericError|escape:"javascript"}",
+            minutesRemaining: "{$validationMinutesRemaining|escape:"javascript"}",
+            tryAgainAfter: "{$validationTryAgainAfter|escape:"javascript"}"
+        };
+                
+        function translateServerError(response) {
+            var error = response.error || '';
+            
+            // Map server errors to translations
+            var errorMap = {
+                'Too many validation attempts': translations.rateLimit,
+                'NAAN not found on n2t.net registry': translations.notFound,
+                'NAAN metadata incomplete': translations.notFound,
+                'NAAN belongs to different domain': translations.domainMismatch,
+                'Missing naan or domain': translations.missingFields,
+                'Invalid NAAN format': translations.invalidFormat,
+                'Invalid domain format': translations.invalidDomain,
+                'Method not allowed': translations.methodNotAllowed
+            };
+            
+            // Return translated message if found, otherwise generic error
+            return errorMap[error] || response.message || error || translations.genericError;
+        }
         
-        // Make AJAX request to validate NAAN before sending
-        $.ajax({
-            url: 'https://revistacarnaubais.com.br/ark-telemetry/validate-naan.php',
-            type: 'POST',
-            data: { naan: naan, domain: window.location.hostname },
-            dataType: 'json',
-            async: false, // Wait for response
-            success: function(response) {
-                if (response.valid !== true) {
-                    alert(response.message || 'Este NAAN não pertence ao seu domínio!');
+        $('#arkSettingsForm').on('submit', function(e) {
+            var naan = $('input[name="arkPrefix"]').val();
+            var $submitBtn = $(this).find('button[type="submit"]');
+            
+            // Disable button to prevent multiple submissions
+            $submitBtn.prop('disabled', true).text('Validating...');
+            
+            $.ajax({
+                url: 'https://revistacarnaubais.com.br/ark-telemetry/validate.php',
+                type: 'POST',
+                data: JSON.stringify({ naan: naan, domain: window.location.hostname }),
+                contentType: 'application/json',
+                dataType: 'json',
+                timeout: 15000,
+                success: function(response) {
+                    $submitBtn.prop('disabled', false).text('Save');
+                    
+                    if (response.valid === true) {
+                        // Valid NAAN - allow form submission
+                        return true;
+                    }
+                    
+                    // Translate server error message
+                    var userMessage = translateServerError(response);
+                    
+                    // Check if it's a rate limit error to add time info
+                    if (response.error === 'Too many validation attempts') {
+                        var waitMinutes = response.wait_minutes || 0;
+                        var waitSeconds = response.wait_seconds || 0;
+                        var now = new Date();
+                        var endTime = new Date(now.getTime() + (waitSeconds * 1000));
+                        
+                        // Build message with translations
+                        var message = userMessage + '\n\n';
+                        message += waitMinutes + ' ' + translations.minutesRemaining + '\n';
+                        message += translations.tryAgainAfter + ' ' + endTime.toLocaleTimeString();
+                        
+                        alert(message);
+                    } else {
+                        alert(userMessage);
+                    }
+                    
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     return false;
+                },
+                error: function(xhr, status) {
+                    $submitBtn.prop('disabled', false).text('Save');
+                    
+                    if (status === 'timeout') {
+                        alert('Validation server timeout. Please try again.');
+                    } else if (xhr.status === 429) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            var waitSeconds = response.wait_seconds || 60;
+                            var endTime = new Date(Date.now() + (waitSeconds * 1000));
+                            alert('Too many attempts. Try again after ' + endTime.toLocaleTimeString());
+                        } catch(e) {
+                            alert(translations.genericError);
+                        }
+                    } else {
+                        alert(translations.genericError);
+                    }
+                    e.preventDefault();
+                    return false;
                 }
-            },
-            error: function() {
-                alert('Erro ao validar NAAN. Tente novamente.');
-                e.preventDefault();
-                return false;
-            }
+            });
         });
     });
-});
-</script>
-
-    {/literal}
+    </script>
 
     {fbvFormArea id="arkPreviewArea" title="plugins.pubIds.ark.manager.settings.preview"}
         <div id="arkPreviewBox" style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; border-left: 4px solid #d00a6c;">
