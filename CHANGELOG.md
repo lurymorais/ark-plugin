@@ -5,6 +5,22 @@ All notable changes to the ARK Plugin for OJS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1.1] - 2026-07-27
+
+### Fixed
+- **FIXED: Tracking parameters breaking ARK resolution** - External services (Meta, Google, etc.) appending parameters like `fbclid` no longer cause 404 errors
+- **FIXED: URL-encoded characters handling** - `%3F` and malformed URLs with multiple `?` are now properly sanitized
+
+### Added
+- **ADDED: `cleanArkParameter()` function** - Extracts only the 'ark' parameter, removing any tracking parameters automatically
+- **ADDED: Multilingual title support** - All available translations of article titles are now displayed in ERC metadata
+- **ADDED: Full locale codes in ERC** - Uses complete locale codes (`pt_BR`, `en`, `es_ES`, etc.) directly from OJS.
+- **ADDED: Title + Subtitle formatting** - Subtitles are now properly concatenated with ` : ` separator in ERC metadata
+
+### Changed
+- **CHANGED: ERC `what` field format** - Now displays all language variants: `[pt_BR] Title : Subtitle | [en] Title : Subtitle`
+- **CHANGED: Language ordering** - Primary locale always appears first, followed by other locales
+
 ## [3.1.1.0] - 2026-07-24
 
 ### Fixed
