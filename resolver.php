@@ -284,7 +284,6 @@ function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUr
         WHERE a.publication_id = ?
         GROUP BY a.author_id, a.seq
         ORDER BY a.seq
-        LIMIT 3
     ");
     $stmt->execute([$publicationId]);
     $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -300,7 +299,7 @@ function getMetadataForERC($pdo, $publicationId, $contextId, $arkSuffix, $baseUr
     // Fallback: if no names found, try to get from email
     if (empty($authorNames)) {
         $stmt = $pdo->prepare("
-            SELECT email FROM authors WHERE publication_id = ? ORDER BY seq LIMIT 3
+            SELECT email FROM authors WHERE publication_id = ? ORDER BY seq
         ");
         $stmt->execute([$publicationId]);
         $emails = $stmt->fetchAll(PDO::FETCH_ASSOC);
