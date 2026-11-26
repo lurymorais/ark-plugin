@@ -9,7 +9,7 @@
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  */
 
-use PKP\plugins\PKPPubIdPlugin;
+use APP\plugins\PubIdPlugin;
 use PKP\config\Config;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\RemoteActionConfirmationModal;
@@ -18,7 +18,7 @@ use APP\core\Application;
 use Illuminate\Support\Facades\DB;
 use PKP\components\forms\FieldText;
 
-class ARKPubIdPlugin extends PKPPubIdPlugin
+class ARKPubIdPlugin extends PubIdPlugin
 {
     private static $registered = false;
     
